@@ -385,6 +385,7 @@
         </div>
     </div>
 
+    <script src="../../assets/js/auth-session.js"></script>
     <script src="../../assets/js/script.js"></script>
     <script src="../../assets/js/materials-manager.js"></script>
     <script>
@@ -393,17 +394,17 @@
         const sortSelect = document.getElementById('sortSelect');
         const searchInput = document.getElementById('searchInput');
         const grid = document.getElementById('infographicsGrid');
-        const cards = Array.from(document.querySelectorAll('.infographic-card'));
 
         function filterInfographics() {
             const subject = subjectFilter.value.toLowerCase();
             const type = typeFilter.value.toLowerCase();
             const search = searchInput.value.toLowerCase();
+            const cards = Array.from(grid.querySelectorAll('.infographic-card'));
 
             cards.forEach(card => {
-                const cardSubject = card.dataset.subject;
-                const cardType = card.dataset.type;
-                const cardTitle = card.dataset.title;
+                const cardSubject = (card.dataset.subject || '').toLowerCase();
+                const cardType = (card.dataset.type || '').toLowerCase();
+                const cardTitle = (card.dataset.title || '').toLowerCase();
 
                 const matchSubject = subject === 'all subjects' || cardSubject === subject;
                 const matchType = type === 'all types' || cardType === type.split(' ')[0];
@@ -415,6 +416,7 @@
 
         function sortInfographics() {
             const sortValue = sortSelect.value;
+            const cards = Array.from(grid.querySelectorAll('.infographic-card'));
             const sortedCards = [...cards];
 
             if (sortValue === 'A-Z') {
@@ -487,6 +489,5 @@
         // Initialize dynamic materials loading for infographics
         initMaterialsPage('notes'); // Infographics stored as 'notes' type
     </script>
-<script src="../../assets/js/auth-session.js"></script>
 </body>
 </html>

@@ -49,18 +49,27 @@ const detectTypeAndFormat = (file, link) => {
     return { type: 'notes', format: 'link' };
 };
 
-// GET /api/materials - Paginated fetch from PostgreSQL DB (Filtered by user)
+// GET /api/materials - Paginated fetch from PostgreSQL DB
 router.get('/', async (req, res) => {
     try {
-        const { type, page = 1, limit = 5 } = req.query;
-        const userId = req.user.user_id;
+        const { type, page = 1, limit = 5, user_id } = req.query;
         
-        let queryStr = 'SELECT * FROM materials WHERE user_id = $1';
-        const binds = [userId];
+        let queryStr = 'SELECT * FROM materials';
+        const binds = [];
+        const conditions = [];
         
         if (type) {
-            queryStr += ' AND type = $2';
+            conditions.push(`type = $${binds.length + 1}`);
             binds.push(type);
+        }
+        
+        if (user_id) {
+            conditions.push(`user_id = $${binds.length + 1}`);
+            binds.push(user_id);
+        }
+        
+        if (conditions.length > 0) {
+            queryStr += ' WHERE ' + conditions.join(' AND ');
         }
         
         queryStr += ' ORDER BY created_at DESC';
@@ -77,7 +86,9 @@ router.get('/', async (req, res) => {
             thumbnail: row.thumbnail,
             downloadCount: row.download_count || 0,
             author: row.author || 'Anonymous',
-            createdAt: row.created_at
+            createdAt: row.created_at,
+            subject: row.subject,
+            difficulty: row.difficulty
         }));
         
         // Pagination
@@ -103,7 +114,7 @@ router.get('/', async (req, res) => {
 router.post('/', upload.single('file'), async (req, res) => {
     try {
         console.log('📥 Received request body:', req.body);
-        const { title, description, link, type: manualType, author } = req.body;
+        const { title, description, link, type: manualType, author, subject, difficulty } = req.body;
         const file = req.file;
         console.log('👤 Author value:', author);
         
@@ -118,8 +129,8 @@ router.post('/', upload.single('file'), async (req, res) => {
         const filePath = file ? `/uploads/${type === 'textbook' ? 'textbooks' : type === 'video' ? 'videos' : type === 'audio' ? 'audio' : 'notes'}/${file.filename}` : null;
         
         await db.query(
-            `INSERT INTO materials (id, title, description, type, format, file_path, link, thumbnail, download_count, created_at, author, user_id)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, $10, $11)`,
+            `INSERT INTO materials (id, title, description, type, format, file_path, link, thumbnail, download_count, created_at, author, user_id, subject, difficulty)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, $10, $11, $12, $13)`,
             [
                 id,
                 title.trim(),
@@ -131,7 +142,9 @@ router.post('/', upload.single('file'), async (req, res) => {
                 null,
                 0,
                 (author || 'Anonymous').trim(),
-                req.user.user_id
+                req.user.user_id,
+                subject || null,
+                difficulty || null
             ]
         );
         
@@ -146,7 +159,9 @@ router.post('/', upload.single('file'), async (req, res) => {
             thumbnail: null,
             downloadCount: 0,
             author: (author || 'Anonymous').trim(),
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            subject: subject || null,
+            difficulty: difficulty || null
         });
     } catch (error) {
         console.error('Database error:', error);
