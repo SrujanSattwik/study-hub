@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test Helper - StudyHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 1.75rem;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        .status.logged-in {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .status.logged-out {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.75rem;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .info {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+        .info strong {
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Auth Test Helper</h1>
+        <p class="subtitle">Simulate login/logout for development testing</p>
+        
+        <div id="status" class="status"></div>
+        
+        <button class="btn btn-primary" onclick="mockLogin()">
+            ✓ Mock Login (Create User)
+        </button>
+        
+        <button class="btn btn-danger" onclick="logout()">
+            ✗ Logout (Clear Session)
+        </button>
+        
+        <button class="btn btn-secondary" onclick="goToGetStarted()">
+            → Go to Get Started
+        </button>
+        
+        <button class="btn btn-secondary" onclick="goToScheduler()">
+            → Go to Syllabus Scheduler
+        </button>
+        
+        <div class="info">
+            <strong>How to use:</strong><br>
+            1. Click "Mock Login" to simulate authentication<br>
+            2. Navigate to Get Started or Scheduler<br>
+            3. Click "Logout" to test login protection<br>
+            4. Try accessing pages without login
+        </div>
+    </div>
+
+    <script src="../assets/js/user-manager.js"></script>
+    <script>
+        function updateStatus() {
+            const statusEl = document.getElementById('status');
+            const isLoggedIn = UserManager.isUserLoggedIn();
+            const userId = UserManager.getCurrentUserId();
+            
+            if (isLoggedIn) {
+                statusEl.className = 'status logged-in';
+                statusEl.innerHTML = `✓ Logged In<br><small>User ID: ${userId}</small>`;
+            } else {
+                statusEl.className = 'status logged-out';
+                statusEl.innerHTML = '✗ Not Logged In<br><small>Click "Mock Login" to continue</small>';
+            }
+        }
+        
+        function mockLogin() {
+            const userId = 'user_' + Date.now();
+            UserManager.loginUser(userId);
+            const user = UserManager.getCurrentUser();
+            user.profile.name = 'Test Student';
+            UserManager.updateCurrentUser(user);
+            alert('✓ Logged in successfully!\nUser ID: ' + userId);
+            updateStatus();
+        }
+        
+        function logout() {
+            if (confirm('Logout and clear session?')) {
+                UserManager.logoutUser();
+                alert('✓ Logged out successfully!');
+                updateStatus();
+            }
+        }
+        
+        function goToGetStarted() {
+            window.location.href = 'get-started.html';
+        }
+        
+        function goToScheduler() {
+            window.location.href = 'get-started/syllabus-scheduler.html';
+        }
+        
+        // Initialize
+        updateStatus();
+    </script>
+</body>
+</html>

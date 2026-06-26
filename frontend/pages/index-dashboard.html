@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="src/css/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/profile-dropdown.css">
+
+    <title>StudyClub - Dashboard</title>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>StudyClub</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="../index.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="index-dashboard.html" class="nav-item active">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="get-started.html" class="nav-item">
+                        <i class="fas fa-rocket"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="materials.html" class="nav-item">
+                        <i class="fas fa-book"></i>
+                        <span>Materials</span>
+                    </a>
+                    <a href="resources.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="community.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </a>
+                    
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="get-started/study-bite.html" class="nav-item">
+                        <i class="fas fa-fire"></i>
+                        <span>StudyBite</span>
+                    </a>
+                    <a href="get-started/cheat-note-creation.html" class="nav-item">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Cheat Notes</span>
+                    </a>
+                    
+                    <a href="KnowNook.html" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        <span>KnowNook AI</span>
+                    </a>
+                    <a href="get-started/syllabus-scheduler.html" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Syllabus Scheduler</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="about.html" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search materials, notes, or ask AI...">
+                </div>
+            </div>
+            
+            <div class="topbar-right">
+                
+                <a href="subscription.html"><button class="topbar-icon-btn" >
+                    <i class="fas fa-cog"></i>
+                </button>
+                </a>
+                <div class="topbar-right" id="auth-container">
+                    <a href="login.html" class="btn btn-primary btn-sm login-btn">Login</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1 class="page-title">Welcome back, Srujan! 👋</h1>
+                    <p class="page-subtitle">Here's what's happening with your learning journey today</p>
+                </div>
+
+                <!-- KPI Stats -->
+                <div class="grid grid-cols-4 mb-xl">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon primary">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">24</div>
+                        <div class="stat-card-label">Materials Accessed</div>
+                        <div class="stat-card-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12% from last week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon secondary">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">18.5h</div>
+                        <div class="stat-card-label">Study Time</div>
+                        <div class="stat-card-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8% from last week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon accent">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">87%</div>
+                        <div class="stat-card-label">Completion Rate</div>
+                        <div class="stat-card-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>5% from last week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon success">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value">12</div>
+                        <div class="stat-card-label">Day Streak</div>
+                        <div class="stat-card-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Keep it up!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="grid grid-cols-3 mb-xl">
+                    <!-- Recent Activity -->
+                    <div class="card" style="grid-column: span 2;">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Activity</h2>
+                            <a href="#" class="text-primary text-sm font-semibold">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Type</th>
+                                            <th>Progress</th>
+                                            <th>Last Accessed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center gap-sm">
+                                                    <i class="fas fa-book text-primary"></i>
+                                                    <span class="font-medium">Data Structures</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge primary">Textbook</span></td>
+                                            <td>
+                                                <div class="flex items-center gap-sm">
+                                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 999px; overflow: hidden;">
+                                                        <div style="width: 75%; height: 100%; background: var(--primary);"></div>
+                                                    </div>
+                                                    <span class="text-sm text-gray-600">75%</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-gray-600">2 hours ago</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center gap-sm">
+                                                    <i class="fas fa-video text-secondary"></i>
+                                                    <span class="font-medium">Machine Learning Basics</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge secondary">Video</span></td>
+                                            <td>
+                                                <div class="flex items-center gap-sm">
+                                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 999px; overflow: hidden;">
+                                                        <div style="width: 45%; height: 100%; background: var(--secondary);"></div>
+                                                    </div>
+                                                    <span class="text-sm text-gray-600">45%</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-gray-600">5 hours ago</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center gap-sm">
+                                                    <i class="fas fa-file-alt text-accent"></i>
+                                                    <span class="font-medium">Calculus Notes</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge accent">Notes</span></td>
+                                            <td>
+                                                <div class="flex items-center gap-sm">
+                                                    <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: 999px; overflow: hidden;">
+                                                        <div style="width: 100%; height: 100%; background: var(--accent);"></div>
+                                                    </div>
+                                                    <span class="text-sm text-gray-600">100%</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-gray-600">1 day ago</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Quick Actions</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="flex" style="flex-direction: column; gap: var(--spacing-md);">
+                                <button class="btn btn-outline" onclick="location.href='KnowNook.html'">
+                                    <i class="fas fa-robot"></i>
+                                    <span>Ask AI Assistant</span>
+                                </button>
+                                <button class="btn btn-outline" onclick="location.href='materials.html'">
+                                    <i class="fas fa-upload"></i>
+                                    <span>Upload Material</span>
+                                </button>
+                                <button class="btn btn-outline" onclick="location.href='get-started/study-bite.html'">
+                                    <i class="fas fa-fire"></i>
+                                    <span>Daily Challenge</span>
+                                </button>
+                                <button class="btn btn-outline" onclick="location.href='get-started/syllabus-scheduler.html'">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <span>Schedule Task</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights Panel -->
+                <div class="card mb-xl">
+                    <div class="card-header">
+                        <div class="flex items-center gap-sm">
+                            <i class="fas fa-lightbulb" style="color: var(--warning);"></i>
+                            <h2 class="card-title">AI Insights & Recommendations</h2>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-cols-3">
+                            <div style="padding: var(--spacing-lg); border-right: 1px solid var(--gray-200);">
+                                <div class="flex items-center gap-sm mb-md">
+                                    <i class="fas fa-chart-line" style="color: var(--success); font-size: 1.5rem;"></i>
+                                    <h3 class="font-semibold text-gray-900">Study Pattern</h3>
+                                </div>
+                                <p class="text-sm text-gray-600">You're most productive between 9 AM - 12 PM. Consider scheduling complex topics during this time.</p>
+                            </div>
+                            <div style="padding: var(--spacing-lg); border-right: 1px solid var(--gray-200);">
+                                <div class="flex items-center gap-sm mb-md">
+                                    <i class="fas fa-exclamation-triangle" style="color: var(--warning); font-size: 1.5rem;"></i>
+                                    <h3 class="font-semibold text-gray-900">Attention Needed</h3>
+                                </div>
+                                <p class="text-sm text-gray-600">You have 3 pending assignments due this week. Review your syllabus scheduler to stay on track.</p>
+                            </div>
+                            <div style="padding: var(--spacing-lg);">
+                                <div class="flex items-center gap-sm mb-md">
+                                    <i class="fas fa-trophy" style="color: var(--accent); font-size: 1.5rem;"></i>
+                                    <h3 class="font-semibold text-gray-900">Achievement</h3>
+                                </div>
+                                <p class="text-sm text-gray-600">Great job! You've maintained a 12-day study streak. Keep up the momentum!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay"></div>
+
+    <!-- Scripts -->
+     <script src="../assets/js/auth-manager.js"></script>
+    <script src="src/js/layout.js"></script>
+</body>
+</html>

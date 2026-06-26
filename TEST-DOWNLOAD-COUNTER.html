@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Test Download Counter</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-card { border: 1px solid #ccc; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        button { padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #4f46e5; }
+        .counter { font-size: 18px; margin: 10px 0; color: #6366f1; font-weight: bold; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Download Counter Test</h1>
+    <p>Open browser console (F12) to see detailed logs</p>
+    
+    <div id="test-materials"></div>
+    
+    <div class="log" id="log"></div>
+
+    <script>
+        const API_URL = 'http://localhost:5500/api/materials';
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${message}<br>`;
+            console.log(message);
+        }
+        
+        async function loadTestMaterials() {
+            log('Loading materials...');
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                const materials = data.materials || data;
+                log(`Loaded ${materials.length} materials`);
+                
+                const container = document.getElementById('test-materials');
+                container.innerHTML = materials.map(material => `
+                    <div class="test-card">
+                        <h3>${material.title}</h3>
+                        <p>ID: ${material.id}</p>
+                        <div class="counter" id="count-${material.id}"><i class="fas fa-download"></i> ${material.downloadCount || 0}</div>
+                        <button onclick="testDownload('${material.id}')">Test Download</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                log('ERROR: ' + error.message);
+            }
+        }
+        
+        async function testDownload(materialId) {
+            log(`Testing download for material: ${materialId}`);
+            try {
+                const response = await fetch(`${API_URL}/${materialId}/download`, {
+                    method: 'POST'
+                });
+                
+                log(`Response status: ${response.status}`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log(`ERROR: ${errorText}`);
+                    return;
+                }
+                
+                const data = await response.json();
+                log(`SUCCESS: New count = ${data.downloadCount}`);
+                
+                const countElement = document.getElementById(`count-${materialId}`);
+                if (countElement) {
+                    countElement.innerHTML = `<i class="fas fa-download"></i> ${data.downloadCount}`;
+                    log(`UI updated successfully`);
+                } else {
+                    log(`ERROR: Count element not found`);
+                }
+            } catch (error) {
+                log(`ERROR: ${error.message}`);
+            }
+        }
+        
+        // Load materials on page load
+        loadTestMaterials();
+    </script>
+</body>
+</html>

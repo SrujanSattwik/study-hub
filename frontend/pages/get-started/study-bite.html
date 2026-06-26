@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../src/css/dashboard.css">
+    <title>StudyBite - StudyClub</title>
+    <style>
+        .studybite-section {
+            background: white;
+            padding: 80px 0;
+        }
+        .challenge-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .challenge-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .challenge-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        #start-challenge:hover {
+         background: linear-gradient(135deg, #667eea, #764ba2);
+         color: white;
+         padding: 15px 30px;
+         border-radius: 30px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+           transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .page-header {
+            padding: 40px 0;
+            text-align: center;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>StudyClub</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="../../index.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="../index-dashboard.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="../get-started.html" class="nav-item active">
+                        <i class="fas fa-rocket"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="../materials.html" class="nav-item">
+                        <i class="fas fa-book"></i>
+                        <span>Materials</span>
+                    </a>
+                    <a href="../resources.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="../community.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </a>
+                    <a href="../about.html" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="study-bite.html" class="nav-item active">
+                        <i class="fas fa-fire"></i>
+                        <span>StudyBite</span>
+                    </a>
+                    <a href="cheat-note-creation.html" class="nav-item">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Cheat Notes</span>
+                    </a>
+                    <a href="../KnowNook.html" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        <span>KnowNook AI</span>
+                    </a>
+                    <a href="syllabus-scheduler.html" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Syllabus Scheduler</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search materials, notes, or ask AI...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="topbar-user" onclick="ModalManager.open('userModal')">
+                    <div class="topbar-user-avatar">SS</div>
+                    <div class="topbar-user-info">
+                        <div class="topbar-user-name">Srujan Sattwik</div>
+                        <div class="topbar-user-role">Student</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-container">
+                <section class="page-header">
+                    <div class="container">
+                        <div class="header-content">
+                            <h1 class="page-title">StudyBite</h1>
+                            <p class="page-subtitle">5-minute daily challenges for niche academic topics.</p>
+                        </div>
+                    </div>
+                </section>
+                <section class="studybite-section">
+                    <div class="container">
+                        <h2 class="section-title">Today's Challenge</h2>
+                        <div class="challenge-card">
+                            <h3>Topic of the Day</h3>
+                            <p>A short description of the challenge will go here.</p>
+                            <button class="btn btn-primary" id="start-challenge">Start Challenge</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <div class="sidebar-overlay"></div>
+    <script src="../src/js/layout.js"></script>
+</body>
+</html>

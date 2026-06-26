@@ -1,0 +1,50 @@
+[
+  {
+    "id": "880b696b-6428-4970-bd40-133877e36f79",
+    "title": "Intermediate Algebra 2e math",
+    "description": "test book",
+    "type": "textbook",
+    "format": "link",
+    "filePath": null,
+    "link": "https://www.infobooks.org/pdfview/intermediate-algebra-2e-lynn-marecek-219/",
+    "thumbnail": null,
+    "downloadCount": 3,
+    "createdAt": "2025-12-21T11:01:17.029Z"
+  },
+  {
+    "id": "49651734-10de-4606-b4eb-4ec677ef08df",
+    "title": "html by Apna School",
+    "description": "youtube class",
+    "type": "video",
+    "format": "link",
+    "filePath": null,
+    "link": "https://youtu.be/HcOc7P5BMi4?si=DlH-W64JJEQedkkZ",
+    "thumbnail": null,
+    "downloadCount": 1,
+    "createdAt": "2025-12-21T14:21:32.057Z"
+  },
+  {
+    "id": "e827efd1-881c-4da8-aa29-de288e30f059",
+    "title": "MATH class X",
+    "description": "",
+    "type": "textbook",
+    "format": "link",
+    "filePath": null,
+    "link": "https://ncert.nic.in/textbook/pdf/jemh1dd.zip",
+    "thumbnail": null,
+    "downloadCount": 2,
+    "createdAt": "2025-12-21T14:38:50.424Z"
+  },
+  {
+    "id": "b4d1b881-54d6-4d62-ba9b-66038a813464",
+    "title": "srujan",
+    "description": "jd",
+    "type": "textbook",
+    "format": "link",
+    "filePath": null,
+    "link": "https://ncert.nic.in/textbook/pdf/iesc1dd.zip",
+    "thumbnail": null,
+    "downloadCount": 1,
+    "createdAt": "2025-12-23T13:21:25.221Z"
+  }
+]

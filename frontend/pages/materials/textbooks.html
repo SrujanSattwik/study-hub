@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textbooks - StudyClub</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../src/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>StudyClub</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="../../index.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="../index-dashboard.html" class="nav-item">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="../get-started.html" class="nav-item">
+                        <i class="fas fa-rocket"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="../materials.html" class="nav-item active">
+                        <i class="fas fa-book"></i>
+                        <span>Materials</span>
+                    </a>
+                    <a href="../resources.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="../community.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </a>
+                    <a href="../about.html" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Materials</div>
+                    <a href="textbooks.html" class="nav-item active">
+                        <i class="fas fa-book"></i>
+                        <span>Textbooks</span>
+                    </a>
+                    <a href="video-lectures.html" class="nav-item">
+                        <i class="fas fa-video"></i>
+                        <span>Video Lectures</span>
+                    </a>
+                    <a href="study-notes.html" class="nav-item">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Study Notes</span>
+                    </a>
+                    <a href="practice-tests.html" class="nav-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>practice Tests</span>
+                    </a>
+                     <a href="infographics.html" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Infographics</span>
+                    </a>
+                     <a href="audio-content.html" class="nav-item">
+                        <i class="fas fa-podcast"></i>
+                        <span>Audio Content</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search materials, notes, or ask AI...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="topbar-user">
+                    <div class="topbar-user-avatar">SS</div>
+                    <div class="topbar-user-info">
+                        <div class="topbar-user-name">Student</div>
+                        <div class="topbar-user-role">Learner</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+        <section class="page-header">
+            <div class="container">
+                <a href="../materials.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Materials</a>
+                <div class="header-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h1 class="page-title">Textbooks</h1>
+                <p class="page-subtitle">Comprehensive textbooks covering all major subjects and academic levels</p>
+                
+                <div class="header-actions">
+                    <div class="search-box-header">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search textbooks by title, author, or subject...">
+                    </div>
+                    <button class="btn btn-primary upload-btn" onclick="openUploadModal()">
+                        <i class="fas fa-upload"></i> Upload Textbook
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="materials-section">
+            <div class="container">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-filter"></i> Filter by:</label>
+                        <select class="filter-select">
+                            <option>All Subjects</option>
+                            <option>Mathematics</option>
+                            <option>Science</option>
+                            <option>Engineering</option>
+                            <option>Business</option>
+                            <option>Arts</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Levels</option>
+                            <option>High School</option>
+                            <option>Undergraduate</option>
+                            <option>Graduate</option>
+                        </select>
+                    </div>
+                    <div class="sort-group">
+                        <label><i class="fas fa-sort"></i> Sort:</label>
+                        <select class="filter-select">
+                            <option>Most Popular</option>
+                            <option>Newest First</option>
+                            <option>A-Z</option>
+                            <option>Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="materials-list" id="materialsList">
+                    <!-- Dynamic textbook items will be loaded here -->
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../about.html">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Upload Textbook</h3>
+                <button class="close-modal" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="upload-mode-toggle" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; justify-content: center;">
+                <button type="button" class="mode-btn active" onclick="switchUploadMode('file')" id="fileModeBtn">
+                    <i class="fas fa-file-upload"></i> Upload File
+                </button>
+                <button type="button" class="mode-btn" onclick="switchUploadMode('link')" id="linkModeBtn">
+                    <i class="fas fa-link"></i> Upload with Link
+                </button>
+            </div>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label>Book Title *</label>
+                    <input type="text" name="title" required placeholder="Enter book title">
+                </div>
+                <div class="form-group">
+                    <label>Author *</label>
+                    <input type="text" name="author" required placeholder="Enter author name">
+                </div>
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select name="subject" required>
+                        <option value="">Select subject</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="business">Business</option>
+                        <option value="arts">Arts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Level *</label>
+                    <select name="level" required>
+                        <option value="">Select level</option>
+                        <option value="high-school">High School</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Brief description of the textbook"></textarea>
+                </div>
+                <div class="form-group" id="fileUploadSection">
+                    <label>Upload File (PDF) *</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="fileInput" accept=".pdf" hidden>
+                        <label for="fileInput" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click to upload or drag and drop</span>
+                            <small>PDF files only (Max 50MB)</small>
+                        </label>
+                        <div id="fileName" class="file-name"></div>
+                    </div>
+                </div>
+                <div class="form-group" id="linkUploadSection" style="display: none;">
+                    <label>File Link *</label>
+                    <input type="url" name="link" id="fileLink" placeholder="Enter file URL (Google Drive, Dropbox, etc.)">
+                    <label style="margin-top: 1rem;">Thumbnail/Cover Image *</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="thumbnailInput" accept="image/*" hidden>
+                        <label for="thumbnailInput" class="file-upload-label">
+                            <i class="fas fa-image"></i>
+                            <span>Upload thumbnail/cover image</span>
+                            <small>JPG, PNG (Max 5MB)</small>
+                        </label>
+                        <div id="thumbnailName" class="file-name"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Request to Upload Textbook
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../assets/js/script.js"></script>
+    <script src="../src/js/layout.js"></script>
+    <script src="../../assets/js/materials-manager.js"></script>
+    <script>
+        // Filter functionality
+        const subjectFilter = document.querySelectorAll('.filter-select')[0];
+        const levelFilter = document.querySelectorAll('.filter-select')[1];
+        const sortSelect = document.querySelectorAll('.filter-select')[2];
+        const searchInput = document.getElementById('searchInput');
+        const materialsList = document.getElementById('materialsList');
+        const items = Array.from(document.querySelectorAll('.material-item'));
+
+        function filterMaterials() {
+            const subject = subjectFilter.value.toLowerCase();
+            const level = levelFilter.value.toLowerCase();
+            const search = searchInput.value.toLowerCase();
+
+            items.forEach(item => {
+                const itemSubject = item.dataset.subject;
+                const itemLevel = item.dataset.level;
+                const itemTitle = item.dataset.title;
+                const itemAuthor = item.dataset.author;
+
+                const matchSubject = subject === 'all subjects' || itemSubject === subject;
+                const matchLevel = level === 'all levels' || itemLevel === level;
+                const matchSearch = search === '' || itemTitle.includes(search) || itemAuthor.includes(search);
+
+                if (matchSubject && matchLevel && matchSearch) {
+                    item.style.display = 'grid';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function sortMaterials() {
+            const sortValue = sortSelect.value;
+            const sortedItems = [...items];
+
+            if (sortValue === 'A-Z') {
+                sortedItems.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+            } else if (sortValue === 'Newest First') {
+                sortedItems.reverse();
+            }
+
+            sortedItems.forEach(item => materialsList.appendChild(item));
+        }
+
+        subjectFilter.addEventListener('change', filterMaterials);
+        levelFilter.addEventListener('change', filterMaterials);
+        searchInput.addEventListener('input', filterMaterials);
+        sortSelect.addEventListener('change', sortMaterials);
+
+        // Upload modal
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        document.getElementById('uploadModal').addEventListener('click', (e) => {
+            if (e.target.id === 'uploadModal') closeUploadModal();
+        });
+
+        function switchUploadMode(mode) {
+            const fileSection = document.getElementById('fileUploadSection');
+            const linkSection = document.getElementById('linkUploadSection');
+            const fileModeBtn = document.getElementById('fileModeBtn');
+            const linkModeBtn = document.getElementById('linkModeBtn');
+            const fileInput = document.getElementById('fileInput');
+            const fileLink = document.getElementById('fileLink');
+
+            if (mode === 'file') {
+                fileSection.style.display = 'block';
+                linkSection.style.display = 'none';
+                fileModeBtn.classList.add('active');
+                linkModeBtn.classList.remove('active');
+                fileInput.required = true;
+                fileLink.required = false;
+            } else {
+                fileSection.style.display = 'none';
+                linkSection.style.display = 'block';
+                fileModeBtn.classList.remove('active');
+                linkModeBtn.classList.add('active');
+                fileInput.required = false;
+                fileLink.required = true;
+            }
+        }
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        document.getElementById('thumbnailInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('thumbnailName').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        // REMOVED: Duplicate submit handler - now handled by materials-manager.js
+        // Initialize dynamic materials loading
+        initMaterialsPage('textbook');
+    </script>
+</body>
+</html>

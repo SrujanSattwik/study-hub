@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../src/css/dashboard.css">
+    <title>MindMesh - StudyClub</title>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../../index.html" class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>StudyClub</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="../../index.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="../index-dashboard.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="../get-started.html" class="nav-item active">
+                        <i class="fas fa-rocket"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="../materials.html" class="nav-item">
+                        <i class="fas fa-book"></i>
+                        <span>Materials</span>
+                    </a>
+                    <a href="../resources.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="../community.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </a>
+                    <a href="../about.html" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="study-bite.html" class="nav-item">
+                        <i class="fas fa-fire"></i>
+                        <span>StudyBite</span>
+                    </a>
+                    <a href="cheat-note-creation.html" class="nav-item">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Cheat Notes</span>
+                    </a>
+                    <a href="../KnowNook.html" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        <span>KnowNook AI</span>
+                    </a>
+                    <a href="syllabus-scheduler.html" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Syllabus Scheduler</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search materials, notes, or ask AI...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="topbar-user" onclick="ModalManager.open('userModal')">
+                    <div class="topbar-user-avatar">SS</div>
+                    <div class="topbar-user-info">
+                        <div class="topbar-user-name">Srujan Sattwik</div>
+                        <div class="topbar-user-role">Student</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="content-container">
+                <section class="page-header" style="text-align: center; padding: 40px 0;">
+                    <div class="container">
+                        <h1 class="page-title">MindMesh</h1>
+                        <p class="page-subtitle">Visual brainstorming and concept mapping - Coming Soon</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay"></div>
+
+    <script src="../src/js/layout.js"></script>
+</body>
+</html>

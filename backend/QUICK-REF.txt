@@ -1,0 +1,52 @@
+╔════════════════════════════════════════════════════════════╗
+║         StudyHub Backend - Quick Reference                 ║
+╚════════════════════════════════════════════════════════════╝
+
+🚀 START SERVER
+   cd backend
+   npm start
+   
+   OR double-click: start.bat
+
+📡 SERVER RUNS ON
+   http://localhost:3001
+
+🔌 ALL ENDPOINTS AVAILABLE
+   ✅ POST /auth/send-otp
+   ✅ POST /auth/verify-otp-signup
+   ✅ GET  /api/materials
+   ✅ POST /api/materials
+   ✅ POST /api/materials/:id/download
+   ✅ POST /api/ask
+   ✅ GET  /uploads/*
+
+📁 FILE STRUCTURE
+   backend/
+   ├── server.js          ← Main server (all services)
+   ├── package.json       ← All dependencies
+   ├── .env              ← Email config
+   ├── db/oracle.js      ← Database connection
+   ├── routes/           ← API routes
+   │   └── materials.js
+   └── uploads/          ← Uploaded files
+       ├── audio/
+       ├── notes/
+       ├── textbooks/
+       └── videos/
+
+⚙️ ENVIRONMENT VARIABLES (.env)
+   MAIL_USER=studyhub.sevices@gmail.com
+   MAIL_PASS=gygo dtcu rvxn uthu
+   PORT=3001
+
+🎯 KEY CHANGES
+   • Single server instead of two
+   • One npm start command
+   • All on port 3001
+   • Unified file structure
+
+📚 MORE INFO
+   • START-HERE.md - Quick start guide
+   • REORGANIZATION-COMPLETE.md - Full details
+
+═══════════════════════════════════════════════════════════

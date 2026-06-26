@@ -1,0 +1,47 @@
+<!-- Universal Upload Form Template - Copy this to ALL material pages -->
+<form class="upload-form" id="uploadForm">
+    <div class="form-group">
+        <label>Title *</label>
+        <input type="text" name="title" required placeholder="Enter title">
+    </div>
+    <div class="form-group">
+        <label>Author/Instructor *</label>
+        <input type="text" name="author" required placeholder="Enter author/instructor name">
+    </div>
+    <div class="form-group">
+        <label>Subject *</label>
+        <select name="subject" required>
+            <option value="">Select subject</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="science">Science</option>
+            <option value="engineering">Engineering</option>
+            <option value="business">Business</option>
+            <option value="arts">Arts</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="3" placeholder="Brief description"></textarea>
+    </div>
+    <div class="form-group" id="fileUploadSection">
+        <label>Upload File *</label>
+        <div class="file-upload-area">
+            <input type="file" name="file" id="fileInput" accept="*" hidden>
+            <label for="fileInput" class="file-upload-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Click to upload or drag and drop</span>
+                <small>All file types accepted (Max 500MB)</small>
+            </label>
+            <div id="fileName" class="file-name"></div>
+        </div>
+    </div>
+    <div class="form-group" id="linkUploadSection" style="display: none;">
+        <label>File Link *</label>
+        <input type="url" name="link" id="fileLink" placeholder="Enter file URL">
+        <label style="margin-top: 1rem;">Thumbnail URL (optional)</label>
+        <input type="url" name="thumbnail" placeholder="Enter thumbnail URL">
+    </div>
+    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+        <i class="fas fa-upload"></i> Upload Material
+    </button>
+</form>

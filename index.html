@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>StudyClub - Your Learning Sanctuary</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active">Home</a></li>
+                <li><a href="KnowNook.html#chat" class="nav-link ai-logo" title="AI Assistant"><i class="fas fa-robot"></i></a></li>
+                <li><a href="get-started.html" class="nav-link">Get Started</a></li>
+                <li><a href="materials.html" class="nav-link">Materials</a></li>
+                <li><a href="resources.html" class="nav-link">Resources</a></li>
+                <li><a href="community.html" class="nav-link">Community</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="login.html" class="nav-link btn-login" onclick="openLoginModal(); return false;">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Your Learning Journey
+                        <span class="gradient-text">Starts Here</span>
+                    </h1>
+                    <p class="hero-description">
+                        Discover a peaceful space designed for focused learning. 
+                        Join thousands of students who have found their perfect study environment.
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="get-started-btn" onclick="location.href='get-started.html'">Get Started</button>
+                        <button class="btn btn-secondary">Learn More</button>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="floating-card card-1" onclick="location.href='materials.html'">
+                        <i class="fas fa-book"></i>
+                        <span>Study Materials</span>
+                    </div>
+                    <div class="floating-card card-2" onclick="location.href='community.html'">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </div>
+                    <div class="floating-card card-3" onclick="location.href='#stats'">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Progress</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Why Choose StudyClub?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>Focused Learning</h3>
+                        <p>Distraction-free environment designed to help you concentrate and retain information better.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Flexible Schedule</h3>
+                        <p>Study at your own pace with 24/7 access to all learning materials and resources.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Safe Environment</h3>
+                        <p>Your privacy and security are our top priorities. Learn with confidence.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3>Track Progress</h3>
+                        <p>Monitor your learning journey with detailed analytics and achievement tracking.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h3>StudyBite</h3>
+                        <p>5-minute daily challenges for niche academic topics, stored locally or in a lightweight JSON structure.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>KnowNook</h3>
+                        <p>Crowdsourced Q&A section with Gemini API integration for instant doubt resolution.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h3>StudySync</h3>
+                        <p>Real-time group study planner with shared calendars and resource pools, using local storage for solo users or lightweight Firebase for group syncing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h3>MindMesh</h3>
+                        <p>Visual brainstorming tool using a canvas-based library (like p5.js) for concept mapping.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <h3>Cheat Note Creation</h3>
+                        <p>Simple note-taking tool for quick, shareable study notes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3>Timetable Creation</h3>
+                        <p>Drag-and-drop timetable builder for individual or group schedules.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3>Syllabus Scheduler</h3>
+                        <p>Tool to break down syllabi into tasks, integrated with the study planner.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <!-- Quick Start Guide -->
+        <section class="quick-start">
+            <div class="container">
+                <h2 class="section-title">Quick Start Guide</h2>
+                <div class="guide-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Choose Your Tools</h3>
+                        <p>Browse through our features and select the tools that match your learning style and goals.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Set Up Your Profile</h3>
+                        <p>Create your account and customize your study preferences and schedule.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Start Learning</h3>
+                        <p>Begin your learning journey with our comprehensive suite of study tools.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section class="stats" id="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="10000">0</div>
+                        <div class="stat-label">Active Students</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="500">0</div>
+                        <div class="stat-label">Groups Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="95">0</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="24">0</div>
+                        <div class="stat-label">Hours Support</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+
+    <!-- Login Modal -->
+    <div class="login-modal-overlay" id="loginModal">
+        <div class="login-modal-card">
+            <button class="close-login-modal" onclick="closeLoginModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue your learning journey</p>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email address" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="login-btn">
+                    <span>Sign In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <div class="divider"><span>or</span></div>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i>
+                    <span>Continue with Google</span>
+                </button>
+                <button class="social-btn github">
+                    <i class="fab fa-github"></i>
+                    <span>Continue with GitHub</span>
+                </button>
+            </div>
+            <div class="signup-link">
+                <p>Don't have an account? <a href="#" onclick="switchToSignup(); return false;">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Paste this just before </body> -->
+<script>
+(function(){
+  // Smooth easing animation (runs with requestAnimationFrame)
+  function animateCounter(el, target, duration) {
+    target = Number(target) || 0;
+    const startTime = performance.now();
+
+    function easeOutQuad(t){ return t * (2 - t); } // smooth end
+    function frame(now){
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const value = Math.floor(easeOutQuad(progress) * target);
+      el.textContent = value;
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = target; // ensure exact final value
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // Trigger animation for all stat-number elements (only once)
+  function triggerStats() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+      if (stat.dataset.animated === 'true') return; // already animated
+      const target = parseInt(stat.getAttribute('data-target'), 10) || 0;
+      stat.textContent = '0';
+      animateCounter(stat, target, 1800); // duration in ms
+      stat.dataset.animated = 'true';
+    });
+  }
+
+  // Setup observer or fallback
+  document.addEventListener('DOMContentLoaded', function () {
+    const statsSection = document.querySelector('.stats');
+    if (!statsSection) return;
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            triggerStats();
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -10% 0px'
+      });
+      observer.observe(statsSection);
+    } else {
+      // Fallback for old browsers: trigger on scroll when in view
+      function onScroll() {
+        const rect = statsSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.85) {
+          triggerStats();
+          window.removeEventListener('scroll', onScroll);
+        }
+      }
+      window.addEventListener('scroll', onScroll);
+      onScroll(); // check immediately in case already visible
+    }
+  });
+})();
+</script>
+
+
+
+</body>
+</html>

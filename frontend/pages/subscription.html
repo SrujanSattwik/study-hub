@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>StudyClub - Your Learning Sanctuary</title>
+    <title>Subscription Plans - StudyClub</title>
+    <style>
+        .pricing-section { padding: 90px 20px; max-width: 1200px; margin: 0 auto; margin-top: 25px; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px; }
+        .pricing-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        .pricing-card.featured { border: 3px solid #6366f1; transform: scale(1.05); }
+        .pricing-card h3 { font-size: 1.8rem; margin-bottom: 10px; }
+        .pricing-card .price { font-size: 2.5rem; font-weight: bold; color: #6366f1; margin: 20px 0; }
+        .pricing-card .price span { font-size: 1rem; color: #666; }
+        .pricing-card ul { list-style: none; padding: 0; margin: 30px 0; text-align: left; }
+        .pricing-card ul li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .pricing-card ul li i { color: #10b981; margin-right: 10px; }
+        .btn-subscribe { width: 100%; padding: 15px; background: #6366f1; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .btn-subscribe:hover { background: #4f46e5; }
+        .btn-subscribe.current { background: #10b981; }
+        .badge { position: absolute; top: 20px; right: 20px; background: #6366f1; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; }
+        .manage-account { max-width: 800px; margin: 60px auto; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .manage-account h2 { margin-bottom: 30px; color: #333; }
+        .account-info { display: grid; gap: 20px; margin-bottom: 30px; }
+        .info-row { display: flex; justify-content: space-between; padding: 15px; background: #f9fafb; border-radius: 8px; }
+        .info-row label { font-weight: 600; color: #666; }
+        .info-row span { color: #333; }
+        .account-actions { display: grid; gap: 15px; margin-top: 30px; }
+        .action-btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+        .action-btn.primary { background: #6366f1; color: white; }
+        .action-btn.primary:hover { background: #4f46e5; }
+        .action-btn.danger { background: #ef4444; color: white; }
+        .action-btn.danger:hover { background: #dc2626; }
+        .action-btn.secondary { background: #f3f4f6; color: #333; }
+        .action-btn.secondary:hover { background: #e5e7eb; }
+    </style>
+</head>
+<body>
+    
+     <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="btn btn-secondary">home</a></li>
+                <li><a href="pages/about.html" class="nav-link">About</a></li>
+                <li><a href="pages/login.html" class="nav-link btn-login" onclick="openLoginModal(); return false;">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="pricing-section">
+        <h1 style="text-align:center;">Choose Your Plan</h1>
+        <p style="text-align:center;color:#666;margin-top:10px;">Upgrade anytime to unlock more features</p>
+        
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Free</h3>
+                <div class="price">Rs 0/-<span>/month</span></div>
+                <ul>
+                    <li><i class="fas fa-check"></i> 10 AI queries per month</li>
+                    <li><i class="fas fa-check"></i> 5 material downloads</li>
+                    <li><i class="fas fa-check"></i> Basic features</li>
+                    <li><i class="fas fa-check"></i> Community access</li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('free')">Current Plan</button>
+            </div>
+            
+            <div class="pricing-card featured">
+                <span class="badge">POPULAR</span>
+                <h3>Pro</h3>
+                <div class="price">Rs 29/-<span>/month</span></div>
+                <ul>
+                    <li><i class="fas fa-check"></i> 500 AI queries per month</li>
+                    <li><i class="fas fa-check"></i> 50 material downloads</li>
+                    <li><i class="fas fa-check"></i> All features</li>
+                    <li><i class="fas fa-check"></i> Priority support</li>
+                    <li><i class="fas fa-check"></i> Ad-free experience</li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('pro')">Upgrade to Pro</button>
+            </div>
+            
+            <div class="pricing-card">
+                <h3>Ultimate</h3>
+                <div class="price">Rs 79/-<span>/month</span></div>
+                <ul>
+                    <li><i class="fas fa-check"></i> Unlimited AI queries</li>
+                    <li><i class="fas fa-check"></i> Unlimited downloads</li>
+                    <li><i class="fas fa-check"></i> All features</li>
+                    <li><i class="fas fa-check"></i> 24/7 support</li>
+                    <li><i class="fas fa-check"></i> Early access to new features</li>
+                    <li><i class="fas fa-check"></i> Custom study plans</li>
+                </ul>
+                <button class="btn-subscribe" onclick="selectPlan('ultimate')">Upgrade to Ultimate</button>
+            </div>
+        </div>
+    </div>
+    <div class="manage-account">
+        <h2><i class="fas fa-user-cog"></i> Manage Account</h2>
+        <div class="account-info">
+            <div class="info-row">
+                <label><i class="fas fa-user"></i> Username:</label>
+                <span id="account-username">-</span>
+            </div>
+            <div class="info-row">
+                <label><i class="fas fa-envelope"></i> Email:</label>
+                <span id="account-email">-</span>
+            </div>
+            <div class="info-row">
+                <label><i class="fas fa-crown"></i> Current Plan:</label>
+                <span id="account-plan">-</span>
+            </div>
+            <div class="info-row">
+                <label><i class="fas fa-calendar"></i> Member Since:</label>
+                <span id="account-date">-</span>
+            </div>
+        </div>
+        <div class="account-actions">
+            <button class="action-btn secondary" onclick="editProfile()"><i class="fas fa-edit"></i> Edit Profile</button>
+            <button class="action-btn secondary" onclick="changePassword()"><i class="fas fa-key"></i> Change Password</button>
+            <button class="action-btn primary" onclick="manageSubscription()"><i class="fas fa-credit-card"></i> Manage Subscription</button>
+            <button class="action-btn danger" onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete Account</button>
+        </div>
+    </div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        function selectPlan(plan) {
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (user.subscription === plan) {
+                alert('You are already on this plan!');
+                return;
+            }
+            
+            if (confirm(`Upgrade to ${plan.toUpperCase()} plan?`)) {
+                // In real app, integrate payment gateway here
+                user.subscription = plan;
+                setCurrentUser(user);
+                alert('Plan upgraded successfully!');
+                location.reload();
+            }
+        }
+        
+        function editProfile() {
+            const user = getCurrentUser();
+            const newUsername = prompt('Enter new username:', user.username);
+            if (newUsername && newUsername.trim()) {
+                user.username = newUsername.trim();
+                setCurrentUser(user);
+                alert('Profile updated!');
+                location.reload();
+            }
+        }
+        
+        function changePassword() {
+            const oldPass = prompt('Enter current password:');
+            const user = getCurrentUser();
+            if (oldPass === user.password) {
+                const newPass = prompt('Enter new password:');
+                if (newPass && newPass.length >= 6) {
+                    user.password = newPass;
+                    setCurrentUser(user);
+                    alert('Password changed successfully!');
+                } else {
+                    alert('Password must be at least 6 characters!');
+                }
+            } else {
+                alert('Incorrect password!');
+            }
+        }
+        
+        function manageSubscription() {
+            document.querySelector('.pricing-section').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function deleteAccount() {
+            if (confirm('Are you sure? This action cannot be undone!')) {
+                if (confirm('Final confirmation: Delete your account permanently?')) {
+                    localStorage.removeItem('currentUser');
+                    alert('Account deleted successfully!');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+        
+        // Update UI based on current plan
+        window.onload = () => {
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('account-username').textContent = user.username;
+                document.getElementById('account-email').textContent = user.email;
+                document.getElementById('account-plan').textContent = user.subscription.toUpperCase();
+                document.getElementById('account-date').textContent = new Date().toLocaleDateString();
+                
+                const buttons = document.querySelectorAll('.btn-subscribe');
+                buttons.forEach(btn => {
+                    const plan = btn.onclick.toString().match(/'(\w+)'/)[1];
+                    if (plan === user.subscription) {
+                        btn.textContent = 'Current Plan';
+                        btn.className = 'btn-subscribe current';
+                        btn.onclick = null;
+                    }
+                });
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+</body>
+</html>

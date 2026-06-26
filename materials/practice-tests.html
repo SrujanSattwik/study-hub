@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Tests - StudyClub</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../KnowNook.html#chat" class="nav-link ai-logo" title="AI Assistant"><i class="fas fa-robot"></i></a></li>
+                <li><a href="../get-started.html" class="nav-link">Get Started</a></li>
+                <li><a href="../materials.html" class="nav-link active">Materials</a></li>
+                <li><a href="../resources.html" class="nav-link">Resources</a></li>
+                <li><a href="../community.html" class="nav-link">Community</a></li>
+                <li><a href="../about.html" class="nav-link">About</a></li>
+                <li><a href="../login.html" class="nav-link btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <a href="../materials.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Materials</a>
+                <div class="header-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h1 class="page-title">Practice Tests</h1>
+                <p class="page-subtitle">Mock exams and practice questions with detailed solutions</p>
+                
+                <div class="header-actions">
+                    <div class="search-box-header">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search tests by subject, topic, or difficulty...">
+                    </div>
+                    <button class="btn btn-primary upload-btn" onclick="openUploadModal()">
+                        <i class="fas fa-upload"></i> Upload Test
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="materials-section">
+            <div class="container">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-filter"></i> Filter by:</label>
+                        <select class="filter-select">
+                            <option>All Subjects</option>
+                            <option>Mathematics</option>
+                            <option>Science</option>
+                            <option>Engineering</option>
+                            <option>Business</option>
+                            <option>Arts</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Difficulty</option>
+                            <option>Easy</option>
+                            <option>Medium</option>
+                            <option>Hard</option>
+                        </select>
+                    </div>
+                    <div class="sort-group">
+                        <label><i class="fas fa-sort"></i> Sort:</label>
+                        <select class="filter-select">
+                            <option>Most Popular</option>
+                            <option>Newest First</option>
+                            <option>A-Z</option>
+                            <option>Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="materials-list" id="materialsList">
+                    <div class="material-item" data-subject="mathematics" data-level="easy" data-title="calculus practice test 1" data-author="studyclub">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Calculus Practice Test 1</h3>
+                            <p class="material-author">by StudyClub</p>
+                            <p class="material-description">Comprehensive calculus test covering derivatives, integrals, and applications with detailed solutions.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.9</span>
+                                <span><i class="fas fa-download"></i> 15k</span>
+                                <span><i class="fas fa-question"></i> 50 questions</span>
+                                <span><i class="fas fa-clock"></i> 90 min</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-pen"></i> Start Test</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="science" data-level="medium" data-title="physics mechanics mock exam" data-author="exam prep">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Physics Mechanics Mock Exam</h3>
+                            <p class="material-author">by Exam Prep</p>
+                            <p class="material-description">Full-length physics exam covering kinematics, dynamics, energy, and momentum.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.8</span>
+                                <span><i class="fas fa-download"></i> 12k</span>
+                                <span><i class="fas fa-question"></i> 40 questions</span>
+                                <span><i class="fas fa-clock"></i> 120 min</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-pen"></i> Start Test</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="engineering" data-level="hard" data-title="data structures algorithms test" data-author="coding academy">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Data Structures & Algorithms Test</h3>
+                            <p class="material-author">by Coding Academy</p>
+                            <p class="material-description">Advanced test on sorting, searching, trees, graphs, and dynamic programming.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.7</span>
+                                <span><i class="fas fa-download"></i> 18k</span>
+                                <span><i class="fas fa-question"></i> 60 questions</span>
+                                <span><i class="fas fa-clock"></i> 150 min</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-pen"></i> Start Test</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="business" data-level="easy" data-title="economics fundamentals quiz" data-author="business school">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Economics Fundamentals Quiz</h3>
+                            <p class="material-author">by Business School</p>
+                            <p class="material-description">Test your knowledge of microeconomics, macroeconomics, and market principles.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.6</span>
+                                <span><i class="fas fa-download"></i> 9k</span>
+                                <span><i class="fas fa-question"></i> 30 questions</span>
+                                <span><i class="fas fa-clock"></i> 60 min</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-pen"></i> Start Test</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="science" data-level="medium" data-title="organic chemistry practice exam" data-author="chem masters">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Organic Chemistry Practice Exam</h3>
+                            <p class="material-author">by Chem Masters</p>
+                            <p class="material-description">Comprehensive test on reactions, mechanisms, synthesis, and spectroscopy.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.8</span>
+                                <span><i class="fas fa-download"></i> 11k</span>
+                                <span><i class="fas fa-question"></i> 45 questions</span>
+                                <span><i class="fas fa-clock"></i> 100 min</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-pen"></i> Start Test</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../about.html">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Upload Modal -->\n    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Upload Practice Test</h3>
+                <button class="close-modal" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label>Test Title *</label>
+                    <input type="text" required placeholder="Enter test title">
+                </div>
+                <div class="form-group">
+                    <label>Author *</label>
+                    <input type="text" required placeholder="Enter author name">
+                </div>
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select required>
+                        <option value="">Select subject</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="business">Business</option>
+                        <option value="arts">Arts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea rows="3" placeholder="Brief description of the test"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload File (PDF) *</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="fileInput" accept=".pdf" hidden>
+                        <label for="fileInput" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click to upload test file</span>
+                            <small>PDF files only (Max 20MB)</small>
+                        </label>
+                        <div id="fileName" class="file-name"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Request to Upload Test
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        const subjectFilter = document.querySelectorAll('.filter-select')[0];
+        const levelFilter = document.querySelectorAll('.filter-select')[1];
+        const sortSelect = document.querySelectorAll('.filter-select')[2];
+        const searchInput = document.getElementById('searchInput');
+        const materialsList = document.getElementById('materialsList');
+        const items = Array.from(document.querySelectorAll('.material-item'));
+
+        function filterMaterials() {
+            const subject = subjectFilter.value.toLowerCase();
+            const level = levelFilter.value.toLowerCase();
+            const search = searchInput.value.toLowerCase();
+
+            items.forEach(item => {
+                const itemSubject = item.dataset.subject;
+                const itemLevel = item.dataset.level;
+                const itemTitle = item.dataset.title;
+                const itemAuthor = item.dataset.author;
+
+                const matchSubject = subject === 'all subjects' || itemSubject === subject;
+                const matchLevel = level.includes('all') || itemLevel === level.split(' ')[0].toLowerCase();
+                const matchSearch = search === '' || itemTitle.includes(search) || itemAuthor.includes(search);
+
+                item.style.display = (matchSubject && matchLevel && matchSearch) ? 'grid' : 'none';
+            });
+        }
+
+        function sortMaterials() {
+            const sortValue = sortSelect.value;
+            const sortedItems = [...items];
+
+            if (sortValue === 'A-Z') {
+                sortedItems.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+            } else if (sortValue === 'Newest First') {
+                sortedItems.reverse();
+            }
+
+            sortedItems.forEach(item => materialsList.appendChild(item));
+        }
+
+        subjectFilter.addEventListener('change', filterMaterials);
+        levelFilter.addEventListener('change', filterMaterials);
+        searchInput.addEventListener('input', filterMaterials);
+        sortSelect.addEventListener('change', sortMaterials);
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        document.getElementById('uploadModal').addEventListener('click', (e) => {
+            if (e.target.id === 'uploadModal') closeUploadModal();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Test uploaded successfully!');
+            closeUploadModal();
+            e.target.reset();
+            document.getElementById('fileName').textContent = '';
+        });
+    </script>
+</body>
+</html>

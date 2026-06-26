@@ -1,0 +1,19 @@
+{
+  "name": "studyhub-backend",
+  "version": "1.0.0",
+  "main": "auth-server.js",
+  "scripts": {
+    "start": "node auth-server.js",
+    "dev": "nodemon auth-server.js"
+  },
+  "dependencies": {
+    "oracledb": "^6.10.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "bcrypt": "^5.1.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

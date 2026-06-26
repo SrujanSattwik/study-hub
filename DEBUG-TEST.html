@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - Materials API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px 5px; cursor: pointer; background: #6366f1; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #4f46e5; }
+        .result { background: #f3f4f6; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        input, select { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Materials API Debug Test</h1>
+    
+    <h2>Step 1: Test Server Connection</h2>
+    <button onclick="testConnection()">Test Connection</button>
+    <div id="connection-result" class="result"></div>
+
+    <h2>Step 2: Get All Materials</h2>
+    <button onclick="getMaterials()">Get Materials</button>
+    <div id="get-result" class="result"></div>
+
+    <h2>Step 3: Add Test Material</h2>
+    <label>Title:</label>
+    <input type="text" id="test-title" value="Test Book">
+    
+    <label>Link:</label>
+    <input type="text" id="test-link" value="https://google.com">
+    
+    <label>Category:</label>
+    <select id="test-category">
+        <option>Textbooks</option>
+        <option>Video Lectures</option>
+        <option>Study Notes</option>
+    </select>
+    
+    <button onclick="addMaterial()">Add Material</button>
+    <div id="add-result" class="result"></div>
+
+    <h2>Step 4: Get Materials Again</h2>
+    <button onclick="getMaterials()">Refresh Materials</button>
+
+    <script>
+        const API_URL = 'http://localhost:5500/api/materials';
+
+        async function testConnection() {
+            const result = document.getElementById('connection-result');
+            result.textContent = 'Testing connection...';
+            result.className = 'result';
+            
+            try {
+                const response = await fetch(API_URL);
+                if (response.ok) {
+                    result.textContent = '✅ SUCCESS! Server is running and responding.';
+                    result.className = 'result success';
+                } else {
+                    result.textContent = `❌ Server responded with error: ${response.status}`;
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                result.textContent = `❌ ERROR: Cannot connect to server.\n\nMake sure:\n1. Server is running (node server.js)\n2. Server is on port 5500\n\nError: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        async function getMaterials() {
+            const result = document.getElementById('get-result');
+            result.textContent = 'Fetching materials...';
+            result.className = 'result';
+            
+            try {
+                const response = await fetch(API_URL);
+                const materials = await response.json();
+                
+                if (materials.length === 0) {
+                    result.textContent = '📭 No materials found. Database is empty.';
+                    result.className = 'result';
+                } else {
+                    result.textContent = `✅ Found ${materials.length} material(s):\n\n${JSON.stringify(materials, null, 2)}`;
+                    result.className = 'result success';
+                }
+            } catch (error) {
+                result.textContent = `❌ ERROR: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        async function addMaterial() {
+            const result = document.getElementById('add-result');
+            result.textContent = 'Adding material...';
+            result.className = 'result';
+            
+            const data = {
+                title: document.getElementById('test-title').value,
+                description: 'Test description',
+                category: document.getElementById('test-category').value,
+                author: 'Test User',
+                difficulty: 'Easy',
+                tags: 'test, demo',
+                thumbnailUrl: '',
+                link: document.getElementById('test-link').value
+            };
+
+            console.log('Sending:', data);
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to add material');
+                }
+
+                const newMaterial = await response.json();
+                result.textContent = `✅ SUCCESS! Material added:\n\n${JSON.stringify(newMaterial, null, 2)}`;
+                result.className = 'result success';
+                
+                // Auto-refresh materials list
+                setTimeout(() => getMaterials(), 500);
+            } catch (error) {
+                result.textContent = `❌ ERROR: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Auto-test connection on load
+        window.onload = () => {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

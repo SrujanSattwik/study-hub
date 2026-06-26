@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Lectures - StudyClub</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../KnowNook.html#chat" class="nav-link ai-logo" title="AI Assistant"><i class="fas fa-robot"></i></a></li>
+                <li><a href="../get-started.html" class="nav-link">Get Started</a></li>
+                <li><a href="../materials.html" class="nav-link active">Materials</a></li>
+                <li><a href="../resources.html" class="nav-link">Resources</a></li>
+                <li><a href="../community.html" class="nav-link">Community</a></li>
+                <li><a href="../about.html" class="nav-link">About</a></li>
+                <li><a href="../login.html" class="nav-link btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <a href="../materials.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Materials</a>
+                <div class="header-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h1 class="page-title">Video Lectures</h1>
+                <p class="page-subtitle">High-quality video content from expert educators and professors</p>
+                
+                <div class="header-actions">
+                    <div class="search-box-header">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search videos by title, instructor, or topic...">
+                    </div>
+                    <button class="btn btn-primary upload-btn" onclick="openUploadModal()">
+                        <i class="fas fa-upload"></i> Upload Video
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="materials-section">
+            <div class="container">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-filter"></i> Filter by:</label>
+                        <select class="filter-select">
+                            <option>All Subjects</option>
+                            <option>Mathematics</option>
+                            <option>Science</option>
+                            <option>Engineering</option>
+                            <option>Business</option>
+                            <option>Arts</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Durations</option>
+                            <option>Short (< 30 min)</option>
+                            <option>Medium (30-60 min)</option>
+                            <option>Long (> 60 min)</option>
+                        </select>
+                    </div>
+                    <div class="sort-group">
+                        <label><i class="fas fa-sort"></i> Sort:</label>
+                        <select class="filter-select">
+                            <option>Most Popular</option>
+                            <option>Newest First</option>
+                            <option>A-Z</option>
+                            <option>Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="materials-list" id="materialsList">
+                    <div class="material-item" data-subject="mathematics" data-level="short" data-title="linear algebra complete course" data-author="mit opencourseware">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Linear Algebra - Complete Course</h3>
+                            <p class="material-author">by MIT OpenCourseWare</p>
+                            <p class="material-description">Comprehensive linear algebra course covering vector spaces, matrices, eigenvalues, and applications.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.9</span>
+                                <span><i class="fas fa-eye"></i> 250k views</span>
+                                <span><i class="fas fa-video"></i> 35 lectures</span>
+                                <span><i class="fas fa-clock"></i> 42 hours</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-play"></i> Watch Now</button>
+                            <button class="btn btn-secondary"><i class="fas fa-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="science" data-level="medium" data-title="quantum mechanics fundamentals" data-author="stanford online">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Quantum Mechanics Fundamentals</h3>
+                            <p class="material-author">by Stanford Online</p>
+                            <p class="material-description">Introduction to quantum mechanics with wave functions, operators, and quantum systems.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.8</span>
+                                <span><i class="fas fa-eye"></i> 180k views</span>
+                                <span><i class="fas fa-video"></i> 28 lectures</span>
+                                <span><i class="fas fa-clock"></i> 35 hours</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-play"></i> Watch Now</button>
+                            <button class="btn btn-secondary"><i class="fas fa-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="engineering" data-level="long" data-title="machine learning specialization" data-author="andrew ng">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Machine Learning Specialization</h3>
+                            <p class="material-author">by Andrew Ng</p>
+                            <p class="material-description">Complete machine learning course covering supervised learning, neural networks, and deep learning.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 5.0</span>
+                                <span><i class="fas fa-eye"></i> 500k views</span>
+                                <span><i class="fas fa-video"></i> 50 lectures</span>
+                                <span><i class="fas fa-clock"></i> 60 hours</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-play"></i> Watch Now</button>
+                            <button class="btn btn-secondary"><i class="fas fa-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="business" data-level="short" data-title="financial accounting basics" data-author="harvard business school">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Financial Accounting Basics</h3>
+                            <p class="material-author">by Harvard Business School</p>
+                            <p class="material-description">Essential accounting principles, financial statements, and business analysis techniques.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.7</span>
+                                <span><i class="fas fa-eye"></i> 120k views</span>
+                                <span><i class="fas fa-video"></i> 20 lectures</span>
+                                <span><i class="fas fa-clock"></i> 25 hours</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-play"></i> Watch Now</button>
+                            <button class="btn btn-secondary"><i class="fas fa-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="arts" data-level="medium" data-title="art history renaissance to modern" data-author="yale university">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Art History: Renaissance to Modern</h3>
+                            <p class="material-author">by Yale University</p>
+                            <p class="material-description">Comprehensive survey of Western art from Renaissance through contemporary movements.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.6</span>
+                                <span><i class="fas fa-eye"></i> 95k views</span>
+                                <span><i class="fas fa-video"></i> 24 lectures</span>
+                                <span><i class="fas fa-clock"></i> 30 hours</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-play"></i> Watch Now</button>
+                            <button class="btn btn-secondary"><i class="fas fa-bookmark"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../about.html">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Upload Modal -->\n    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Upload Video Lecture</h3>
+                <button class="close-modal" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label>Video Title *</label>
+                    <input type="text" required placeholder="Enter video title">
+                </div>
+                <div class="form-group">
+                    <label>Instructor *</label>
+                    <input type="text" required placeholder="Enter instructor name">
+                </div>
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select required>
+                        <option value="">Select subject</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="business">Business</option>
+                        <option value="arts">Arts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea rows="3" placeholder="Brief description of the video"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Video URL or Upload File *</label>
+                    <input type="text" placeholder="YouTube/Vimeo URL or upload file">
+                    <div class="file-upload-area" style="margin-top: 1rem;">
+                        <input type="file" id="fileInput" accept="video/*" hidden>
+                        <label for="fileInput" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Or click to upload video file</span>
+                            <small>MP4, AVI, MOV (Max 500MB)</small>
+                        </label>
+                        <div id="fileName" class="file-name"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Request to Upload Video
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        const subjectFilter = document.querySelectorAll('.filter-select')[0];
+        const levelFilter = document.querySelectorAll('.filter-select')[1];
+        const sortSelect = document.querySelectorAll('.filter-select')[2];
+        const searchInput = document.getElementById('searchInput');
+        const materialsList = document.getElementById('materialsList');
+        const items = Array.from(document.querySelectorAll('.material-item'));
+
+        function filterMaterials() {
+            const subject = subjectFilter.value.toLowerCase();
+            const level = levelFilter.value.toLowerCase();
+            const search = searchInput.value.toLowerCase();
+
+            items.forEach(item => {
+                const itemSubject = item.dataset.subject;
+                const itemLevel = item.dataset.level;
+                const itemTitle = item.dataset.title;
+                const itemAuthor = item.dataset.author;
+
+                const matchSubject = subject === 'all subjects' || itemSubject === subject;
+                const matchLevel = level.includes('all') || itemLevel === level.split(' ')[0].toLowerCase();
+                const matchSearch = search === '' || itemTitle.includes(search) || itemAuthor.includes(search);
+
+                item.style.display = (matchSubject && matchLevel && matchSearch) ? 'grid' : 'none';
+            });
+        }
+
+        function sortMaterials() {
+            const sortValue = sortSelect.value;
+            const sortedItems = [...items];
+
+            if (sortValue === 'A-Z') {
+                sortedItems.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+            } else if (sortValue === 'Newest First') {
+                sortedItems.reverse();
+            }
+
+            sortedItems.forEach(item => materialsList.appendChild(item));
+        }
+
+        subjectFilter.addEventListener('change', filterMaterials);
+        levelFilter.addEventListener('change', filterMaterials);
+        searchInput.addEventListener('input', filterMaterials);
+        sortSelect.addEventListener('change', sortMaterials);
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        document.getElementById('uploadModal').addEventListener('click', (e) => {
+            if (e.target.id === 'uploadModal') closeUploadModal();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Video uploaded successfully!');
+            closeUploadModal();
+            e.target.reset();
+            document.getElementById('fileName').textContent = '';
+        });
+    </script>
+</body>
+</html>

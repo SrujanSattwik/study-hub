@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Signup Test - StudyClub</title>
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-brand">
+                <div class="brand-content">
+                    <div class="brand-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h1>StudyClub</h1>
+                    </div>
+                    <h2>Join Us Today!</h2>
+                    <p>Create your account and start your learning journey with thousands of students.</p>
+                </div>
+            </div>
+
+            <div class="auth-form-container">
+                <a href="../index.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+                
+                <div class="auth-form-card">
+                    <h2 id="signupTitle">Create Account</h2>
+                    <p class="auth-subtitle" id="signupSubtitle">Join StudyClub and start your learning journey</p>
+
+                    <form class="auth-form" id="signupForm">
+                        <div id="signupFields">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" id="fullName" placeholder="John Doe" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" id="email" placeholder="you@example.com" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Password</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="signupPassword" placeholder="Create a password" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                                </div>
+                            </div>
+
+                            <div class="form-options">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="termsCheckbox" required>
+                                    <span>I agree to Terms & Privacy Policy</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="otpFields" style="display: none;">
+                            <div class="otp-info">
+                                <i class="fas fa-envelope-open-text"></i>
+                                <p>We've sent a 6-digit verification code to <strong id="displayEmail"></strong></p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Enter OTP</label>
+                                <div class="otp-input-container">
+                                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" required>
+                                </div>
+                            </div>
+
+                            <div class="otp-actions">
+                                <button type="button" class="resend-btn" id="resendBtn" disabled>
+                                    <i class="fas fa-redo"></i> Resend OTP <span id="timer">(60s)</span>
+                                </button>
+                                <button type="button" class="back-btn" onclick="backToSignup()">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="auth-btn">
+                            <span id="btnText">Create Account</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const otpFields = document.getElementById('otpFields');
+            const isOtpVisible = otpFields.style.display !== 'none';
+            
+            if (!isOtpVisible) {
+                const password = document.getElementById('signupPassword').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                const email = document.getElementById('email').value;
+                const termsChecked = document.getElementById('termsCheckbox').checked;
+                
+                if (!termsChecked) {
+                    alert('Please agree to Terms & Privacy Policy!');
+                    return;
+                }
+                
+                if (password !== confirm) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters!');
+                    return;
+                }
+                
+                showOtpVerification(email);
+            } else {
+                const otp = getOtpValue();
+                
+                if (otp.length !== 6) {
+                    alert('Please enter complete 6-digit OTP!');
+                    return;
+                }
+                
+                if (otp === '123456') {
+                    alert('✓ Account created successfully!');
+                    document.getElementById('signupForm').reset();
+                    backToSignup();
+                } else {
+                    alert('❌ Invalid OTP! Use 123456 for demo');
+                }
+            }
+        });
+        
+        function showOtpVerification(email) {
+            document.getElementById('signupFields').style.display = 'none';
+            document.getElementById('otpFields').style.display = 'block';
+            document.getElementById('signupTitle').textContent = 'Verify Your Email';
+            document.getElementById('signupSubtitle').textContent = 'Enter the verification code sent to your email';
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('btnText').textContent = 'Verify & Create Account';
+            document.querySelector('.otp-input').focus();
+            startResendTimer();
+            console.log('OTP sent to:', email, '(Demo OTP: 123456)');
+            alert('📧 OTP sent! Use: 123456');
+        }
+        
+        function backToSignup() {
+            document.getElementById('signupFields').style.display = 'block';
+            document.getElementById('otpFields').style.display = 'none';
+            document.getElementById('signupTitle').textContent = 'Create Account';
+            document.getElementById('signupSubtitle').textContent = 'Join StudyClub and start your learning journey';
+            document.getElementById('btnText').textContent = 'Create Account';
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+        }
+        
+        function getOtpValue() {
+            const inputs = document.querySelectorAll('.otp-input');
+            return Array.from(inputs).map(input => input.value).join('');
+        }
+        
+        let resendTimer;
+        function startResendTimer() {
+            let seconds = 60;
+            const timerEl = document.getElementById('timer');
+            const resendBtn = document.getElementById('resendBtn');
+            resendBtn.disabled = true;
+            
+            resendTimer = setInterval(() => {
+                seconds--;
+                timerEl.textContent = `(${seconds}s)`;
+                if (seconds <= 0) {
+                    clearInterval(resendTimer);
+                    timerEl.textContent = '';
+                    resendBtn.disabled = false;
+                }
+            }, 1000);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+                
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').slice(0, 6);
+                    pastedData.split('').forEach((char, i) => {
+                        if (otpInputs[i]) otpInputs[i].value = char;
+                    });
+                    if (pastedData.length === 6) otpInputs[5].focus();
+                });
+            });
+            
+            document.getElementById('resendBtn').addEventListener('click', function() {
+                if (!this.disabled) {
+                    alert('✓ OTP resent! (Demo OTP: 123456)');
+                    startResendTimer();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

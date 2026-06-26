@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textbooks - StudyClub</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../KnowNook.html#chat" class="nav-link ai-logo" title="AI Assistant"><i class="fas fa-robot"></i></a></li>
+                <li><a href="../get-started.html" class="nav-link">Get Started</a></li>
+                <li><a href="../materials.html" class="nav-link active">Materials</a></li>
+                <li><a href="../resources.html" class="nav-link">Resources</a></li>
+                <li><a href="../community.html" class="nav-link">Community</a></li>
+                <li><a href="../about.html" class="nav-link">About</a></li>
+                <li><a href="../login.html" class="nav-link btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <a href="../materials.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Materials</a>
+                <div class="header-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h1 class="page-title">Textbooks</h1>
+                <p class="page-subtitle">Comprehensive textbooks covering all major subjects and academic levels</p>
+                
+                <div class="header-actions">
+                    <div class="search-box-header">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search textbooks by title, author, or subject...">
+                    </div>
+                    <button class="btn btn-primary upload-btn" onclick="openUploadModal()">
+                        <i class="fas fa-upload"></i> Upload Textbook
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="materials-section">
+            <div class="container">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-filter"></i> Filter by:</label>
+                        <select class="filter-select">
+                            <option>All Subjects</option>
+                            <option>Mathematics</option>
+                            <option>Science</option>
+                            <option>Engineering</option>
+                            <option>Business</option>
+                            <option>Arts</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Levels</option>
+                            <option>High School</option>
+                            <option>Undergraduate</option>
+                            <option>Graduate</option>
+                        </select>
+                    </div>
+                    <div class="sort-group">
+                        <label><i class="fas fa-sort"></i> Sort:</label>
+                        <select class="filter-select">
+                            <option>Most Popular</option>
+                            <option>Newest First</option>
+                            <option>A-Z</option>
+                            <option>Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="materials-list" id="materialsList">
+                    <div class="material-item" data-subject="mathematics" data-level="undergraduate" data-title="calculus early transcendentals" data-author="james stewart">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Calculus: Early Transcendentals</h3>
+                            <p class="material-author">by James Stewart</p>
+                            <p class="material-description">Comprehensive calculus textbook covering limits, derivatives, integrals, and series with real-world applications.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.8</span>
+                                <span><i class="fas fa-download"></i> 12.5k</span>
+                                <span><i class="fas fa-file-pdf"></i> PDF</span>
+                                <span><i class="fas fa-clock"></i> 1200 pages</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="engineering" data-level="graduate" data-title="introduction to algorithms" data-author="thomas h cormen">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Introduction to Algorithms</h3>
+                            <p class="material-author">by Thomas H. Cormen</p>
+                            <p class="material-description">The definitive guide to algorithms, covering sorting, searching, graph algorithms, and computational complexity.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.9</span>
+                                <span><i class="fas fa-download"></i> 18.2k</span>
+                                <span><i class="fas fa-file-pdf"></i> PDF</span>
+                                <span><i class="fas fa-clock"></i> 1312 pages</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="science" data-level="undergraduate" data-title="physics for scientists and engineers" data-author="raymond a serway">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Physics for Scientists and Engineers</h3>
+                            <p class="material-author">by Raymond A. Serway</p>
+                            <p class="material-description">Comprehensive physics textbook with modern applications, problem-solving strategies, and real-world examples.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.7</span>
+                                <span><i class="fas fa-download"></i> 9.8k</span>
+                                <span><i class="fas fa-file-pdf"></i> PDF</span>
+                                <span><i class="fas fa-clock"></i> 1400 pages</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="science" data-level="undergraduate" data-title="organic chemistry" data-author="paula yurkanis bruice">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Organic Chemistry</h3>
+                            <p class="material-author">by Paula Yurkanis Bruice</p>
+                            <p class="material-description">Student-friendly organic chemistry textbook with clear explanations, reaction mechanisms, and practice problems.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.6</span>
+                                <span><i class="fas fa-download"></i> 7.3k</span>
+                                <span><i class="fas fa-file-pdf"></i> PDF</span>
+                                <span><i class="fas fa-clock"></i> 1280 pages</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+
+                    <div class="material-item" data-subject="business" data-level="undergraduate" data-title="principles of economics" data-author="n gregory mankiw">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="material-info">
+                            <h3>Principles of Economics</h3>
+                            <p class="material-author">by N. Gregory Mankiw</p>
+                            <p class="material-description">Accessible introduction to economics with real-world examples, case studies, and policy applications.</p>
+                            <div class="material-meta">
+                                <span><i class="fas fa-star"></i> 4.5</span>
+                                <span><i class="fas fa-download"></i> 11.2k</span>
+                                <span><i class="fas fa-file-pdf"></i> PDF</span>
+                                <span><i class="fas fa-clock"></i> 880 pages</span>
+                            </div>
+                        </div>
+                        <div class="material-actions">
+                            <button class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+                            <button class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../about.html">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Upload Textbook</h3>
+                <button class="close-modal" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label>Book Title *</label>
+                    <input type="text" required placeholder="Enter book title">
+                </div>
+                <div class="form-group">
+                    <label>Author *</label>
+                    <input type="text" required placeholder="Enter author name">
+                </div>
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select required>
+                        <option value="">Select subject</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="business">Business</option>
+                        <option value="arts">Arts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Level *</label>
+                    <select required>
+                        <option value="">Select level</option>
+                        <option value="high-school">High School</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea rows="3" placeholder="Brief description of the textbook"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload File (PDF) *</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="fileInput" accept=".pdf" required hidden>
+                        <label for="fileInput" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click to upload or drag and drop</span>
+                            <small>PDF files only (Max 50MB)</small>
+                        </label>
+                        <div id="fileName" class="file-name"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Request to Upload Textbook
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        // Filter functionality
+        const subjectFilter = document.querySelectorAll('.filter-select')[0];
+        const levelFilter = document.querySelectorAll('.filter-select')[1];
+        const sortSelect = document.querySelectorAll('.filter-select')[2];
+        const searchInput = document.getElementById('searchInput');
+        const materialsList = document.getElementById('materialsList');
+        const items = Array.from(document.querySelectorAll('.material-item'));
+
+        function filterMaterials() {
+            const subject = subjectFilter.value.toLowerCase();
+            const level = levelFilter.value.toLowerCase();
+            const search = searchInput.value.toLowerCase();
+
+            items.forEach(item => {
+                const itemSubject = item.dataset.subject;
+                const itemLevel = item.dataset.level;
+                const itemTitle = item.dataset.title;
+                const itemAuthor = item.dataset.author;
+
+                const matchSubject = subject === 'all subjects' || itemSubject === subject;
+                const matchLevel = level === 'all levels' || itemLevel === level;
+                const matchSearch = search === '' || itemTitle.includes(search) || itemAuthor.includes(search);
+
+                if (matchSubject && matchLevel && matchSearch) {
+                    item.style.display = 'grid';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function sortMaterials() {
+            const sortValue = sortSelect.value;
+            const sortedItems = [...items];
+
+            if (sortValue === 'A-Z') {
+                sortedItems.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+            } else if (sortValue === 'Newest First') {
+                sortedItems.reverse();
+            }
+
+            sortedItems.forEach(item => materialsList.appendChild(item));
+        }
+
+        subjectFilter.addEventListener('change', filterMaterials);
+        levelFilter.addEventListener('change', filterMaterials);
+        searchInput.addEventListener('input', filterMaterials);
+        sortSelect.addEventListener('change', sortMaterials);
+
+        // Upload modal
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        document.getElementById('uploadModal').addEventListener('click', (e) => {
+            if (e.target.id === 'uploadModal') closeUploadModal();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Textbook uploaded successfully!');
+            closeUploadModal();
+            e.target.reset();
+            document.getElementById('fileName').textContent = '';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+/* Materials Page Styles */
+.materials-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.material-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.material-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.material-card .thumbnail {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.material-card .card-content {
+    padding: 1.5rem;
+}
+
+.material-card h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    color: #1a1a1a;
+}
+
+.material-card .desc {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.material-card .meta {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.material-card .badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.material-card .badge.category {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.material-card .badge.difficulty.easy {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.material-card .badge.difficulty.medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.material-card .badge.difficulty.hard {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.material-card .tags {
+    color: #6366f1;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.material-card .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.material-card .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.material-card .author {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.material-card .download-count {
+    font-size: 0.8rem;
+    color: #6366f1;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.material-card .download-count i {
+    font-size: 0.75rem;
+}
+
+.material-card .btn-view {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.material-card .btn-view:hover {
+    background: #4f46e5;
+}
+
+.no-materials {
+    text-align: center;
+    color: #888;
+    padding: 3rem;
+    grid-column: 1 / -1;
+}
+
+/* Add Material Button */
+.add-material-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #6366f1;
+    color: white;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s;
+    z-index: 100;
+}
+
+.add-material-btn:hover {
+    background: #4f46e5;
+    transform: scale(1.1);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn-submit,
+.btn-cancel {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-submit {
+    background: #6366f1;
+    color: white;
+}
+
+.btn-submit:hover {
+    background: #4f46e5;
+}
+
+.btn-cancel {
+    background: #e5e7eb;
+    color: #333;
+}
+
+.btn-cancel:hover {
+    background: #d1d5db;
+}
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 2000;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast.toast-success {
+    background: #10b981;
+}
+
+.toast.toast-error {
+    background: #ef4444;
+}
+
+/* Filters Section */
+.filters-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .materials-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .add-material-btn {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}

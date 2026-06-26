@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Get Started - StudyClub</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="KnowNook.html#chat" class="nav-link ai-logo" title="AI Assistant"><i class="fas fa-robot"></i></a></li>
+                <li><a href="#" class="nav-link active">Get Started</a></li>
+                <li><a href="materials.html" class="nav-link">Materials</a></li>
+                <li><a href="resources.html" class="nav-link">Resources</a></li>
+                <li><a href="community.html" class="nav-link">Community</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="login.html" class="nav-link btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="page-title">StudyClub Features</h1>
+                    <p class="page-subtitle">Explore and interact with all available tools and upcoming features</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Overview -->
+        <section class="features-overview">
+            <div class="container">
+                <h2 class="section-title">All StudyClub Features</h2>
+                <p class="section-subtitle">Choose the tools that fit your learning style</p>
+                
+               
+                <!-- Study Tools -->
+                <div class="feature-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-tools"></i>
+                        Study Tools
+                    </h3>
+                    <div class="features-grid">
+                        <a href="study-bite.html" style="text-decoration: none;"><div class="feature-card clickable" data-feature="studybite">
+                            <div class="feature-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <h3>StudyBite</h3>
+                            <p>5-minute daily challenges for niche academic topics, stored locally or in a lightweight JSON structure.</p>
+                            <div class="feature-status">Coming Soon</div>
+                        </div></a>
+
+                        <a href="KnowNook.html" class="KnowNook" style="text-decoration: none;"><div class="feature-card clickable" data-feature="knownook">
+                            <div class="feature-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3>KnowNook</h3>
+                            <h4>Chat with AI</h4>
+                            <p>Crowdsourced Q&A section with Gemini  for instant doubt resolution.</p>
+                            <div class="feature-status">get started</div>
+                        </div></a>
+
+                        <a href="cheat-note-creation.html" style="text-decoration: none;"><div class="feature-card clickable" data-feature="cheat-notes">
+                            <div class="feature-icon">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <h3>Cheat Note Creation</h3>
+                            <p>Simple note-taking tool for quick, shareable study notes.</p>
+                            <div class="feature-status">Coming Soon</div>
+                        </div></a>
+
+                        <a href="syllabus-scheduler.html" style="text-decoration: none;">
+                        <div class="feature-card clickable" data-feature="syllabus-scheduler">
+                            <div class="feature-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <h3>Syllabus Scheduler</h3>
+                            <p>Tool to break down syllabi into tasks, integrated with the study planner.</p>
+                            <div class="feature-status">Coming Soon</div>
+                        </div>
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- Collaboration Tools -->
+                <div class="feature-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-users"></i>
+                        Collaboration Tools
+                    </h3>
+                    <div class="features-grid">
+                        <div class="feature-card clickable" data-feature="studysync">
+                            <div class="feature-icon">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <h3>StudySync</h3>
+                            <p>Real-time group study planner with shared calendars and resource pools, using local storage for solo users or lightweight Firebase for group syncing.</p>
+                            <div class="feature-status">Coming Soon</div>
+                        </div>
+                        <div class="feature-card clickable" data-feature="timetable-creation">
+                            <div class="feature-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h3>Timetable Creation</h3>
+                            <p>Drag-and-drop timetable builder for individual or group schedules.</p>
+                            <div class="feature-status">Coming Soon</div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Core Features -->
+                <div class="feature-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-gem"></i>
+                        Core Features
+                    </h3>
+                    <div class="features-grid">
+                        <div class="feature-card clickable" data-feature="focused-learning">
+                            <div class="feature-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3>Focused Learning</h3>
+                            <p>Distraction-free environment designed to help you concentrate and retain information better.</p>
+                            <div class="feature-status">Available</div>
+                        </div>
+                        <div class="feature-card clickable" data-feature="flexible-schedule">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h3>Flexible Schedule</h3>
+                            <p>Study at your own pace with 24/7 access to all learning materials and resources.</p>
+                            <div class="feature-status">Available</div>
+                        </div>
+                        <div class="feature-card clickable" data-feature="safe-environment">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Safe Environment</h3>
+                            <p>Your privacy and security are our top priorities. Learn with confidence.</p>
+                            <div class="feature-status">Available</div>
+                        </div>
+                        <div class="feature-card clickable" data-feature="track-progress">
+                            <div class="feature-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h3>Track Progress</h3>
+                            <p>Monitor your learning journey with detailed analytics and achievement tracking.</p>
+                            <div class="feature-status">Available</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Creative Tools -->
+                <div class="feature-category">
+                    <h3 class="category-title">
+                        <i class="fas fa-palette"></i>
+                        Creative Tools
+                    </h3>
+                    <div class="features-grid">
+                        <div class="feature-card clickable" data-feature="mindmesh">
+                            <div class="feature-icon">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <h3>MindMesh</h3>
+                            <p>Visual brainstorming tool using a canvas-based library (like p5.js) for concept mapping.</p>
+                            <div class="feature-status">Coming Soon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Quick Start Guide -->
+        <section class="quick-start">
+            <div class="container">
+                <h2 class="section-title">Quick Start Guide</h2>
+                <div class="guide-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Choose Your Tools</h3>
+                        <p>Browse through our features and select the tools that match your learning style and goals.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Set Up Your Profile</h3>
+                        <p>Create your account and customize your study preferences and schedule.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Start Learning</h3>
+                        <p>Begin your learning journey with our comprehensive suite of study tools.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <!-- Call to Action -->
+         <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Transform Your Learning?</h2>
+                    <p>Join thousands of students who have already discovered the power of StudyClub.</p>
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary">Create Account</button>
+                        <button class="btn btn-secondary">Learn More</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

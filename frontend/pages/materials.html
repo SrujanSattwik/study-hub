@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/materials.css">
+    <link rel="stylesheet" href="src/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Study Materials - StudyClub</title>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>StudyClub</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="../index.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="index-dashboard.html" class="nav-item">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="get-started.html" class="nav-item">
+                        <i class="fas fa-rocket"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="materials.html" class="nav-item active">
+                        <i class="fas fa-book"></i>
+                        <span>Materials</span>
+                    </a>
+                    <a href="resources.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="community.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </a>
+                    <a href="about.html" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Materials</div>
+                    <a href="materials/textbooks.html" class="nav-item">
+                        <i class="fas fa-book"></i>
+                        <span>Textbooks</span>
+                    </a>
+                    <a href="materials/video-lectures.html" class="nav-item">
+                        <i class="fas fa-video"></i>
+                        <span>Video Lectures</span>
+                    </a>
+                    <a href="materials/study-notes.html" class="nav-item">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Study Notes</span>
+                    </a>
+                    <a href="materials/practice-tests.html" class="nav-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>practice Tests</span>
+                    </a>
+                     <a href="materials/infographics.html" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Infographics</span>
+                    </a>
+                     <a href="materials/audio-content.html" class="nav-item">
+                        <i class="fas fa-podcast"></i>
+                        <span>Audio Content</span>
+                    </a>
+                </div>
+
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="KnowNook.html" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        <span>KnowNook AI</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="topbar-right">
+                <a href="login.html" class="btn btn-primary btn-sm login-btn">Login</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="container">
+                <div class="search-content">
+                    <h2>Find Your Perfect Study Material</h2>
+                    <p>Search through thousands of resources to find exactly what you need</p>
+                    <div class="search-box">
+                        <input type="text" placeholder="Search for subjects, topics, or materials...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Materials Categories -->
+        <section class="materials-section">
+            <div class="container">
+                <div class="materials-grid">
+                    <a href="materials/textbooks.html" class="material-category">
+                        <div class="category-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Textbooks</h3>
+                        <p>Comprehensive textbooks covering all major subjects and academic levels.</p>
+                        <div class="material-count">500+ Books</div>
+                    </a>
+                    
+                    <a href="materials/video-lectures.html" class="material-category">
+                        <div class="category-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h3>Video Lectures</h3>
+                        <p>High-quality video content from expert educators and professors.</p>
+                        <div class="material-count">1000+ Videos</div>
+                    </a>
+                    
+                    <a href="materials/study-notes.html" class="material-category">
+                        <div class="category-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3>Study Notes</h3>
+                        <p>Comprehensive study notes and summaries for quick revision.</p>
+                        <div class="material-count">2000+ Notes</div>
+                    </a>
+                    
+                    <a href="materials/practice-tests.html" class="material-category">
+                        <div class="category-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3>Practice Tests</h3>
+                        <p>Mock exams and practice questions with detailed solutions.</p>
+                        <div class="material-count">500+ Tests</div>
+                    </a>
+                    
+                    <a href="materials/infographics.html" class="material-category">
+                        <div class="category-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Infographics</h3>
+                        <p>Visual learning materials and concept maps for better understanding.</p>
+                        <div class="material-count">300+ Graphics</div>
+                    </a>
+                    
+                    <a href="materials/audio-content.html" class="material-category">
+                        <div class="category-icon">
+                            <i class="fas fa-podcast"></i>
+                        </div>
+                        <h3>Audio Content</h3>
+                        <p>Podcasts and audio lectures for learning on the go.</p>
+                        <div class="material-count">200+ Audio</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Submitted Materials -->
+        <section class="user-materials">
+            <div class="container">
+                <h2 class="section-title">Community Materials</h2>
+                
+                <!-- Filters -->
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label for="category-filter">Category</label>
+                            <select id="category-filter">
+                                <option value="">All Categories</option>
+                                <option value="textbook">Textbooks</option>
+                                <option value="video">Video Lectures</option>
+                                <option value="notes">Study Notes</option>
+                                <option value="audio">Audio Content</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="difficulty-filter">Difficulty</label>
+                            <select id="difficulty-filter">
+                                <option value="">All Levels</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Materials Grid -->
+                <div class="materials-container" id="materials-container">
+                    <p class="no-materials">Loading materials...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Material Button -->
+        <button class="add-material-btn" onclick="openModal()" title="Add Material">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- Add Material Modal -->
+        <div id="add-material-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Material</h2>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
+                <form id="add-material-form">
+                    <div class="form-group">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="General">General</option>
+                            <option value="Textbooks">Textbooks</option>
+                            <option value="Video Lectures">Video Lectures</option>
+                            <option value="Study Notes">Study Notes</option>
+                            <option value="Practice Tests">Practice Tests</option>
+                            <option value="Infographics">Infographics</option>
+                            <option value="Audio Content">Audio Content</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author</label>
+                        <input type="text" id="author" name="author" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty" name="difficulty">
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Tags (comma-separated)</label>
+                        <input type="text" id="tags" name="tags" placeholder="math, calculus, tutorial">
+                    </div>
+                    <div class="form-group">
+                        <label for="thumbnailUrl">Thumbnail URL (optional)</label>
+                        <input type="url" id="thumbnailUrl" name="thumbnailUrl" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="link">Resource Link *</label>
+                        <input type="url" id="link" name="link" required placeholder="https://example.com/resource">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-submit">Add Material</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/auth-manager.js"></script>
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/materials.js"></script>
+    <script src="src/js/layout.js"></script>
+</body>
+</html> 

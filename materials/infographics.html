@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographics - StudyClub</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>StudyClub</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../KnowNook.html#chat" class="nav-link ai-logo" title="AI Assistant"><i class="fas fa-robot"></i></a></li>
+                <li><a href="../get-started.html" class="nav-link">Get Started</a></li>
+                <li><a href="../materials.html" class="nav-link active">Materials</a></li>
+                <li><a href="../resources.html" class="nav-link">Resources</a></li>
+                <li><a href="../community.html" class="nav-link">Community</a></li>
+                <li><a href="../about.html" class="nav-link">About</a></li>
+                <li><a href="../login.html" class="nav-link btn-login">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <a href="../materials.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Materials</a>
+                <div class="header-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h1 class="page-title">Infographics Gallery</h1>
+                <p class="page-subtitle">Visual learning materials and concept maps for better understanding</p>
+                
+                <div class="header-actions">
+                    <div class="search-box-header">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search infographics by title, topic, or subject...">
+                    </div>
+                    <button class="btn btn-primary upload-btn" onclick="openUploadModal()">
+                        <i class="fas fa-upload"></i> Upload Infographic
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="infographics-section">
+            <div class="container">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-filter"></i> Filter by:</label>
+                        <select class="filter-select" id="subjectFilter">
+                            <option>All Subjects</option>
+                            <option>Mathematics</option>
+                            <option>Science</option>
+                            <option>Engineering</option>
+                            <option>Business</option>
+                            <option>Arts</option>
+                        </select>
+                        <select class="filter-select" id="typeFilter">
+                            <option>All Types</option>
+                            <option>Concept Map</option>
+                            <option>Timeline</option>
+                            <option>Process Flow</option>
+                            <option>Comparison</option>
+                        </select>
+                    </div>
+                    <div class="sort-group">
+                        <label><i class="fas fa-sort"></i> Sort:</label>
+                        <select class="filter-select" id="sortSelect">
+                            <option>Most Popular</option>
+                            <option>Newest First</option>
+                            <option>A-Z</option>
+                            <option>Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="infographics-grid" id="infographicsGrid">
+                    <div class="infographic-card" data-subject="mathematics" data-type="concept" data-title="calculus concepts visual guide">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-function"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Calculus Concepts Visual Guide</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Visual Learning</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.9</span>
+                                <span><i class="fas fa-download"></i> 25k</span>
+                                <span><i class="fas fa-expand"></i> 1920x1080</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Mathematics</span>
+                                <span class="tag">Concept Map</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="science" data-type="timeline" data-title="periodic table visual reference">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-atom"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Periodic Table Visual Reference</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Science Graphics</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.8</span>
+                                <span><i class="fas fa-download"></i> 30k</span>
+                                <span><i class="fas fa-expand"></i> 2560x1440</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Science</span>
+                                <span class="tag">Timeline</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="engineering" data-type="process" data-title="machine learning algorithm flowchart">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Machine Learning Algorithm Flowchart</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> AI Academy</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 5.0</span>
+                                <span><i class="fas fa-download"></i> 40k</span>
+                                <span><i class="fas fa-expand"></i> 3840x2160</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Engineering</span>
+                                <span class="tag">Process Flow</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="business" data-type="concept" data-title="business model canvas template">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Business Model Canvas Template</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Business Visuals</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.7</span>
+                                <span><i class="fas fa-download"></i> 22k</span>
+                                <span><i class="fas fa-expand"></i> 1920x1080</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Business</span>
+                                <span class="tag">Concept Map</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="arts" data-type="timeline" data-title="art history timeline infographic">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Art History Timeline Infographic</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Art Education</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.6</span>
+                                <span><i class="fas fa-download"></i> 18k</span>
+                                <span><i class="fas fa-expand"></i> 2048x1536</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Arts</span>
+                                <span class="tag">Timeline</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="science" data-type="comparison" data-title="dna vs rna comparison chart">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-dna"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>DNA vs RNA Comparison Chart</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Biology Hub</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.9</span>
+                                <span><i class="fas fa-download"></i> 28k</span>
+                                <span><i class="fas fa-expand"></i> 1920x1080</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Science</span>
+                                <span class="tag">Comparison</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="mathematics" data-type="process" data-title="statistics formulas cheat sheet">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Statistics Formulas Cheat Sheet</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Math Masters</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.8</span>
+                                <span><i class="fas fa-download"></i> 32k</span>
+                                <span><i class="fas fa-expand"></i> 2560x1440</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Mathematics</span>
+                                <span class="tag">Process Flow</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infographic-card" data-subject="engineering" data-type="concept" data-title="software development lifecycle">
+                        <div class="infographic-image">
+                            <div class="image-placeholder">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="infographic-overlay">
+                                <button class="btn-icon" onclick="viewInfographic(this)"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" onclick="downloadInfographic(this)"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div class="infographic-info">
+                            <h3>Software Development Lifecycle</h3>
+                            <p class="infographic-author"><i class="fas fa-user"></i> Dev Graphics</p>
+                            <div class="infographic-meta">
+                                <span><i class="fas fa-star"></i> 4.7</span>
+                                <span><i class="fas fa-download"></i> 26k</span>
+                                <span><i class="fas fa-expand"></i> 1920x1080</span>
+                            </div>
+                            <div class="infographic-tags">
+                                <span class="tag">Engineering</span>
+                                <span class="tag">Concept Map</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../about.html">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Upload Infographic</h3>
+                <button class="close-modal" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label>Infographic Title *</label>
+                    <input type="text" required placeholder="Enter infographic title">
+                </div>
+                <div class="form-group">
+                    <label>Creator *</label>
+                    <input type="text" required placeholder="Enter creator name">
+                </div>
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select required>
+                        <option value="">Select subject</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="engineering">Engineering</option>
+                        <option value="business">Business</option>
+                        <option value="arts">Arts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea rows="3" placeholder="Brief description of the infographic"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload Image File *</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                        <label for="fileInput" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click to upload infographic</span>
+                            <small>PNG, JPG, SVG (Max 10MB)</small>
+                        </label>
+                        <div id="fileName" class="file-name"></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Request to Upload Infographic
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        const subjectFilter = document.getElementById('subjectFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const sortSelect = document.getElementById('sortSelect');
+        const searchInput = document.getElementById('searchInput');
+        const grid = document.getElementById('infographicsGrid');
+        const cards = Array.from(document.querySelectorAll('.infographic-card'));
+
+        function filterInfographics() {
+            const subject = subjectFilter.value.toLowerCase();
+            const type = typeFilter.value.toLowerCase();
+            const search = searchInput.value.toLowerCase();
+
+            cards.forEach(card => {
+                const cardSubject = card.dataset.subject;
+                const cardType = card.dataset.type;
+                const cardTitle = card.dataset.title;
+
+                const matchSubject = subject === 'all subjects' || cardSubject === subject;
+                const matchType = type === 'all types' || cardType === type.split(' ')[0];
+                const matchSearch = search === '' || cardTitle.includes(search);
+
+                card.style.display = (matchSubject && matchType && matchSearch) ? 'block' : 'none';
+            });
+        }
+
+        function sortInfographics() {
+            const sortValue = sortSelect.value;
+            const sortedCards = [...cards];
+
+            if (sortValue === 'A-Z') {
+                sortedCards.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+            } else if (sortValue === 'Newest First') {
+                sortedCards.reverse();
+            }
+
+            sortedCards.forEach(card => grid.appendChild(card));
+        }
+
+        subjectFilter.addEventListener('change', filterInfographics);
+        typeFilter.addEventListener('change', filterInfographics);
+        searchInput.addEventListener('input', filterInfographics);
+        sortSelect.addEventListener('change', sortInfographics);
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        function viewInfographic(btn) {
+            alert('Opening infographic preview...');
+        }
+
+        function downloadInfographic(btn) {
+            alert('Downloading infographic...');
+        }
+
+        document.getElementById('uploadModal').addEventListener('click', (e) => {
+            if (e.target.id === 'uploadModal') closeUploadModal();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = `Selected: ${fileName}`;
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Infographic uploaded successfully!');
+            closeUploadModal();
+            e.target.reset();
+            document.getElementById('fileName').textContent = '';
+        });
+    </script>
+</body>
+</html>

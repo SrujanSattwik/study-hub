@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KnowNook | AI Study Assistant</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="src/css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>StudyClub</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="../index.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="index-dashboard.html" class="nav-item">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="get-started.html" class="nav-item">
+                        <i class="fas fa-rocket"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="materials.html" class="nav-item">
+                        <i class="fas fa-book"></i>
+                        <span>Materials</span>
+                    </a>
+                    <a href="resources.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </a>
+                    <a href="community.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Community</span>
+                    </a>
+                    <a href="about.html" class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="KnowNook.html" class="nav-item active">
+                        <i class="fas fa-robot"></i>
+                        <span>KnowNook AI</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="topbar-right">
+                <a href="login.html" class="btn btn-primary btn-sm">Login</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+        <section class="hero-section kn-hero">
+            <div class="container hero-content">
+                <h1>Welcome to KnowNook</h1>
+                <p>Your AI-powered study assistant. Ask questions, upload images, and get instant help with your studies.</p>
+                <a href="#chat" class="btn btn-primary">Start Chatting</a>
+            </div>
+        </section>
+
+        <section class="kn-chat-section" id="chat">
+            <div class="container">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h3>KnowNook AI</h3>
+                        <p>Powered by Gemini 2.0 Flash</p>
+                    </div>
+                    <div class="chat-box" id="chat-box">
+                        <div class="message bot">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm KnowNook AI, powered by Google Gemini. I can help you with:</p>
+                                <p>📚 Study questions and explanations<br>
+                                🖼️ Image analysis (upload screenshots, diagrams, problems)<br>
+                                💡 Homework help and concept clarification<br>
+                                📝 Note-taking and summarization</p>
+                                <p>Just type your question or upload an image to get started!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <form id="chat-form" class="chat-form">
+                            <label for="file-upload" class="file-upload-btn" title="Upload image">
+                                <i class="fas fa-paperclip"></i>
+                            </label>
+                            <input type="file" id="file-upload" accept="image/*" hidden>
+                            <textarea id="chat-input" placeholder="Type your question here..." rows="1"></textarea>
+                            <button type="submit" id="send-btn" class="send-btn" title="Send message">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section kn-features">
+            <div class="container">
+                <h2>KnowNook Features</h2>
+                <div class="features-container">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>AI-Powered Answers</h3>
+                        <p>Get instant, accurate answers to your study questions powered by Google Gemini AI.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <h3>Image Analysis</h3>
+                        <p>Upload screenshots, diagrams, or problem images for detailed explanations and solutions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>Interactive Chat</h3>
+                        <p>Have natural conversations with AI to clarify concepts and deepen your understanding.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+            </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>StudyClub</span>
+                    </div>
+                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="community.html">Community</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 StudyClub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/knownook-chat.js"></script>
+    <script src="../assets/js/script.js"></script>
+    <script src="src/js/layout.js"></script>
+</body>
+</html>
