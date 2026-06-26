@@ -114,17 +114,14 @@ async function sendToGemini(text, image) {
     }
     
     const requestBody = {
-        contents: [{
-            parts: parts
-        }]
+        parts: parts
     };
     
     try {
-        const response = await fetch(API_URL, {
+        const response = await AuthSession.fetchWithAuth('/api/ask', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'x-goog-api-key': API_KEY
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
         });
@@ -134,18 +131,10 @@ async function sendToGemini(text, image) {
         
         if (!response.ok) {
             console.error('API Error:', data);
-            return `Error: ${data.error?.message || 'Failed to get response'}`;
+            return `Error: ${data.answer || 'Failed to get response'}`;
         }
         
-        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-            return data.candidates[0].content.parts[0].text;
-        }
-        
-        if (data.promptFeedback?.blockReason) {
-            return `Content blocked: ${data.promptFeedback.blockReason}`;
-        }
-        
-        return 'No response generated. Please try rephrasing your question.';
+        return data.answer || 'No response generated. Please try rephrasing your question.';
     } catch (error) {
         console.error('Fetch Error:', error);
         return `Network error: ${error.message}`;

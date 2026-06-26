@@ -49,16 +49,17 @@ const detectTypeAndFormat = (file, link) => {
     return { type: 'notes', format: 'link' };
 };
 
-// GET /api/materials - Paginated fetch from PostgreSQL DB
+// GET /api/materials - Paginated fetch from PostgreSQL DB (Filtered by user)
 router.get('/', async (req, res) => {
     try {
         const { type, page = 1, limit = 5 } = req.query;
+        const userId = req.user.user_id;
         
-        let queryStr = 'SELECT * FROM materials';
-        const binds = [];
+        let queryStr = 'SELECT * FROM materials WHERE user_id = $1';
+        const binds = [userId];
         
         if (type) {
-            queryStr += ' WHERE type = $1';
+            queryStr += ' AND type = $2';
             binds.push(type);
         }
         
@@ -117,8 +118,8 @@ router.post('/', upload.single('file'), async (req, res) => {
         const filePath = file ? `/uploads/${type === 'textbook' ? 'textbooks' : type === 'video' ? 'videos' : type === 'audio' ? 'audio' : 'notes'}/${file.filename}` : null;
         
         await db.query(
-            `INSERT INTO materials (id, title, description, type, format, file_path, link, thumbnail, download_count, created_at, author)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, $10)`,
+            `INSERT INTO materials (id, title, description, type, format, file_path, link, thumbnail, download_count, created_at, author, user_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, $10, $11)`,
             [
                 id,
                 title.trim(),
@@ -129,7 +130,8 @@ router.post('/', upload.single('file'), async (req, res) => {
                 link || null,
                 null,
                 0,
-                (author || 'Anonymous').trim()
+                (author || 'Anonymous').trim(),
+                req.user.user_id
             ]
         );
         

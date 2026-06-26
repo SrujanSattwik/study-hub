@@ -14,7 +14,7 @@ async function initMaterialsPage(materialType) {
 async function loadMaterialsByType(type) {
     try {
         console.log(`📡 Fetching ${type} materials from API...`);
-        const response = await fetch(`${API_URL}?type=${type}`);
+        const response = await AuthSession.fetchWithAuth(`${API_URL}?type=${type}`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,7 +90,7 @@ function renderMaterialsList(materials) {
 async function handleMaterialDownload(materialId, link) {
     try {
         // Update download count
-        const response = await fetch(`${API_URL}/${materialId}/download`, {
+        const response = await AuthSession.fetchWithAuth(`${API_URL}/${materialId}/download`, {
             method: 'POST'
         });
         
@@ -215,7 +215,7 @@ function setupUploadForm() {
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
             
-            const response = await fetch(API_URL, {
+            const response = await AuthSession.fetchWithAuth(API_URL, {
                 method: 'POST',
                 body: formData
             });

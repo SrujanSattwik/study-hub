@@ -9,6 +9,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const db = require('./db/postgres');
 const materialsRouter = require('./routes/materials');
+const activeSessions = require('./db/sessions');
 
 const app = express();
 
@@ -29,8 +30,41 @@ app.use(bodyParser.json());
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Materials API
-app.use('/api/materials', materialsRouter);
+// Authentication middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  const sessionUser = activeSessions.get(token);
+  if (!sessionUser) {
+    return res.status(403).json({ error: 'Invalid or expired session' });
+  }
+
+  req.user = sessionUser;
+  next();
+}
+
+// Session validation endpoint
+app.get('/auth/session', authenticateToken, (req, res) => {
+  res.json({ success: true, user: req.user });
+});
+
+// Logout endpoint
+app.post('/auth/logout', (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token) {
+    activeSessions.delete(token);
+  }
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// Materials API (Protected)
+app.use('/api/materials', authenticateToken, materialsRouter);
 
 // In-memory OTP storage
 const otpStore = new Map();
@@ -139,6 +173,12 @@ app.post('/auth/login', async (req, res) => {
     );
 
     const token = uuidv4();
+    activeSessions.set(token, {
+      user_id: user.user_id,
+      full_name: user.full_name,
+      email: user.email,
+      role: user.role
+    });
 
     res.json({
       success: true,
@@ -216,15 +256,21 @@ app.post('/auth/verify-otp-signup', async (req, res) => {
 // Gemini AI endpoint
 const GEMINI_API_KEY = "AIzaSyCGe_4efn5LSsp1_1IKF9_jen3nM-bpdaQ";
 
-app.post("/api/ask", async (req, res) => {
-    const { question } = req.body;
-    if (!question) return res.status(400).json({ answer: "No question provided." });
+app.post("/api/ask", authenticateToken, async (req, res) => {
+    let parts = req.body.parts;
+    if (!parts && req.body.question) {
+        parts = [{ text: req.body.question }];
+    }
+    
+    if (!parts || !parts.length) {
+        return res.status(400).json({ answer: "No question or content provided." });
+    }
 
     try {
         const response = await axios.post(
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
             {
-                contents: [{ parts: [{ text: question }] }]
+                contents: [{ parts: parts }]
             },
             {
                 headers: {

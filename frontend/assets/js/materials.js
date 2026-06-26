@@ -7,7 +7,7 @@ async function loadMaterials(filters = {}) {
         console.log('🔍 Loading materials with filters:', filters);
         console.log('🌐 API URL:', `${API_URL}?${params}`);
         
-        const response = await fetch(`${API_URL}?${params}`);
+        const response = await AuthSession.fetchWithAuth(`${API_URL}?${params}`);
         console.log('📡 Response status:', response.status);
         
         if (!response.ok) {
@@ -81,7 +81,7 @@ function renderMaterials(materials) {
 async function handleDownload(materialId, link) {
     console.log('Download clicked for material:', materialId);
     try {
-        const response = await fetch(`${API_URL}/${materialId}/download`, {
+        const response = await AuthSession.fetchWithAuth(`${API_URL}/${materialId}/download`, {
             method: 'POST'
         });
         
@@ -118,7 +118,7 @@ async function handleDownload(materialId, link) {
 // Submit new material
 async function submitMaterial(formData) {
     try {
-        const response = await fetch(API_URL, {
+        const response = await AuthSession.fetchWithAuth(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)

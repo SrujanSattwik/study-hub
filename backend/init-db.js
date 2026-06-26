@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS materials (
   thumbnail       VARCHAR(500),
   download_count  INTEGER DEFAULT 0,
   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  author          VARCHAR(150) DEFAULT 'Anonymous'
+  author          VARCHAR(150) DEFAULT 'Anonymous',
+  user_id         VARCHAR(36)
 );
 `;
 
@@ -30,7 +31,12 @@ async function init() {
   try {
     console.log('Initializing database tables...');
     await db.query(schema);
-    console.log('✅ Tables created successfully or already exist!');
+    
+    // Add user_id column if the table already exists
+    console.log('Ensuring user_id column exists on materials table...');
+    await db.query(`ALTER TABLE materials ADD COLUMN IF NOT EXISTS user_id VARCHAR(36)`);
+    
+    console.log('✅ Tables created/migrated successfully or already exist!');
   } catch (err) {
     console.error('❌ Error creating tables:', err.message || err);
   } finally {
