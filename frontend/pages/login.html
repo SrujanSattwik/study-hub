@@ -57,7 +57,7 @@
                             <label>Email Address</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" placeholder="you@example.com" required>
+                                <input type="email" id="loginEmail" placeholder="you@example.com" required>
                             </div>
                         </div>
 
@@ -399,8 +399,8 @@
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = this.querySelector('input[type="email"]').value.trim();
-            const password = this.querySelector('input[type="password"]').value;
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('password').value;
             const submitBtn = this.querySelector('button[type="submit"]');
             
             if (!email || !password) {

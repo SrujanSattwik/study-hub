@@ -79,13 +79,18 @@ const AuthSession = {
         const isProtected = this.PROTECTED_PATHS.some(p => pageName.includes(p));
         const hasSession = this.isLoggedIn();
 
+        console.log(`[AUTH DEBUG] checkAccessControl: pageName=${pageName}, isProtected=${isProtected}, hasSession=${hasSession}`);
+        console.log(`[AUTH DEBUG] Token present: ${!!this.getToken()}, User present: ${!!this.getUser()}`);
+
         if (isProtected && !hasSession) {
-            console.warn('Unauthorized access. Redirecting to login page...');
+            console.warn(`[AUTH DEBUG] Unauthorized access. Redirecting to login page... Reason: protected page and no active session. Destination: ${this.pagesDir}login.html`);
             window.location.href = `${this.pagesDir}login.html`;
+            return;
         }
 
         // Validate session with backend on load if logged in
         if (hasSession) {
+            console.log('[AUTH DEBUG] Active session found. Validating with backend...');
             this.validateBackendSession();
         }
     },
@@ -94,40 +99,48 @@ const AuthSession = {
     async validateBackendSession() {
         try {
             const token = this.getToken();
+            console.log(`[AUTH DEBUG] Sending session validation request to ${this.API_BASE}/auth/session`);
             const res = await fetch(`${this.API_BASE}/auth/session`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
+            console.log(`[AUTH DEBUG] Session validation response status: ${res.status}`);
             if (!res.ok) {
                 // Token invalid or expired
-                console.error('Session validation failed. Logging out...');
+                console.error(`[AUTH DEBUG] Session validation failed (status ${res.status}). Logging out...`);
                 this.logout(true);
+            } else {
+                console.log('[AUTH DEBUG] Session validated successfully.');
             }
         } catch (err) {
-            console.error('Failed to validate session with backend:', err);
+            console.error('[AUTH DEBUG] Failed to validate session with backend:', err);
         }
     },
 
     // Handle session logout
     async logout(silent = false) {
+        console.log(`[AUTH DEBUG] logout() called. silent=${silent}`);
         if (!silent) {
             try {
                 const token = this.getToken();
+                console.log('[AUTH DEBUG] Sending logout request to backend...');
                 await fetch(`${this.API_BASE}/auth/logout`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
             } catch (err) {
-                console.error('Failed to contact logout endpoint:', err);
+                console.error('[AUTH DEBUG] Failed to contact logout endpoint:', err);
             }
         }
         
         // Clean session keys
+        console.log('[AUTH DEBUG] Removing auth keys from localStorage...');
         localStorage.removeItem(this.TOKEN_KEY);
         localStorage.removeItem(this.USER_KEY);
         localStorage.removeItem('studyhub_current_user'); // also reset onboarding mock login key
         
         // Redirect to login page
+        console.log(`[AUTH DEBUG] Redirecting to: ${this.pagesDir}login.html`);
         window.location.href = `${this.pagesDir}login.html`;
     },
 
@@ -146,12 +159,12 @@ const AuthSession = {
             'Authorization': token ? `Bearer ${token}` : ''
         };
 
+        console.log(`[AUTH DEBUG] fetchWithAuth: ${options.method || 'GET'} ${finalUrl}`);
         const response = await fetch(finalUrl, options);
         
-        // Handle auth expiration
+        // Handle auth expiration / permission warning without forcing page redirect
         if (response.status === 401 || response.status === 403) {
-            console.warn('Session expired or unauthorized. Performing logout...');
-            this.logout(true);
+            console.warn(`[AUTH DEBUG] API request returned status ${response.status} for ${finalUrl}. Keeping page active.`);
         }
 
         return response;
