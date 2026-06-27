@@ -984,6 +984,14 @@ async function enterWorkspace(groupId) {
         document.getElementById('workspace-group-desc').textContent = data.group.description;
         document.getElementById('workspace-icon-box').innerHTML = `<i class="${data.group.icon}"></i>`;
         
+        // Populate enriched header metadata fields
+        const catEl = document.getElementById('workspace-group-category');
+        if (catEl) catEl.textContent = data.group.category || 'other';
+        const memEl = document.getElementById('workspace-group-members');
+        if (memEl) memEl.textContent = data.group.member_count || 0;
+        const createdEl = document.getElementById('workspace-group-created');
+        if (createdEl) createdEl.textContent = data.group.created_at ? new Date(data.group.created_at).toLocaleDateString() : 'N/A';
+
         // Apply Cover banner layout style
         document.getElementById('workspace-banner').style.backgroundImage = `linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%), url('${data.group.cover_image}')`;
         document.getElementById('workspace-banner').style.backgroundSize = 'cover';
@@ -1100,6 +1108,7 @@ function appendChatMessage(msg) {
     const div = document.createElement('div');
     div.id = `msg-${msg.messageId}`;
     div.className = `chat-message-bubble ${isMe ? 'me' : ''}`;
+    div.setAttribute('data-author-initials', AuthSession.getInitials(msg.authorName || 'U'));
 
     let bodyContent = escapeHtml(msg.content);
     // If message is file attachment format
@@ -1123,7 +1132,7 @@ function appendChatMessage(msg) {
 
     div.innerHTML = `
         <div class="message-meta">
-            <span>${escapeHtml(msg.authorName)}</span>
+            <strong>${escapeHtml(msg.authorName)}</strong>
             <span>${new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
         <div class="message-body">${bodyContent}</div>
