@@ -22,15 +22,15 @@ let isHandRaised = false;
 let meetingTimerInterval = null;
 let meetingSeconds = 0;
 
-// Socket initialization guard â€” prevents duplicate listener registration on re-render
+// Socket initialization guard — prevents duplicate listener registration on re-render
 let _socketInitialized = false;
 
 // ---------------------------------------------------------------
-// INITIALIZATION â€” ordered: auth check â†’ parallel data load â†’ socket
+// INITIALIZATION — ordered: auth → skeletons → bundle → socket
 // ---------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Validate session from localStorage (AuthSession.init() may already redirect)
+    // 1. Auth check — runs once, reads only localStorage (zero network overhead)
     currentUser = AuthSession.getUser();
     if (!currentUser) {
         console.warn('[COMMUNITY] No valid session found, redirecting to login...');
@@ -39,18 +39,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('[COMMUNITY] Session valid. User:', currentUser.full_name);
 
-    // 2. Load all community sections in parallel â€” a failure in one won't block others
-    loadHomeData();
+    // 2. Show skeleton placeholders IMMEDIATELY (synchronous, no network needed)
+    //    User sees a populated-looking shell before any data arrives
+    showAllSkeletons();
 
-    // 3. Initialize socket connection (fire after data load request is dispatched)
-    initSocketConnection();
-
-    // 4. Set up scroll/feed events
+    // 3. Set up scroll/feed events early
     setupFeedEvents();
+
+    // 4. Fire single bundled data request — replaces 10 individual HTTP calls
+    await loadHomeData();
+
+    // 5. Init socket AFTER essential UI has rendered — doesn't block rendering
+    initSocketConnection();
 });
 
 // ---------------------------------------------------------------
-// SOCKET CONNECTION â€” guarded against double-initialization
+// SOCKET CONNECTION — guarded against double-initialization
 // ---------------------------------------------------------------
 
 function initSocketConnection() {
@@ -66,7 +70,7 @@ function initSocketConnection() {
         });
 
         socket.on('connect', () => {
-            console.log('ðŸ“¡ Socket connected to server');
+            console.log('📡 Socket connected to server');
             // Pass token for server-side session validation (socket auth)
             const token = (AuthSession.getToken && AuthSession.getToken()) || localStorage.getItem('studyhub_token');
             socket.emit('registerUser', { userId: currentUser.user_id, token });
@@ -109,15 +113,14 @@ function initSocketConnection() {
         });
 
         // Handle raised hand notification
-        // FIXED: was comparing activeGroupId === activeGroupId (always true tautology)
         socket.on('handRaised', (data) => {
             if (data.groupId === activeGroupId && activeTab === 'meeting') {
-                showNotificationToast(`${data.userName} ${data.raised ? 'raised their hand! âœ‹' : 'lowered their hand.'}`);
+                showNotificationToast(`${data.userName} ${data.raised ? 'raised their hand! ✋' : 'lowered their hand.'}`);
                 updateParticipantHand(data.userId, data.raised);
             }
         });
 
-        // Presence changes â€” FIXED: was comparing activeGroupId === activeGroupId (tautology)
+        // Presence changes
         socket.on('presenceChanged', (data) => {
             if (data.groupId === activeGroupId && activeGroupId) {
                 if (typeof loadWorkspaceMembers === 'function') loadWorkspaceMembers();
@@ -140,7 +143,7 @@ function initSocketConnection() {
         });
 
     } else {
-        console.warn('âš ï¸ Socket.io not loaded â€” operating in offline mode.');
+        console.warn('⚠️ Socket.io not loaded — operating in offline mode.');
         // Graceful fallback: mock socket so emit() calls don't throw errors
         socket = {
             emit: (event, payload) => {
@@ -173,35 +176,360 @@ function initSocketConnection() {
 }
 
 // ---------------------------------------------------------------
-// CORE DATA LOADING â€” all sections in parallel with isolated errors
+// SKELETON LOADERS — shown immediately at DOM ready, zero network
+// ---------------------------------------------------------------
+
+const SKELETON_CARD = `<div style="height:72px;background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:var(--radius-md);"></div>`;
+const SKELETON_ROW  = `<div style="height:20px;background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:4px;margin-bottom:8px;"></div>`;
+
+// Inject shimmer keyframes once
+if (!document.getElementById('shimmer-style')) {
+    const s = document.createElement('style');
+    s.id = 'shimmer-style';
+    s.textContent = '@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}';
+    document.head.appendChild(s);
+}
+
+function showAllSkeletons() {
+    const skeletonTargets = [
+        { id: 'sidebar-suggested-groups',   html: SKELETON_CARD.repeat(3) },
+        { id: 'sidebar-active-meetings',    html: SKELETON_CARD.repeat(2) },
+        { id: 'sidebar-online-members',     html: (SKELETON_ROW).repeat(4) },
+        { id: 'sidebar-notifications-list', html: (SKELETON_CARD).repeat(3) },
+        { id: 'sidebar-challenges-list',    html: (SKELETON_CARD).repeat(3) },
+        { id: 'discussion-posts-feed',      html: SKELETON_CARD.repeat(3) },
+        { id: 'my-groups-grid',             html: SKELETON_CARD.repeat(3) },
+        { id: 'explore-groups-grid',        html: SKELETON_CARD.repeat(6) },
+        { id: 'home-events-list',           html: (SKELETON_ROW).repeat(3) }
+    ];
+    skeletonTargets.forEach(({ id, html }) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    });
+}
+
+// ---------------------------------------------------------------
+// CORE DATA LOADING — single bundled HTTP call (replaces 10 individual requests)
+// Renders each section as soon as the bundle response arrives.
+// Falls back to individual calls if bundle endpoint fails.
 // ---------------------------------------------------------------
 
 async function loadHomeData() {
-    console.log('[COMMUNITY] Starting parallel data load...');
+    const t0 = performance.now();
+    console.log('[COMMUNITY] Fetching home-bundle...');
 
-    const tasks = [
-        { name: 'Stats',                fn: loadStats },
-        { name: 'JoinedGroups',         fn: loadJoinedGroups },
-        { name: 'ExploreGroups',        fn: loadExploreGroups },
-        { name: 'FeedPosts',            fn: loadFeedPosts },
-        { name: 'UpcomingEvents',       fn: loadUpcomingEvents },
-        { name: 'SuggestedGroups',      fn: loadSuggestedGroups },
-        { name: 'ActiveMeetings',       fn: loadActiveMeetings },
-        { name: 'OnlineMembers',        fn: loadOnlineMembers },
-        { name: 'SidebarNotifications', fn: loadSidebarNotifications },
-        { name: 'Challenges',           fn: loadChallenges }
-    ];
+    try {
+        const res = await AuthSession.fetchWithAuth('/api/community/home-bundle');
+        if (!res.ok) throw new Error(`Bundle HTTP ${res.status}`);
+        const data = await res.json();
 
-    // Promise.allSettled: all 10 sections fire in parallel; individual failures are isolated
-    const results = await Promise.allSettled(tasks.map(task => task.fn()));
+        if (!data.success || !data.bundle) throw new Error('Bundle response invalid');
 
-    results.forEach((result, i) => {
-        if (result.status === 'rejected') {
-            console.error(`[COMMUNITY] Section "${tasks[i].name}" failed:`, result.reason);
-        }
-    });
+        const b = data.bundle;
+        const elapsed = (performance.now() - t0).toFixed(0);
+        console.log(`[COMMUNITY] Bundle received in ${elapsed}ms — populating sections.`);
 
-    console.log('[COMMUNITY] All sections have settled.');
+        // Populate all sections synchronously from the single response
+        // Each renderer is called directly with data — no extra network round-trips
+        renderStats(b.stats);
+        renderJoinedGroups(b.joinedGroups);
+        renderExploreGroups(b.exploreGroups);
+        renderFeedPosts(b.feed);
+        renderUpcomingEvents(b.events);
+        renderSuggestedGroups(b.suggestedGroups);
+        renderActiveMeetings(b.activeMeetings);
+        renderOnlineMembers(b.onlineUsers);
+        renderSidebarNotifications(b.notifications);
+        renderChallenges(b.challenges);
+
+        console.log(`[COMMUNITY] All sections rendered from bundle. Total: ${(performance.now() - t0).toFixed(0)}ms`);
+
+    } catch (err) {
+        console.warn('[COMMUNITY] Bundle failed, falling back to individual requests:', err.message);
+
+        // Graceful fallback: individual parallel requests (old behavior)
+        const tasks = [
+            { name: 'Stats',                fn: loadStats },
+            { name: 'JoinedGroups',         fn: loadJoinedGroups },
+            { name: 'ExploreGroups',        fn: loadExploreGroups },
+            { name: 'FeedPosts',            fn: loadFeedPosts },
+            { name: 'UpcomingEvents',       fn: loadUpcomingEvents },
+            { name: 'SuggestedGroups',      fn: loadSuggestedGroups },
+            { name: 'ActiveMeetings',       fn: loadActiveMeetings },
+            { name: 'OnlineMembers',        fn: loadOnlineMembers },
+            { name: 'SidebarNotifications', fn: loadSidebarNotifications },
+            { name: 'Challenges',           fn: loadChallenges }
+        ];
+        const results = await Promise.allSettled(tasks.map(t => t.fn()));
+        results.forEach((r, i) => {
+            if (r.status === 'rejected') console.error(`[COMMUNITY] Fallback "${tasks[i].name}" failed:`, r.reason);
+        });
+    }
+}
+
+// ---------------------------------------------------------------
+// BUNDLE RENDERERS — called with data directly from the bundle response.
+// Functionally identical to their loadX() counterparts but accept data
+// as a parameter instead of fetching it themselves.
+// The original loadX() functions remain for post-action refreshes.
+// ---------------------------------------------------------------
+
+function renderStats(stats) {
+    if (!stats) return;
+    animateCounter('stats-active-members', stats.activeMembers);
+    animateCounter('stats-joined-groups', stats.myGroups);
+    animateCounter('stats-questions-solved', stats.questionsSolved);
+    animateCounter('stats-materials-shared', stats.materialsShared);
+    const solvedTrend = document.getElementById('stats-questions-solved-trend');
+    if (solvedTrend) solvedTrend.innerHTML = `<i class="fas fa-check-circle"></i> +${stats.questionsAskedToday || 0} today`;
+    const materialsTrend = document.getElementById('stats-materials-shared-trend');
+    if (materialsTrend) materialsTrend.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> total ${stats.materialsShared || 0}`;
+}
+
+function renderJoinedGroups(groups) {
+    const grid = document.getElementById('my-groups-grid');
+    const emptyState = document.getElementById('my-groups-empty-state');
+    if (!grid) return;
+    if (!groups || groups.length === 0) {
+        grid.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'flex';
+        return;
+    }
+    if (emptyState) emptyState.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = groups.map(group => `
+        <div class="group-card" style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 6px rgba(0,0,0,0.02);transition:var(--transition);">
+            <div style="height:100px;background-image:url('${group.cover_image}');background-size:cover;background-position:center;position:relative;">
+                <div style="position:absolute;bottom:-18px;left:var(--spacing-md);width:44px;height:44px;border-radius:var(--radius-md);background:white;box-shadow:0 4px 8px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;border:1px solid var(--gray-200);">
+                    <i class="${group.icon}" style="font-size:1.25rem;color:var(--primary);"></i>
+                </div>
+            </div>
+            <div style="padding:var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md);flex:1;">
+                <h4 style="font-weight:700;font-size:1rem;color:var(--gray-900);margin-bottom:4px;">${escapeHtml(group.name)}</h4>
+                <p style="font-size:0.82rem;color:var(--gray-600);line-height:1.4;height:38px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:var(--spacing-md);">${escapeHtml(group.description)}</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--gray-600);border-top:1px solid var(--gray-100);padding-top:var(--spacing-sm);">
+                    <span><i class="fas fa-users"></i> ${group.member_count} members</span>
+                    <span><i class="fas fa-clock"></i> ${escapeHtml(group.meeting_schedule)}</span>
+                </div>
+            </div>
+            <div style="padding:0 var(--spacing-md) var(--spacing-md) var(--spacing-md);">
+                <button onclick="enterWorkspace('${group.group_id}')" style="width:100%;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:white;border:none;padding:var(--spacing-sm);border-radius:var(--radius-md);font-weight:600;cursor:pointer;font-size:0.85rem;transition:var(--transition);">Continue Workspace</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderExploreGroups(groups) {
+    const grid = document.getElementById('explore-groups-grid');
+    if (!grid) return;
+    if (!groups || groups.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;padding:3rem 1rem;text-align:center;color:var(--gray-600);"><i class="fas fa-search" style="font-size:2rem;color:var(--gray-300);margin-bottom:var(--spacing-sm);"></i><p>No study groups found.</p></div>`;
+        return;
+    }
+    grid.innerHTML = groups.map(group => `
+        <div class="group-card" style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 6px rgba(0,0,0,0.02);transition:var(--transition);">
+            <div style="height:100px;background-image:url('${group.cover_image}');background-size:cover;background-position:center;position:relative;">
+                <div style="position:absolute;bottom:-18px;left:var(--spacing-md);width:44px;height:44px;border-radius:var(--radius-md);background:white;box-shadow:0 4px 8px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;border:1px solid var(--gray-200);">
+                    <i class="${group.icon}" style="font-size:1.25rem;color:var(--primary);"></i>
+                </div>
+            </div>
+            <div style="padding:var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md);flex:1;">
+                <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:var(--radius-full);background:rgba(99,102,241,0.1);color:var(--primary);display:inline-block;margin-bottom:6px;">${group.category}</span>
+                <h4 style="font-weight:700;font-size:1rem;color:var(--gray-900);margin-bottom:4px;">${escapeHtml(group.name)}</h4>
+                <p style="font-size:0.82rem;color:var(--gray-600);line-height:1.4;height:38px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:var(--spacing-md);">${escapeHtml(group.description)}</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--gray-600);border-top:1px solid var(--gray-100);padding-top:var(--spacing-sm);">
+                    <span><i class="fas fa-users"></i> ${group.member_count} members</span>
+                    <span><i class="fas fa-clock"></i> ${escapeHtml(group.meeting_schedule)}</span>
+                </div>
+            </div>
+            <div style="padding:0 var(--spacing-md) var(--spacing-md) var(--spacing-md);">
+                <button onclick="handleJoinGroup('${group.group_id}')" style="width:100%;background:white;border:1px solid var(--gray-200);color:var(--primary);padding:var(--spacing-sm);border-radius:var(--radius-md);font-weight:600;cursor:pointer;font-size:0.85rem;transition:var(--transition);">Join Group</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderFeedPosts(posts) {
+    const feed = document.getElementById('discussion-posts-feed');
+    const emptyState = document.getElementById('feed-empty-state');
+    if (!feed) return;
+    if (!posts || posts.length === 0) {
+        feed.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'flex';
+        return;
+    }
+    if (emptyState) emptyState.style.display = 'none';
+    feed.style.display = 'flex';
+    feed.innerHTML = posts.map(post => `
+        <div class="card" style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:var(--spacing-md);margin-bottom:var(--spacing-md);box-shadow:0 4px 6px rgba(0,0,0,0.02);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--spacing-sm);">
+                <div style="display:flex;align-items:center;gap:var(--spacing-sm);">
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">
+                        ${AuthSession.getInitials(post.author_name)}
+                    </div>
+                    <div>
+                        <h4 style="font-size:0.92rem;font-weight:700;color:var(--gray-900);">${escapeHtml(post.author_name)}</h4>
+                        <span style="font-size:0.72rem;color:var(--gray-600);">${new Date(post.created_at).toLocaleString()}</span>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size:0.92rem;color:var(--gray-900);margin-bottom:var(--spacing-md);line-height:1.5;white-space:pre-wrap;">${escapeHtml(post.content)}</div>
+            ${post.media_path ? `<div style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--gray-200);margin-bottom:var(--spacing-md);max-height:350px;"><img src="${AuthSession.API_BASE}${post.media_path}" style="width:100%;height:100%;object-fit:contain;"></div>` : ''}
+            <div style="display:flex;gap:var(--spacing-md);border-top:1px solid var(--gray-100);padding-top:var(--spacing-sm);font-size:0.85rem;color:var(--gray-600);">
+                <button onclick="handleLikePost('${post.post_id}')" style="background:transparent;border:none;cursor:pointer;color:${post.is_liked ? 'var(--primary)' : 'var(--gray-600)'};font-weight:600;display:flex;align-items:center;gap:4px;">
+                    <i class="${post.is_liked ? 'fas' : 'far'} fa-thumbs-up"></i> Like (${post.likes_count})
+                </button>
+                <button onclick="toggleCommentsSection('${post.post_id}')" style="background:transparent;border:none;cursor:pointer;color:var(--gray-600);font-weight:600;display:flex;align-items:center;gap:4px;">
+                    <i class="far fa-comment"></i> Comments (${post.comments_count})
+                </button>
+            </div>
+            <div id="comments-section-${post.post_id}" style="display:none;margin-top:var(--spacing-md);border-top:1px solid var(--gray-100);padding-top:var(--spacing-md);">
+                <div id="comments-list-${post.post_id}" style="display:flex;flex-direction:column;gap:var(--spacing-sm);margin-bottom:var(--spacing-md);"></div>
+                <form onsubmit="handleSendComment(event,'${post.post_id}')" style="display:flex;gap:var(--spacing-sm);">
+                    <input type="text" id="comment-input-${post.post_id}" placeholder="Write a comment..." required style="flex:1;padding:6px 12px;border-radius:var(--radius-full);border:1px solid var(--gray-200);outline:none;font-size:0.85rem;">
+                    <button type="submit" style="background:var(--primary);color:white;border:none;padding:4px 14px;border-radius:var(--radius-full);font-weight:600;font-size:0.8rem;cursor:pointer;">Reply</button>
+                </form>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderUpcomingEvents(events) {
+    const container = document.getElementById('home-events-list');
+    if (!container) return;
+    if (!events || events.length === 0) {
+        container.innerHTML = `<p style="font-size:0.8rem;color:var(--gray-600);font-style:italic;">No upcoming community events scheduled.</p>`;
+        return;
+    }
+    container.innerHTML = events.map(ev => {
+        const d = new Date(ev.event_date);
+        return `<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:var(--spacing-sm);display:flex;align-items:center;gap:var(--spacing-sm);">
+            <div style="min-width:44px;height:44px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;">
+                <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;">${d.toLocaleString('default',{month:'short'})}</span>
+                <span style="font-size:1.1rem;font-weight:800;line-height:1;">${d.getDate()}</span>
+            </div>
+            <div style="flex:1;overflow:hidden;">
+                <div style="font-size:0.85rem;font-weight:700;color:var(--gray-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(ev.title)}</div>
+                <div style="font-size:0.72rem;color:var(--gray-600);">${escapeHtml(ev.group_name)} · ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderSuggestedGroups(groups) {
+    const container = document.getElementById('sidebar-suggested-groups');
+    const emptyLabel = document.getElementById('suggested-groups-empty');
+    if (!container) return;
+    if (!groups || groups.length === 0) {
+        container.innerHTML = '';
+        if (emptyLabel) emptyLabel.style.display = 'block';
+        return;
+    }
+    if (emptyLabel) emptyLabel.style.display = 'none';
+    container.innerHTML = groups.map(group => `
+        <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:var(--spacing-sm);display:flex;align-items:center;justify-content:space-between;gap:var(--spacing-xs);">
+            <div style="display:flex;align-items:center;gap:var(--spacing-xs);overflow:hidden;flex:1;">
+                <div style="width:32px;height:32px;min-width:32px;border-radius:4px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;">
+                    <i class="${group.icon}" style="color:var(--primary);font-size:0.85rem;"></i>
+                </div>
+                <div style="overflow:hidden;flex:1;">
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--gray-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(group.name)}</div>
+                    <div style="font-size:0.72rem;color:var(--gray-600);">${group.member_count} members</div>
+                </div>
+            </div>
+            <button onclick="handleJoinGroup('${group.group_id}')" style="background:var(--primary);color:white;border:none;padding:4px 10px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--transition);">Join</button>
+        </div>
+    `).join('');
+}
+
+function renderActiveMeetings(meetings) {
+    const container = document.getElementById('sidebar-active-meetings');
+    const emptyLabel = document.getElementById('active-meetings-empty');
+    if (!container) return;
+    if (!meetings || meetings.length === 0) {
+        container.innerHTML = '';
+        if (emptyLabel) emptyLabel.style.display = 'block';
+        return;
+    }
+    if (emptyLabel) emptyLabel.style.display = 'none';
+    container.innerHTML = meetings.map(meeting => `
+        <div style="background:rgba(99,102,241,0.03);border:1px solid rgba(99,102,241,0.15);border-radius:var(--radius-md);padding:var(--spacing-sm);position:relative;overflow:hidden;">
+            <div style="position:absolute;right:8px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);"></div>
+            <h5 style="font-size:0.82rem;font-weight:700;color:var(--gray-900);margin-bottom:2px;">${escapeHtml(meeting.title)}</h5>
+            <p style="font-size:0.72rem;color:var(--gray-600);margin-bottom:var(--spacing-xs);">Group: <strong>${escapeHtml(meeting.group_name)}</strong></p>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--gray-600);">
+                <span>Host: ${escapeHtml(meeting.host_name)}</span>
+                <button onclick="enterWorkspace('${meeting.group_id}')" style="background:var(--success);color:white;border:none;padding:2px 8px;border-radius:4px;font-weight:600;cursor:pointer;">Join Room</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderOnlineMembers(onlineUsers) {
+    const container = document.getElementById('sidebar-online-members');
+    const emptyLabel = document.getElementById('online-members-empty');
+    if (!container) return;
+    if (!onlineUsers || onlineUsers.length === 0) {
+        container.innerHTML = '';
+        if (emptyLabel) emptyLabel.style.display = 'block';
+        return;
+    }
+    if (emptyLabel) emptyLabel.style.display = 'none';
+    container.innerHTML = onlineUsers.map(user => `
+        <div style="display:flex;align-items:center;gap:var(--spacing-xs);padding:4px 0;">
+            <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem;">
+                ${AuthSession.getInitials(user.full_name)}
+            </div>
+            <div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.82rem;font-weight:500;color:var(--gray-900);">${escapeHtml(user.full_name)}</div>
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--success);"></span>
+        </div>
+    `).join('');
+}
+
+function renderSidebarNotifications(notifications) {
+    const container = document.getElementById('sidebar-notifications-list');
+    const emptyLabel = document.getElementById('notifications-empty');
+    if (!container) return;
+    if (!notifications || notifications.length === 0) {
+        container.innerHTML = '';
+        if (emptyLabel) emptyLabel.style.display = 'block';
+        return;
+    }
+    if (emptyLabel) emptyLabel.style.display = 'none';
+    container.innerHTML = notifications.map(notif => `
+        <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:var(--spacing-sm);font-size:0.78rem;position:relative;transition:var(--transition);cursor:pointer;" onclick="markNotificationRead('${notif.notification_id}')">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+                <strong style="color:var(--gray-900);">${escapeHtml(notif.title)}</strong>
+                ${!notif.is_read ? '<span style="width:6px;height:6px;border-radius:50%;background:var(--primary);"></span>' : ''}
+            </div>
+            <div style="color:var(--gray-700);line-height:1.3;">${escapeHtml(notif.content)}</div>
+            <div style="font-size:0.68rem;color:var(--gray-600);margin-top:4px;">${new Date(notif.created_at).toLocaleDateString()}</div>
+        </div>
+    `).join('');
+}
+
+function renderChallenges(challenges) {
+    const container = document.getElementById('sidebar-challenges-list');
+    if (!container) return;
+    if (!challenges || challenges.length === 0) {
+        container.innerHTML = `<p style="font-size:0.78rem;color:var(--gray-600);font-style:italic;">No active challenges today.</p>`;
+        return;
+    }
+    container.innerHTML = challenges.map(ch => `
+        <div class="challenge-item">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:0.8rem;font-weight:700;color:var(--gray-900);">${escapeHtml(ch.title)}</span>
+                <span style="font-size:0.7rem;font-weight:600;color:var(--primary);">${ch.reward}</span>
+            </div>
+            <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:var(--spacing-xs);">${escapeHtml(ch.description)}</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div class="challenge-progress-bar" style="flex:1;margin-top:0;">
+                    <div class="challenge-progress-fill" style="width:${ch.progress}%"></div>
+                </div>
+                <span style="font-size:0.7rem;font-weight:600;color:var(--gray-700);">${ch.progress}%</span>
+            </div>
+        </div>
+    `).join('');
 }
 
 // ---------------------------------------------------------------
@@ -223,7 +551,9 @@ function setErrorState(containerId, message = 'Failed to load. Please refresh.')
 }
 
 // ---------------------------------------------------------------
-// STATS LOADING
+// INDIVIDUAL LOAD FUNCTIONS — used for post-action refreshes
+// (join group, like post, RSVP, etc.) These fetch fresh data and
+// delegate rendering to the shared render* functions above.
 // ---------------------------------------------------------------
 
 async function loadStats() {
@@ -231,20 +561,7 @@ async function loadStats() {
         const res = await AuthSession.fetchWithAuth('/api/community/stats');
         if (!res.ok) throw new Error('Stats fetch failed');
         const data = await res.json();
-        if (data.success && data.stats) {
-            animateCounter('stats-active-members', data.stats.activeMembers);
-            animateCounter('stats-joined-groups', data.stats.myGroups);
-            animateCounter('stats-questions-solved', data.stats.questionsSolved);
-            animateCounter('stats-materials-shared', data.stats.materialsShared);
-
-            const todayQ = data.stats.questionsAskedToday || 0;
-            const solvedTrend = document.getElementById('stats-questions-solved-trend');
-            if (solvedTrend) solvedTrend.innerHTML = `<i class="fas fa-check-circle"></i> +${todayQ} today`;
-
-            const materials = data.stats.materialsShared || 0;
-            const materialsTrend = document.getElementById('stats-materials-shared-trend');
-            if (materialsTrend) materialsTrend.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> total ${materials}`;
-        }
+        if (data.success && data.stats) renderStats(data.stats);
     } catch (error) {
         console.error('[COMMUNITY] Error loading stats:', error);
     }
@@ -279,124 +596,32 @@ async function loadSuggestedGroups() {
     try {
         const res = await AuthSession.fetchWithAuth('/api/community/groups/suggested');
         const data = await res.json();
-        const container = document.getElementById('sidebar-suggested-groups');
-        const emptyLabel = document.getElementById('suggested-groups-empty');
-        if (!container) return;
-
-        if (!data.success || !data.groups || data.groups.length === 0) {
-            container.innerHTML = '';
-            if (emptyLabel) emptyLabel.style.display = 'block';
-            return;
-        }
-
-        if (emptyLabel) emptyLabel.style.display = 'none';
-        container.innerHTML = data.groups.map(group => `
-            <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--spacing-sm); display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-xs);">
-                <div style="display: flex; align-items: center; gap: var(--spacing-xs); overflow: hidden; flex: 1;">
-                    <div style="width: 32px; height: 32px; min-width: 32px; border-radius: 4px; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center;">
-                        <i class="${group.icon}" style="color: var(--primary); font-size: 0.85rem;"></i>
-                    </div>
-                    <div style="overflow: hidden; flex: 1;">
-                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(group.name)}</div>
-                        <div style="font-size: 0.72rem; color: var(--gray-600);">${group.member_count} members</div>
-                    </div>
-                </div>
-                <button onclick="handleJoinGroup('${group.group_id}')" style="background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: var(--transition);">Join</button>
-            </div>
-        `).join('');
-    } catch (err) {
-        console.error('Error loading suggested groups:', err);
-    }
+        renderSuggestedGroups(data.success ? data.groups : []);
+    } catch (err) { console.error('Error loading suggested groups:', err); }
 }
 
 async function loadActiveMeetings() {
     try {
         const res = await AuthSession.fetchWithAuth('/api/community/meetings/active');
         const data = await res.json();
-        const container = document.getElementById('sidebar-active-meetings');
-        const emptyLabel = document.getElementById('active-meetings-empty');
-        if (!container) return;
-
-        if (!data.success || !data.meetings || data.meetings.length === 0) {
-            container.innerHTML = '';
-            if (emptyLabel) emptyLabel.style.display = 'block';
-            return;
-        }
-
-        if (emptyLabel) emptyLabel.style.display = 'none';
-        container.innerHTML = data.meetings.map(meeting => `
-            <div style="background: rgba(99, 102, 241, 0.03); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: var(--radius-md); padding: var(--spacing-sm); position: relative; overflow: hidden;">
-                <div style="position: absolute; right: 8px; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success);"></div>
-                <h5 style="font-size: 0.82rem; font-weight: 700; color: var(--gray-900); margin-bottom: 2px;">${escapeHtml(meeting.title)}</h5>
-                <p style="font-size: 0.72rem; color: var(--gray-600); margin-bottom: var(--spacing-xs);">Group: <strong>${escapeHtml(meeting.group_name)}</strong></p>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: var(--gray-600);">
-                    <span>Host: ${escapeHtml(meeting.host_name)}</span>
-                    <button onclick="enterWorkspace('${meeting.group_id}')" style="background: var(--success); color: white; border: none; padding: 2px 8px; border-radius: 4px; font-weight: 600; cursor: pointer;">Join Room</button>
-                </div>
-            </div>
-        `).join('');
-    } catch (err) {
-        console.error('Error loading active meetings:', err);
-    }
+        renderActiveMeetings(data.success ? data.meetings : []);
+    } catch (err) { console.error('Error loading active meetings:', err); }
 }
 
 async function loadOnlineMembers() {
     try {
         const res = await AuthSession.fetchWithAuth('/api/community/presence/online');
         const data = await res.json();
-        const container = document.getElementById('sidebar-online-members');
-        const emptyLabel = document.getElementById('online-members-empty');
-        if (!container) return;
-
-        if (!data.success || !data.onlineUsers || data.onlineUsers.length === 0) {
-            container.innerHTML = '';
-            if (emptyLabel) emptyLabel.style.display = 'block';
-            return;
-        }
-
-        if (emptyLabel) emptyLabel.style.display = 'none';
-        container.innerHTML = data.onlineUsers.map(user => `
-            <div style="display: flex; align-items: center; gap: var(--spacing-xs); padding: 4px 0;">
-                <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7rem;">
-                    ${AuthSession.getInitials(user.full_name)}
-                </div>
-                <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem; font-weight: 500; color: var(--gray-900);">${escapeHtml(user.full_name)}</div>
-                <span class="presence-dot online" style="width: 6px; height: 6px; border-radius: 50%; background: var(--success);"></span>
-            </div>
-        `).join('');
-    } catch (err) {
-        console.error('Error loading online presence:', err);
-    }
+        renderOnlineMembers(data.success ? data.onlineUsers : []);
+    } catch (err) { console.error('Error loading online presence:', err); }
 }
 
 async function loadSidebarNotifications() {
     try {
         const res = await AuthSession.fetchWithAuth('/api/community/notifications');
         const data = await res.json();
-        const container = document.getElementById('sidebar-notifications-list');
-        const emptyLabel = document.getElementById('notifications-empty');
-        if (!container) return;
-
-        if (!data.success || !data.notifications || data.notifications.length === 0) {
-            container.innerHTML = '';
-            if (emptyLabel) emptyLabel.style.display = 'block';
-            return;
-        }
-
-        if (emptyLabel) emptyLabel.style.display = 'none';
-        container.innerHTML = data.notifications.map(notif => `
-            <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--spacing-sm); font-size: 0.78rem; position: relative; transition: var(--transition); cursor: pointer;" onclick="markNotificationRead('${notif.notification_id}')">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px;">
-                    <strong style="color: var(--gray-900);">${escapeHtml(notif.title)}</strong>
-                    ${!notif.is_read ? '<span style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary);"></span>' : ''}
-                </div>
-                <div style="color: var(--gray-700); line-height: 1.3;">${escapeHtml(notif.content)}</div>
-                <div style="font-size: 0.68rem; color: var(--gray-600); margin-top: 4px;">${new Date(notif.created_at).toLocaleDateString()}</div>
-            </div>
-        `).join('');
-    } catch (err) {
-        console.error('Error loading notifications:', err);
-    }
+        renderSidebarNotifications(data.success ? data.notifications : []);
+    } catch (err) { console.error('Error loading notifications:', err); }
 }
 
 async function markNotificationRead(id) {
@@ -415,32 +640,8 @@ async function loadChallenges() {
     try {
         const res = await AuthSession.fetchWithAuth('/api/community/challenges');
         const data = await res.json();
-        const container = document.getElementById('sidebar-challenges-list');
-        if (!container) return;
-
-        if (!data.success || !data.challenges || data.challenges.length === 0) {
-            container.innerHTML = `<p style="font-size: 0.78rem; color: var(--gray-600); font-style: italic;">No active challenges today.</p>`;
-            return;
-        }
-
-        container.innerHTML = data.challenges.map(ch => `
-            <div class="challenge-item">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--gray-900);">${escapeHtml(ch.title)}</span>
-                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--primary);">${ch.reward}</span>
-                </div>
-                <div style="font-size: 0.72rem; color: var(--gray-600); margin-bottom: var(--spacing-xs);">${escapeHtml(ch.description)}</div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div class="challenge-progress-bar" style="flex: 1; margin-top: 0;">
-                        <div class="challenge-progress-fill" style="width: ${ch.progress}%"></div>
-                    </div>
-                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--gray-700);">${ch.progress}%</span>
-                </div>
-            </div>
-        `).join('');
-    } catch (err) {
-        console.error('Error loading challenges:', err);
-    }
+        renderChallenges(data.success ? data.challenges : []);
+    } catch (err) { console.error('Error loading challenges:', err); }
 }
 
 async function loadJoinedGroups() {
@@ -448,89 +649,19 @@ async function loadJoinedGroups() {
         const res = await AuthSession.fetchWithAuth('/api/community/groups/joined');
         if (!res.ok) throw new Error('Fetch failed');
         const data = await res.json();
-        
-        const grid = document.getElementById('my-groups-grid');
-        const emptyState = document.getElementById('my-groups-empty-state');
-        if (!grid) return;
-
-        if (data.groups.length === 0) {
-            grid.style.display = 'none';
-            if (emptyState) emptyState.style.display = 'flex';
-            return;
-        }
-
-        if (emptyState) emptyState.style.display = 'none';
-        grid.style.display = 'grid';
-
-        grid.innerHTML = data.groups.map(group => `
-            <div class="group-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: var(--transition);">
-                <div style="height: 100px; background-image: url('${group.cover_image}'); background-size: cover; background-position: center; position: relative;">
-                    <div style="position: absolute; bottom: -18px; left: var(--spacing-md); width: 44px; height: 44px; border-radius: var(--radius-md); background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; border: 1px solid var(--gray-200);">
-                        <i class="${group.icon}" style="font-size: 1.25rem; color: var(--primary);"></i>
-                    </div>
-                </div>
-                <div style="padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md); flex: 1;">
-                    <h4 style="font-weight: 700; font-size: 1rem; color: var(--gray-900); margin-bottom: 4px;">${escapeHtml(group.name)}</h4>
-                    <p style="font-size: 0.82rem; color: var(--gray-600); line-height: 1.4; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: var(--spacing-md);">${escapeHtml(group.description)}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--gray-600); border-top: 1px solid var(--gray-100); padding-top: var(--spacing-sm);">
-                        <span><i class="fas fa-users"></i> ${group.member_count} members</span>
-                        <span><i class="fas fa-clock"></i> ${escapeHtml(group.meeting_schedule)}</span>
-                    </div>
-                </div>
-                <div style="padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);">
-                    <button onclick="enterWorkspace('${group.group_id}')" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border: none; padding: var(--spacing-sm); border-radius: var(--radius-md); font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: var(--transition);">Continue Workspace</button>
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading joined groups:', error);
-    }
+        renderJoinedGroups(data.groups);
+    } catch (error) { console.error('Error loading joined groups:', error); }
 }
 
 async function loadExploreGroups(category = 'all', search = '') {
     try {
         let url = `/api/community/groups?category=${category}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
-        
         const res = await AuthSession.fetchWithAuth(url);
         if (!res.ok) throw new Error('Fetch failed');
         const data = await res.json();
-
-        const grid = document.getElementById('explore-groups-grid');
-        if (data.groups.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; padding: 3rem 1rem; text-align: center; color: var(--gray-600);">
-                    <i class="fas fa-search" style="font-size: 2rem; color: var(--gray-300); margin-bottom: var(--spacing-sm);"></i>
-                    <p>No study groups found matching your criteria.</p>
-                </div>
-            `;
-            return;
-        }
-
-        grid.innerHTML = data.groups.map(group => `
-            <div class="group-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: var(--transition);">
-                <div style="height: 100px; background-image: url('${group.cover_image}'); background-size: cover; background-position: center; position: relative;">
-                    <div style="position: absolute; bottom: -18px; left: var(--spacing-md); width: 44px; height: 44px; border-radius: var(--radius-md); background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; border: 1px solid var(--gray-200);">
-                        <i class="${group.icon}" style="font-size: 1.25rem; color: var(--primary);"></i>
-                    </div>
-                </div>
-                <div style="padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md) var(--spacing-md); flex: 1;">
-                    <span style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: var(--radius-full); background: rgba(99, 102, 241, 0.1); color: var(--primary); display: inline-block; margin-bottom: 6px;">${group.category}</span>
-                    <h4 style="font-weight: 700; font-size: 1rem; color: var(--gray-900); margin-bottom: 4px;">${escapeHtml(group.name)}</h4>
-                    <p style="font-size: 0.82rem; color: var(--gray-600); line-height: 1.4; height: 38px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: var(--spacing-md);">${escapeHtml(group.description)}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--gray-600); border-top: 1px solid var(--gray-100); padding-top: var(--spacing-sm);">
-                        <span><i class="fas fa-users"></i> ${group.member_count} members</span>
-                        <span><i class="fas fa-clock"></i> ${escapeHtml(group.meeting_schedule)}</span>
-                    </div>
-                </div>
-                <div style="padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);">
-                    <button onclick="handleJoinGroup('${group.group_id}')" style="width: 100%; background: white; border: 1px solid var(--gray-200); color: var(--primary); padding: var(--spacing-sm); border-radius: var(--radius-md); font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: var(--transition);">Join Group</button>
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading explore groups:', error);
-    }
+        renderExploreGroups(data.groups);
+    } catch (error) { console.error('Error loading explore groups:', error); }
 }
 
 async function handleJoinGroup(groupId) {

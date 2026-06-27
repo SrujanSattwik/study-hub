@@ -27,7 +27,7 @@ pool.on('error', (err, client) => {
   console.error('[DB POOL ERROR] Unexpected error on idle client:', err.message);
 });
 
-// Helper function to execute queries using the pool
+// Standard query — used across all routes
 async function query(text, params) {
   try {
     return await pool.query(text, params);
@@ -37,7 +37,31 @@ async function query(text, params) {
   }
 }
 
+/**
+ * Timed query — returns { rows, rowCount, queryMs }
+ * Used by profiling middleware and home-bundle to measure DB overhead precisely.
+ * Slow queries (>100ms) trigger a warning log automatically.
+ * @param {string} text
+ * @param {Array} [params]
+ * @returns {Promise<{ rows: any[], rowCount: number, queryMs: number }>}
+ */
+async function timedQuery(text, params) {
+  const start = process.hrtime.bigint();
+  try {
+    const result = await pool.query(text, params);
+    const queryMs = Number(process.hrtime.bigint() - start) / 1e6;
+    if (queryMs > 100) {
+      console.warn(`[DB SLOW QUERY] ${queryMs.toFixed(1)}ms | ${text.substring(0, 100)}`);
+    }
+    return { rows: result.rows, rowCount: result.rowCount, queryMs };
+  } catch (err) {
+    console.error('[DB QUERY ERROR]', err.message, '| Query:', text.substring(0, 120));
+    throw err;
+  }
+}
+
 module.exports = {
   query,
+  timedQuery,
   pool
 };
