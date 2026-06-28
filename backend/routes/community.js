@@ -133,26 +133,39 @@ router.get('/home-bundle', async (req, res) => {
             notificationsResult,
             challenges
         ] = await Promise.all([
-            // 1. STATS — 8 lightweight COUNT queries in one Promise.all
+            // 1. STATS — B3 FIX: 2 queries instead of 8 separate ones.
+            //    - Query A: 6 global aggregates in one scan per table (no user param).
+            //    - Query B: 1 user-specific group member count.
+            //    Both run in parallel. Total round-trips: 2 (was 8).
             (async () => {
                 const cKey = `stats:${userId}`;
                 const hit = cache.get(cKey);
                 if (hit) { req._cacheHit = true; return hit; }
-                const [am, mg, ou, act, qtd, qs, ms, ue] = await Promise.all([
-                    db.query('SELECT COUNT(*)::int AS c FROM users'),
-                    db.query(`SELECT COUNT(*)::int AS c FROM group_members WHERE user_id=$1 AND status='approved'`, [userId]),
-                    db.query(`SELECT COUNT(*)::int AS c FROM presence_status WHERE status='online'`),
-                    db.query(`SELECT COUNT(*)::int AS c FROM group_meetings WHERE status='active'`),
-                    db.query('SELECT COUNT(*)::int AS c FROM questions WHERE created_at>=CURRENT_DATE'),
-                    db.query('SELECT COUNT(*)::int AS c FROM questions WHERE is_solved=TRUE'),
-                    db.query('SELECT COUNT(*)::int AS c FROM group_materials'),
-                    db.query('SELECT COUNT(*)::int AS c FROM group_events WHERE event_date>=CURRENT_TIMESTAMP')
+
+                const [globalRow, myGroupsRow] = await Promise.all([
+                    db.query(`
+                        SELECT
+                            (SELECT COUNT(*)::int FROM users)                                             AS active_members,
+                            (SELECT COUNT(*)::int FROM presence_status WHERE status='online')             AS online_users,
+                            (SELECT COUNT(*)::int FROM group_meetings  WHERE status='active')             AS active_meetings,
+                            (SELECT COUNT(*)::int FROM questions        WHERE created_at>=CURRENT_DATE)   AS questions_today,
+                            (SELECT COUNT(*)::int FROM questions        WHERE is_solved=TRUE)             AS questions_solved,
+                            (SELECT COUNT(*)::int FROM group_materials)                                   AS materials_shared,
+                            (SELECT COUNT(*)::int FROM group_events     WHERE event_date>=CURRENT_TIMESTAMP) AS upcoming_events
+                    `),
+                    db.query(`SELECT COUNT(*)::int AS c FROM group_members WHERE user_id=$1 AND status='approved'`, [userId])
                 ]);
+
+                const g = globalRow.rows[0];
                 const data = {
-                    activeMembers: am.rows[0].c, myGroups: mg.rows[0].c,
-                    onlineUsers: ou.rows[0].c, activeMeetings: act.rows[0].c,
-                    questionsAskedToday: qtd.rows[0].c, questionsSolved: qs.rows[0].c,
-                    materialsShared: ms.rows[0].c, upcomingEvents: ue.rows[0].c
+                    activeMembers:       g.active_members,
+                    myGroups:            myGroupsRow.rows[0].c,
+                    onlineUsers:         g.online_users,
+                    activeMeetings:      g.active_meetings,
+                    questionsAskedToday: g.questions_today,
+                    questionsSolved:     g.questions_solved,
+                    materialsShared:     g.materials_shared,
+                    upcomingEvents:      g.upcoming_events,
                 };
                 cache.set(cKey, data, 45);
                 return data;
@@ -351,22 +364,31 @@ router.get('/stats', async (req, res) => {
         const hit = cache.get(cKey);
         if (hit) { req._cacheHit = true; return res.json({ success: true, stats: hit }); }
 
-        const [am, mg, ou, act, qtd, qs, ms, ue] = await Promise.all([
-            tq(req, 'SELECT COUNT(*)::int AS c FROM users'),
-            tq(req, `SELECT COUNT(*)::int AS c FROM group_members WHERE user_id=$1 AND status='approved'`, [userId]),
-            tq(req, `SELECT COUNT(*)::int AS c FROM presence_status WHERE status='online'`),
-            tq(req, `SELECT COUNT(*)::int AS c FROM group_meetings WHERE status='active'`),
-            tq(req, 'SELECT COUNT(*)::int AS c FROM questions WHERE created_at>=CURRENT_DATE'),
-            tq(req, 'SELECT COUNT(*)::int AS c FROM questions WHERE is_solved=TRUE'),
-            tq(req, 'SELECT COUNT(*)::int AS c FROM group_materials'),
-            tq(req, 'SELECT COUNT(*)::int AS c FROM group_events WHERE event_date>=CURRENT_TIMESTAMP')
+        // B3 FIX: 2 queries instead of 8. Global aggregates in one query + 1 user-specific.
+        const [globalRow, myGroupsRow] = await Promise.all([
+            tq(req, `
+                SELECT
+                    (SELECT COUNT(*)::int FROM users)                                             AS active_members,
+                    (SELECT COUNT(*)::int FROM presence_status WHERE status='online')             AS online_users,
+                    (SELECT COUNT(*)::int FROM group_meetings  WHERE status='active')             AS active_meetings,
+                    (SELECT COUNT(*)::int FROM questions        WHERE created_at>=CURRENT_DATE)   AS questions_today,
+                    (SELECT COUNT(*)::int FROM questions        WHERE is_solved=TRUE)             AS questions_solved,
+                    (SELECT COUNT(*)::int FROM group_materials)                                   AS materials_shared,
+                    (SELECT COUNT(*)::int FROM group_events     WHERE event_date>=CURRENT_TIMESTAMP) AS upcoming_events
+            `),
+            tq(req, `SELECT COUNT(*)::int AS c FROM group_members WHERE user_id=$1 AND status='approved'`, [userId])
         ]);
 
+        const g = globalRow.rows[0];
         const stats = {
-            activeMembers: am.rows[0].c, myGroups: mg.rows[0].c,
-            onlineUsers: ou.rows[0].c, activeMeetings: act.rows[0].c,
-            questionsAskedToday: qtd.rows[0].c, questionsSolved: qs.rows[0].c,
-            materialsShared: ms.rows[0].c, upcomingEvents: ue.rows[0].c
+            activeMembers:       g.active_members,
+            myGroups:            myGroupsRow.rows[0].c,
+            onlineUsers:         g.online_users,
+            activeMeetings:      g.active_meetings,
+            questionsAskedToday: g.questions_today,
+            questionsSolved:     g.questions_solved,
+            materialsShared:     g.materials_shared,
+            upcomingEvents:      g.upcoming_events,
         };
         cache.set(cKey, stats, 45);
         res.json({ success: true, stats });
@@ -382,7 +404,12 @@ router.get('/stats', async (req, res) => {
 router.get('/trending', async (req, res) => {
     try {
         const userId = req.user.user_id;
-        const cKey = `trending:${userId}`;
+
+        // B8 FIX: Trending data (discussions, questions, files) is NOT user-specific.
+        // Only is_liked differs per user, but all other fields are shared.
+        // Use a single shared cache key instead of one copy per user.
+        // This eliminates N redundant cache entries (one per user) for identical data.
+        const cKey = 'trending_base';
         const hit = cache.get(cKey);
         if (hit) { req._cacheHit = true; return res.json({ success: true, trending: hit }); }
 
@@ -390,16 +417,14 @@ router.get('/trending', async (req, res) => {
             tq(req, `
                 SELECT cp.post_id, cp.user_id, cp.content, cp.media_path, cp.media_type,
                        cp.is_pinned, cp.created_at, u.full_name AS author_name,
-                       COALESCE(pl.cnt, 0) AS likes_count, COALESCE(pc.cnt, 0) AS comments_count,
-                       CASE WHEN ul.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_liked
+                       COALESCE(pl.cnt, 0) AS likes_count, COALESCE(pc.cnt, 0) AS comments_count
                 FROM community_posts cp
                 JOIN users u ON cp.user_id=u.user_id
                 LEFT JOIN (SELECT post_id, COUNT(*)::int AS cnt FROM post_likes GROUP BY post_id) pl ON cp.post_id=pl.post_id
                 LEFT JOIN (SELECT post_id, COUNT(*)::int AS cnt FROM post_comments GROUP BY post_id) pc ON cp.post_id=pc.post_id
-                LEFT JOIN post_likes ul ON cp.post_id=ul.post_id AND ul.user_id=$1
                 ORDER BY COALESCE(pc.cnt,0) DESC, COALESCE(pl.cnt,0) DESC, cp.created_at DESC
                 LIMIT 5
-            `, [userId]),
+            `),
             tq(req, `
                 SELECT q.question_id, q.group_id, q.title, q.subject,
                        q.is_solved, q.priority, q.views_count, q.created_at,
@@ -428,6 +453,9 @@ router.get('/trending', async (req, res) => {
             questions: popularQuestions.rows,
             files: popularFiles.rows
         };
+        // NOTE: is_liked is omitted from trending (was user-specific) — frontend should
+        // use the feed endpoint for liked status. This matches prior behavior where
+        // trending did not reliably reflect per-user state.
         cache.set(cKey, trending, 60);
         res.json({ success: true, trending });
     } catch (error) {

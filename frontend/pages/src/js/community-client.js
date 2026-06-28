@@ -179,33 +179,112 @@ function initSocketConnection() {
 // SKELETON LOADERS — shown immediately at DOM ready, zero network
 // ---------------------------------------------------------------
 
-const SKELETON_CARD = `<div style="height:72px;background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:var(--radius-md);"></div>`;
-const SKELETON_ROW  = `<div style="height:20px;background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:4px;margin-bottom:8px;"></div>`;
+// ── Shape-accurate skeleton HTML ────────────────────────────────────────────
+// Uses classes from skeletons.css (sk, sk-circle, etc.) for GPU-shimmer.
+// Each skeleton mirrors the exact layout of the final content.
 
-// Inject shimmer keyframes once
-if (!document.getElementById('shimmer-style')) {
-    const s = document.createElement('style');
-    s.id = 'shimmer-style';
-    s.textContent = '@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}';
-    document.head.appendChild(s);
-}
+const SK_GROUP_CARD = `
+<div class="sk-group-card">
+  <div class="sk sk-group-card__banner"></div>
+  <div class="sk-group-card__body">
+    <div class="sk sk-group-card__title"></div>
+    <div class="sk sk-group-card__desc"></div>
+    <div class="sk sk-group-card__desc-2"></div>
+    <div class="sk-group-card__meta">
+      <div class="sk sk-group-card__meta-l"></div>
+      <div class="sk sk-group-card__meta-r"></div>
+    </div>
+  </div>
+  <div class="sk sk-group-card__btn"></div>
+</div>`;
+
+const SK_POST = `
+<div class="sk-post">
+  <div class="sk-post__header">
+    <div class="sk sk-circle sk-post__avatar"></div>
+    <div class="sk-post__meta">
+      <div class="sk sk-post__name"></div>
+      <div class="sk sk-post__time"></div>
+    </div>
+  </div>
+  <div class="sk sk-post__line-1"></div>
+  <div class="sk sk-post__line-2"></div>
+  <div class="sk sk-post__line-3"></div>
+  <div class="sk-post__actions">
+    <div class="sk sk-post__action"></div>
+    <div class="sk sk-post__action"></div>
+  </div>
+</div>`;
+
+const SK_NOTIF = `
+<div class="sk-notif">
+  <div class="sk sk-circle sk-notif__icon"></div>
+  <div class="sk-notif__body">
+    <div class="sk sk-notif__title"></div>
+    <div class="sk sk-notif__text"></div>
+    <div class="sk sk-notif__time"></div>
+  </div>
+</div>`;
+
+const SK_MEMBER = `
+<div class="sk-member">
+  <div class="sk sk-circle sk-member__avatar"></div>
+  <div class="sk sk-member__name"></div>
+</div>`;
+
+const SK_ROW = `<div class="sk sk-widget-row"></div>`;
 
 function showAllSkeletons() {
-    const skeletonTargets = [
-        { id: 'sidebar-suggested-groups',   html: SKELETON_CARD.repeat(3) },
-        { id: 'sidebar-active-meetings',    html: SKELETON_CARD.repeat(2) },
-        { id: 'sidebar-online-members',     html: (SKELETON_ROW).repeat(4) },
-        { id: 'sidebar-notifications-list', html: (SKELETON_CARD).repeat(3) },
-        { id: 'sidebar-challenges-list',    html: (SKELETON_CARD).repeat(3) },
-        { id: 'discussion-posts-feed',      html: SKELETON_CARD.repeat(3) },
-        { id: 'my-groups-grid',             html: SKELETON_CARD.repeat(3) },
-        { id: 'explore-groups-grid',        html: SKELETON_CARD.repeat(6) },
-        { id: 'home-events-list',           html: (SKELETON_ROW).repeat(3) }
+    const targets = [
+        { id: 'sidebar-suggested-groups',   html: SK_GROUP_CARD.repeat(3) },
+        { id: 'sidebar-active-meetings',    html: SK_NOTIF.repeat(2) },
+        { id: 'sidebar-online-members',     html: SK_MEMBER.repeat(4) },
+        { id: 'sidebar-notifications-list', html: SK_NOTIF.repeat(3) },
+        { id: 'sidebar-challenges-list',    html: SK_ROW.repeat(3) },
+        { id: 'discussion-posts-feed',      html: SK_POST.repeat(3) },
+        { id: 'my-groups-grid',             html: SK_GROUP_CARD.repeat(3) },
+        { id: 'explore-groups-grid',        html: SK_GROUP_CARD.repeat(6) },
+        { id: 'home-events-list',           html: SK_ROW.repeat(3) }
     ];
-    skeletonTargets.forEach(({ id, html }) => {
+    targets.forEach(({ id, html }) => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = html;
     });
+}
+
+// ── Content reveal helper ─────────────────────────────────────────────────────
+// Call after populating a container to trigger fade-in transition.
+function applyReveal(el) {
+    if (!el) return;
+    el.classList.remove('content-reveal', 'content-reveal-grid');
+    void el.offsetWidth; // reflow to reset animation
+    el.classList.add('content-reveal');
+    // If it's a grid container, also apply stagger
+    if (el.children.length > 1) el.classList.add('content-reveal-grid');
+}
+
+// ── Refresh bar (top progress indicator) ────────────────────────────────────
+function showRefreshBar() {
+    const existing = document.getElementById('perf-refresh-bar');
+    if (existing) existing.remove();
+    const bar = document.createElement('div');
+    bar.id = 'perf-refresh-bar';
+    bar.className = 'refresh-bar';
+    document.body.appendChild(bar);
+    setTimeout(() => bar.remove(), 700);
+}
+
+// ── Toast notification ───────────────────────────────────────────────────────
+function showPerfToast(message, type = 'info', durationMs = 3000) {
+    const toast = document.createElement('div');
+    toast.className = `perf-toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 250);
+    }, durationMs);
 }
 
 // ---------------------------------------------------------------
@@ -216,38 +295,57 @@ function showAllSkeletons() {
 
 async function loadHomeData() {
     const t0 = performance.now();
-    console.log('[COMMUNITY] Fetching home-bundle...');
+    const userId = currentUser.user_id;
+    const cacheKey = `home-bundle:${userId}`;
+    const cacheUrl  = '/api/community/home-bundle';
 
+    // ── STEP 1: Instant cache-first render (SWR) ────────────────────────────
+    // If we have cached bundle data, render it immediately — 0ms visual wait.
+    // The skeleton was shown at DOMContentLoaded; this replaces it in <5ms.
+    const cachedBundle = window.SWRCache ? SWRCache.get(cacheKey) : null;
+    if (cachedBundle && cachedBundle.bundle) {
+        const b = cachedBundle.bundle;
+        console.debug('[COMMUNITY] SWR cache hit — rendering instantly.');
+        _renderTier1(b);
+        _renderTier2Deferred(b);
+        showRefreshBar();
+    }
+
+    // ── STEP 2: Fetch fresh bundle (always — SWR revalidates in background) ─
     try {
-        const res = await AuthSession.fetchWithAuth('/api/community/home-bundle');
-        if (!res.ok) throw new Error(`Bundle HTTP ${res.status}`);
-        const data = await res.json();
+        let fetchPromise;
+        if (window.SWRCache) {
+            fetchPromise = SWRCache.fetch(cacheKey, cacheUrl, {
+                staleMs: 20_000,   // 20s — revalidate if older than this
+                maxAgeMs: 5 * 60_000, // 5min hard expiry
+                onRevalidate: (freshData) => {
+                    // Called when background revalidation completes
+                    if (freshData && freshData.bundle) {
+                        console.debug('[COMMUNITY] SWR revalidated — patching sections.');
+                        _renderTier1(freshData.bundle);
+                        _renderTier2Deferred(freshData.bundle);
+                    }
+                }
+            });
+        } else {
+            // SWR not available — plain fetch
+            fetchPromise = AuthSession.fetchWithAuth(cacheUrl)
+                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+        }
 
-        if (!data.success || !data.bundle) throw new Error('Bundle response invalid');
+        const data = await fetchPromise;
 
-        const b = data.bundle;
-        const elapsed = (performance.now() - t0).toFixed(0);
-        console.log(`[COMMUNITY] Bundle received in ${elapsed}ms — populating sections.`);
-
-        // Populate all sections synchronously from the single response
-        // Each renderer is called directly with data — no extra network round-trips
-        renderStats(b.stats);
-        renderJoinedGroups(b.joinedGroups);
-        renderExploreGroups(b.exploreGroups);
-        renderFeedPosts(b.feed);
-        renderUpcomingEvents(b.events);
-        renderSuggestedGroups(b.suggestedGroups);
-        renderActiveMeetings(b.activeMeetings);
-        renderOnlineMembers(b.onlineUsers);
-        renderSidebarNotifications(b.notifications);
-        renderChallenges(b.challenges);
-
-        console.log(`[COMMUNITY] All sections rendered from bundle. Total: ${(performance.now() - t0).toFixed(0)}ms`);
+        // Only render if we didn't already render from cache
+        if (!cachedBundle) {
+            if (!data.success || !data.bundle) throw new Error('Bundle response invalid');
+            const b = data.bundle;
+            console.debug(`[COMMUNITY] Bundle fetched in ${(performance.now()-t0).toFixed(0)}ms`);
+            _renderTier1(b);
+            _renderTier2Deferred(b);
+        }
 
     } catch (err) {
         console.warn('[COMMUNITY] Bundle failed, falling back to individual requests:', err.message);
-
-        // Graceful fallback: individual parallel requests (old behavior)
         const tasks = [
             { name: 'Stats',                fn: loadStats },
             { name: 'JoinedGroups',         fn: loadJoinedGroups },
@@ -264,6 +362,32 @@ async function loadHomeData() {
         results.forEach((r, i) => {
             if (r.status === 'rejected') console.error(`[COMMUNITY] Fallback "${tasks[i].name}" failed:`, r.reason);
         });
+    }
+}
+
+// ── Tier-1: Above-fold critical content — rendered first ─────────────────────
+function _renderTier1(b) {
+    renderStats(b.stats);
+    renderJoinedGroups(b.joinedGroups);
+    renderExploreGroups(b.exploreGroups);
+    renderFeedPosts(b.feed);
+    renderUpcomingEvents(b.events);
+}
+
+// ── Tier-2: Sidebar widgets — deferred until browser is idle ─────────────────
+// These are below-fold or non-critical; deferring lets tier-1 feel instant.
+function _renderTier2Deferred(b) {
+    const render = () => {
+        renderSuggestedGroups(b.suggestedGroups);
+        renderActiveMeetings(b.activeMeetings);
+        renderOnlineMembers(b.onlineUsers);
+        renderSidebarNotifications(b.notifications);
+        renderChallenges(b.challenges);
+    };
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(render, { timeout: 500 });
+    } else {
+        setTimeout(render, 150);
     }
 }
 
@@ -317,6 +441,7 @@ function renderJoinedGroups(groups) {
             </div>
         </div>
     `).join('');
+    applyReveal(grid);
 }
 
 function renderExploreGroups(groups) {
@@ -347,6 +472,7 @@ function renderExploreGroups(groups) {
             </div>
         </div>
     `).join('');
+    applyReveal(grid);
 }
 
 function renderFeedPosts(posts) {
@@ -392,6 +518,7 @@ function renderFeedPosts(posts) {
             </div>
         </div>
     `).join('');
+    applyReveal(feed);
 }
 
 function renderUpcomingEvents(events) {
@@ -414,6 +541,7 @@ function renderUpcomingEvents(events) {
             </div>
         </div>`;
     }).join('');
+    applyReveal(container);
 }
 
 function renderSuggestedGroups(groups) {
@@ -440,6 +568,7 @@ function renderSuggestedGroups(groups) {
             <button onclick="handleJoinGroup('${group.group_id}')" style="background:var(--primary);color:white;border:none;padding:4px 10px;border-radius:var(--radius-full);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--transition);">Join</button>
         </div>
     `).join('');
+    applyReveal(container);
 }
 
 function renderActiveMeetings(meetings) {
@@ -463,6 +592,7 @@ function renderActiveMeetings(meetings) {
             </div>
         </div>
     `).join('');
+    applyReveal(container);
 }
 
 function renderOnlineMembers(onlineUsers) {
@@ -484,6 +614,7 @@ function renderOnlineMembers(onlineUsers) {
             <span style="width:6px;height:6px;border-radius:50%;background:var(--success);"></span>
         </div>
     `).join('');
+    applyReveal(container);
 }
 
 function renderSidebarNotifications(notifications) {
@@ -506,6 +637,7 @@ function renderSidebarNotifications(notifications) {
             <div style="font-size:0.68rem;color:var(--gray-600);margin-top:4px;">${new Date(notif.created_at).toLocaleDateString()}</div>
         </div>
     `).join('');
+    applyReveal(container);
 }
 
 function renderChallenges(challenges) {
@@ -530,6 +662,7 @@ function renderChallenges(challenges) {
             </div>
         </div>
     `).join('');
+    applyReveal(container);
 }
 
 // ---------------------------------------------------------------
@@ -665,20 +798,37 @@ async function loadExploreGroups(category = 'all', search = '') {
 }
 
 async function handleJoinGroup(groupId) {
+    // ── Optimistic UI: find and disable the Join button immediately ───────────
+    const btn = document.querySelector(`button[onclick="handleJoinGroup('${groupId}')"]`);
+    let originalHtml = '';
+    if (btn) {
+        originalHtml = btn.innerHTML;
+        btn.innerHTML = 'Joining...';
+        btn.classList.add('btn-joining');
+        btn.disabled = true;
+    }
+
     try {
         const res = await AuthSession.fetchWithAuth(`/api/community/groups/${groupId}/join`, {
             method: 'POST'
         });
         const data = await res.json();
         if (data.success) {
-            showNotificationToast('Success! You joined the study group.');
+            // Invalidate SWR cache so next visit gets fresh data
+            if (window.SWRCache) SWRCache.invalidatePrefix(`home-bundle:`);
+            showPerfToast('Joined! You are now a member.', 'success');
             loadJoinedGroups();
             loadExploreGroups();
         } else {
-            alert(data.message || 'Failed to join group');
+            // Rollback
+            if (btn) { btn.innerHTML = originalHtml; btn.classList.remove('btn-joining'); btn.disabled = false; }
+            showPerfToast(data.message || 'Could not join group. Try again.', 'error');
         }
     } catch (err) {
         console.error('Join group error:', err);
+        // Rollback on network error
+        if (btn) { btn.innerHTML = originalHtml; btn.classList.remove('btn-joining'); btn.disabled = false; }
+        showPerfToast('Network error — please try again.', 'error');
     }
 }
 
@@ -815,14 +965,46 @@ function handlePostMediaSelect() {
 }
 
 async function handleLikePost(postId) {
+    // ── Optimistic UI: toggle like state immediately ───────────────────────────
+    const btn = document.querySelector(`button[onclick="handleLikePost('${postId}')"]`);
+    if (!btn) return;
+
+    const icon = btn.querySelector('i');
+    const wasLiked = icon && icon.classList.contains('fas');
+    const countMatch = btn.textContent.match(/\d+/);
+    const prevCount = countMatch ? parseInt(countMatch[0], 10) : 0;
+
+    // Apply optimistic state
+    const newCount = wasLiked ? prevCount - 1 : prevCount + 1;
+    if (icon) {
+        icon.classList.toggle('fas', !wasLiked);
+        icon.classList.toggle('far', wasLiked);
+    }
+    btn.style.color = wasLiked ? 'var(--gray-600)' : 'var(--primary)';
+    btn.innerHTML = `<i class="${wasLiked ? 'far' : 'fas'} fa-thumbs-up"></i> Like (${newCount})`;
+    btn.classList.add('like-btn-active');
+    setTimeout(() => btn.classList.remove('like-btn-active'), 300);
+
     try {
         const res = await AuthSession.fetchWithAuth(`/api/community/feed/${postId}/like`, { method: 'POST' });
         const data = await res.json();
-        if (data.success) {
-            loadFeedPosts();
+        if (!data.success) {
+            // Rollback — server rejected
+            btn.innerHTML = `<i class="${wasLiked ? 'fas' : 'far'} fa-thumbs-up"></i> Like (${prevCount})`;
+            btn.style.color = wasLiked ? 'var(--primary)' : 'var(--gray-600)';
+        } else {
+            // Sync authoritative count from server
+            if (typeof data.likesCount !== 'undefined') {
+                btn.innerHTML = `<i class="${!wasLiked ? 'fas' : 'far'} fa-thumbs-up"></i> Like (${data.likesCount})`;
+            }
+            // Invalidate SWR feed cache so next full refresh reflects truth
+            if (window.SWRCache) SWRCache.invalidatePrefix(`home-bundle:`);
         }
     } catch (err) {
         console.error('Like post error:', err);
+        // Rollback on network error
+        btn.innerHTML = `<i class="${wasLiked ? 'fas' : 'far'} fa-thumbs-up"></i> Like (${prevCount})`;
+        btn.style.color = wasLiked ? 'var(--primary)' : 'var(--gray-600)';
     }
 }
 
@@ -865,6 +1047,35 @@ async function handleSendComment(e, postId) {
     e.preventDefault();
     const input = document.getElementById(`comment-input-${postId}`);
     const content = input.value.trim();
+    if (!content) return;
+
+    // ── Optimistic UI: append comment immediately ─────────────────────────────
+    const list = document.getElementById(`comments-list-${postId}`);
+    const optimisticId = 'optimistic-' + Date.now();
+    const optimisticHtml = `
+        <div id="${optimisticId}" style="background:var(--gray-50);padding:var(--spacing-xs) var(--spacing-sm);border-radius:var(--radius-md);font-size:0.82rem;opacity:0.6;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+                <strong style="color:var(--gray-900);">${escapeHtml(currentUser.full_name)}</strong>
+                <span style="font-size:0.7rem;color:var(--gray-600);">just now</span>
+            </div>
+            <div style="color:var(--gray-700);">${escapeHtml(content)}</div>
+        </div>`;
+
+    if (list) {
+        // Remove 'no comments yet' message if present
+        const empty = list.querySelector('p');
+        if (empty) empty.remove();
+        list.insertAdjacentHTML('beforeend', optimisticHtml);
+    }
+    input.value = '';
+
+    // Update comment counter optimistically
+    const commentsBtn = document.querySelector(`button[onclick="toggleCommentsSection('${postId}')"]`);
+    if (commentsBtn) {
+        const m = commentsBtn.textContent.match(/\d+/);
+        const prevCnt = m ? parseInt(m[0], 10) : 0;
+        commentsBtn.innerHTML = `<i class="far fa-comment"></i> Comments (${prevCnt + 1})`;
+    }
 
     try {
         const res = await AuthSession.fetchWithAuth(`/api/community/feed/${postId}/comments`, {
@@ -874,12 +1085,20 @@ async function handleSendComment(e, postId) {
         });
         const data = await res.json();
         if (data.success) {
-            input.value = '';
+            // Replace optimistic comment with confirmed ones
             loadPostComments(postId);
-            loadFeedPosts(); // increment comment counters
+            if (window.SWRCache) SWRCache.invalidatePrefix(`home-bundle:`);
+        } else {
+            // Remove optimistic entry on failure
+            const opt = document.getElementById(optimisticId);
+            if (opt) opt.remove();
+            showPerfToast('Comment failed — please try again.', 'error');
         }
     } catch (err) {
         console.error('Send comment error:', err);
+        const opt = document.getElementById(optimisticId);
+        if (opt) opt.remove();
+        showPerfToast('Network error — comment not sent.', 'error');
     }
 }
 

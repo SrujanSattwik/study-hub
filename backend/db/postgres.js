@@ -8,7 +8,9 @@ const pool = process.env.DATABASE_URL
       statement_timeout: 15000,          // 15s query timeout
       connectionTimeoutMillis: 5000,     // 5s to acquire a connection
       idleTimeoutMillis: 30000,          // 30s idle before closing
-      max: 20                            // max pool size
+      max: 30,                           // bumped from 20 for concurrent load
+      keepAlive: true,                   // prevents TCP teardown between queries
+      keepAliveInitialDelayMillis: 10000
     })
   : new Pool({
       host: process.env.DB_HOST || 'localhost',
@@ -19,7 +21,9 @@ const pool = process.env.DATABASE_URL
       statement_timeout: 15000,          // 15s query timeout
       connectionTimeoutMillis: 5000,     // 5s to acquire a connection
       idleTimeoutMillis: 30000,          // 30s idle before closing
-      max: 20                            // max pool size
+      max: 30,                           // bumped from 20 for concurrent load
+      keepAlive: true,                   // prevents TCP teardown between queries
+      keepAliveInitialDelayMillis: 10000
     });
 
 // Prevent unhandled pool errors from crashing the server

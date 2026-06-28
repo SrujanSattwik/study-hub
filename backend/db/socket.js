@@ -4,6 +4,9 @@ const db = require('./postgres');
 // Store online users mapping: user_id -> Set of socket IDs (multi-tab support)
 const onlineUsers = new Map();
 
+// O(1) author name lookup — populated at registerUser, avoids DB query on every chat message
+const userNames = new Map(); // user_id -> full_name
+
 // Import active sessions so we can validate socket auth
 let activeSessions;
 try {
@@ -40,6 +43,16 @@ function initSocket(io) {
       }
 
       currentUserId = data.userId;
+
+      // Cache name for O(1) lookup in sendGroupMessage
+      if (data.userName) {
+        userNames.set(currentUserId, data.userName);
+      } else if (!userNames.has(currentUserId)) {
+        // Fetch once and cache — only on first connection
+        db.query('SELECT full_name FROM users WHERE user_id = $1', [currentUserId])
+          .then(r => { if (r.rows.length > 0) userNames.set(currentUserId, r.rows[0].full_name); })
+          .catch(() => {});
+      }
 
       // Multi-tab: store Set of socket IDs per user
       if (!onlineUsers.has(currentUserId)) {
@@ -90,17 +103,27 @@ function initSocket(io) {
       const messageId = uuidv4();
 
       try {
-        // Save to database and fetch author name in parallel
-        const [, userResult] = await Promise.all([
-          db.query(
-            `INSERT INTO group_messages (message_id, group_id, user_id, content, parent_id)
-             VALUES ($1, $2, $3, $4, $5)`,
-            [messageId, groupId, userId, content, parentId || null]
-          ),
-          db.query('SELECT full_name FROM users WHERE user_id = $1', [userId])
-        ]);
+        // B9 FIX: Use O(1) local name cache — zero DB queries on the hot path.
+        // Falls back to DB only if name not yet cached (first message race, edge case).
+        let authorName = userNames.get(userId) || null;
 
-        const authorName = userResult.rows.length > 0 ? userResult.rows[0].full_name : 'Anonymous';
+        const insertPromise = db.query(
+          `INSERT INTO group_messages (message_id, group_id, user_id, content, parent_id)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [messageId, groupId, userId, content, parentId || null]
+        );
+
+        if (!authorName) {
+          // Cache miss — parallel insert + name fetch (rare path)
+          const [, userResult] = await Promise.all([
+            insertPromise,
+            db.query('SELECT full_name FROM users WHERE user_id = $1', [userId])
+          ]);
+          authorName = userResult.rows.length > 0 ? userResult.rows[0].full_name : 'Anonymous';
+          userNames.set(userId, authorName);
+        } else {
+          await insertPromise;
+        }
 
         // Broadcast to room
         const messageObj = {
@@ -189,6 +212,7 @@ function initSocket(io) {
           // Only go offline if ALL tabs are closed
           if (userSockets.size === 0) {
             onlineUsers.delete(currentUserId);
+            userNames.delete(currentUserId); // free name cache entry
 
             // Update presence to offline
             db.query(

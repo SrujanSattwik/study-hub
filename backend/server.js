@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require('compression');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
@@ -40,6 +41,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
+// Gzip compression — reduces JSON payload size by 60–80% for API responses
+// Applied before all routes so every response is eligible
+app.use(compression());
 
 // Body parsing — express.json() is sufficient; body-parser is not needed
 app.use(express.json());
