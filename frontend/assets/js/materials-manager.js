@@ -33,10 +33,10 @@ async function loadMaterialsByType(type) {
 
 // Render materials in the list format
 function renderMaterialsList(materials) {
-    const container = document.getElementById('materialsList') || document.getElementById('infographicsGrid');
+    const container = document.getElementById('materialsList');
     
     if (!container) {
-        console.error('❌ materialsList or infographicsGrid container not found');
+        console.error('❌ materialsList container not found');
         return;
     }
     
@@ -45,75 +45,43 @@ function renderMaterialsList(materials) {
         return;
     }
     
-    if (container.id === 'infographicsGrid') {
-        container.innerHTML = materials.map(material => {
-            const createdDate = material.createdAt ? new Date(material.createdAt).toLocaleDateString() : 'N/A';
-            return `
-            <div class="infographic-card" data-subject="${escapeHtml(material.subject || '').toLowerCase()}" data-type="${(material.format || '').toLowerCase()}" data-title="${escapeHtml(material.title).toLowerCase()}">
-                <div class="infographic-image">
-                    ${material.thumbnail ? `<img src="${material.thumbnail}" alt="${escapeHtml(material.title)}" style="width: 100%; height: 100%; object-fit: cover;">` : `
-                    <div class="image-placeholder">
-                        <i class="fas fa-chart-line"></i>
-                    </div>`}
-                    <div class="infographic-overlay">
-                        <button class="btn-icon" onclick="handleMaterialDownload('${material.id}', '${escapeHtml(material.link || material.filePath || '#')}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn-icon" onclick="handleMaterialDownload('${material.id}', '${escapeHtml(material.link || material.filePath || '#')}')"><i class="fas fa-download"></i></button>
-                    </div>
-                </div>
-                <div class="infographic-info">
-                    <h3>${escapeHtml(material.title)}</h3>
-                    <p class="infographic-author"><i class="fas fa-user"></i> ${escapeHtml(material.author || 'Anonymous')}</p>
-                    <div class="infographic-meta">
-                        <span><i class="fas fa-star"></i> 5.0</span>
-                        <span id="download-count-${material.id}"><i class="fas fa-download"></i> ${material.downloadCount || 0}</span>
-                        <span><i class="fas fa-calendar"></i> ${createdDate}</span>
-                    </div>
-                    <div class="infographic-tags">
-                        <span class="tag">${escapeHtml(material.subject || 'General')}</span>
-                    </div>
+    container.innerHTML = materials.map(material => {
+        const createdDate = material.createdAt ? new Date(material.createdAt).toLocaleDateString() : 'N/A';
+        
+        // Determine icon based on material type
+        let iconClass = 'fas fa-book-open';
+        if (material.type === 'video') iconClass = 'fas fa-video';
+        else if (material.type === 'audio') iconClass = 'fas fa-headphones';
+        else if (material.type === 'textbook') iconClass = 'fas fa-book';
+        else if (material.type === 'notes') iconClass = 'fas fa-file-alt';
+        
+        return `
+        <div class="material-item" data-subject="${material.category || material.type}" data-level="undergraduate" data-title="${escapeHtml(material.title).toLowerCase()}" data-author="${escapeHtml(material.author || 'anonymous')}">
+            <div class="material-thumbnail">
+                ${material.thumbnail ? `<img src="${material.thumbnail}" alt="${escapeHtml(material.title)}" style="width: 100%; height: 100%; object-fit: cover;">` : `<i class="${iconClass}"></i>`}
+            </div>
+            <div class="material-info">
+                <h3>${escapeHtml(material.title)}</h3>
+                <p class="material-author">by ${escapeHtml(material.author || 'Anonymous')}</p>
+                <p class="material-description">${escapeHtml(material.description || 'No description available')}</p>
+                <div class="material-meta">
+                    <span id="download-count-${material.id}"><i class="fas fa-download"></i> ${material.downloadCount || 0}</span>
+                    <span><i class="fas fa-file-${material.format === 'pdf' ? 'pdf' : 'alt'}"></i> ${(material.format || 'link').toUpperCase()}</span>
+                    <span><i class="fas fa-calendar"></i> ${createdDate}</span>
+                    <span><i class="fas fa-user"></i> ${escapeHtml(material.author || 'Anonymous')}</span>
                 </div>
             </div>
-            `;
-        }).join('');
-    } else {
-        container.innerHTML = materials.map(material => {
-            const createdDate = material.createdAt ? new Date(material.createdAt).toLocaleDateString() : 'N/A';
-            
-            // Determine icon based on material type
-            let iconClass = 'fas fa-book-open';
-            if (material.type === 'video') iconClass = 'fas fa-video';
-            else if (material.type === 'audio') iconClass = 'fas fa-headphones';
-            else if (material.type === 'textbook') iconClass = 'fas fa-book';
-            else if (material.type === 'notes') iconClass = 'fas fa-file-alt';
-            
-            return `
-            <div class="material-item" data-subject="${escapeHtml(material.subject || '').toLowerCase()}" data-level="${escapeHtml(material.difficulty || '').toLowerCase()}" data-title="${escapeHtml(material.title).toLowerCase()}" data-author="${escapeHtml(material.author || 'anonymous')}">
-                <div class="material-thumbnail">
-                    ${material.thumbnail ? `<img src="${material.thumbnail}" alt="${escapeHtml(material.title)}" style="width: 100%; height: 100%; object-fit: cover;">` : `<i class="${iconClass}"></i>`}
-                </div>
-                <div class="material-info">
-                    <h3>${escapeHtml(material.title)}</h3>
-                    <p class="material-author">by ${escapeHtml(material.author || 'Anonymous')}</p>
-                    <p class="material-description">${escapeHtml(material.description || 'No description available')}</p>
-                    <div class="material-meta">
-                        <span id="download-count-${material.id}"><i class="fas fa-download"></i> ${material.downloadCount || 0}</span>
-                        <span><i class="fas fa-file-${material.format === 'pdf' ? 'pdf' : 'alt'}"></i> ${(material.format || 'link').toUpperCase()}</span>
-                        <span><i class="fas fa-calendar"></i> ${createdDate}</span>
-                        <span><i class="fas fa-user"></i> ${escapeHtml(material.author || 'Anonymous')}</span>
-                    </div>
-                </div>
-                <div class="material-actions">
-                    <button class="btn btn-primary" onclick="handleMaterialDownload('${material.id}', '${escapeHtml(material.link || material.filePath || '#')}')">
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="btn btn-secondary" style="background: white; color: #6366f1; border: 1px solid #6366f1;" onclick="saveMaterial('${material.id}')">
-                        <i class="fas fa-bookmark"></i> Save
-                    </button>
-                </div>
+            <div class="material-actions">
+                <button class="btn btn-primary" onclick="handleMaterialDownload('${material.id}', '${escapeHtml(material.link || material.filePath || '#')}')">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button class="btn btn-secondary" style="background: white; color: #6366f1; border: 1px solid #6366f1;" onclick="saveMaterial('${material.id}')">
+                    <i class="fas fa-bookmark"></i> Save
+                </button>
             </div>
-            `;
-        }).join('');
-    }
+        </div>
+    `;
+    }).join('');
     
     console.log(`✅ Rendered ${materials.length} materials`);
 }
@@ -192,21 +160,21 @@ function setupUploadForm() {
         e.preventDefault();
         
         const formData = new FormData();
+        const inputs = form.elements;
         
-        // Get form values by input name attribute
-        const title = form.elements['title']?.value || '';
-        const author = form.elements['author']?.value || '';
-        const subject = form.elements['subject']?.value || '';
-        const difficulty = form.elements['level']?.value || form.elements['difficulty']?.value || '';
-        const description = form.elements['description']?.value || '';
+        // Get form values
+        const title = inputs[0].value;
+        const author = inputs[1].value;
+        const subject = inputs[2]?.value || '';
+        const description = inputs[3]?.value || inputs[4]?.value || '';
         
-        console.log('📝 Form values:', { title, author, subject, difficulty, description });
+        console.log('📝 Form values:', { title, author, subject, description });
         
         // Check upload mode
         const fileInput = document.getElementById('fileInput');
         const linkInput = document.getElementById('fileLink') || document.getElementById('videoLink') || document.getElementById('audioLink') || document.getElementById('imageLink');
         const thumbnailInput = document.getElementById('thumbnailInput');
-        const linkMode = document.getElementById('linkUploadSection') && document.getElementById('linkUploadSection').style.display !== 'none';
+        const linkMode = document.getElementById('linkUploadSection').style.display !== 'none';
         
         if (linkMode) {
             // Link upload mode
@@ -218,8 +186,6 @@ function setupUploadForm() {
             
             formData.append('title', title);
             formData.append('author', author);
-            formData.append('subject', subject);
-            formData.append('difficulty', difficulty);
             formData.append('description', description);
             formData.append('link', link);
             formData.append('type', currentMaterialType);
@@ -238,8 +204,6 @@ function setupUploadForm() {
             
             formData.append('title', title);
             formData.append('author', author);
-            formData.append('subject', subject);
-            formData.append('difficulty', difficulty);
             formData.append('description', description);
             formData.append('file', file);
             formData.append('type', currentMaterialType);

@@ -1,69 +1,47 @@
 const express = require('express');
-const compression = require('compression');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const axios = require('axios');
+const bodyParser = require('body-parser');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const db = require('./db/postgres');
 const materialsRouter = require('./routes/materials');
-const communityRouter = require('./routes/community');
 const activeSessions = require('./db/sessions');
 
 const app = express();
-const http = require('http');
-const socketIo = require('socket.io');
-const server = http.createServer(app);
 
-const ALLOWED_ORIGINS = [
-  'http://localhost:5500',
-  'http://127.0.0.1:5500'
-];
-
-const io = socketIo(server, {
-  cors: {
-    origin: ALLOWED_ORIGINS,
-    methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }
-});
-
-const { initSocket } = require('./db/socket');
-initSocket(io);
-
-// CORS configuration — must include DELETE for feed post deletion
+// CORS configuration
 app.use(cors({
-  origin: ALLOWED_ORIGINS,
-  methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: [
+    "http://localhost:5500",
+    "http://127.0.0.1:5500"
+  ],
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-// Gzip compression — reduces JSON payload size by 60–80% for API responses
-// Applied before all routes so every response is eligible
-app.use(compression());
-
-// Body parsing — express.json() is sufficient; body-parser is not needed
 app.use(express.json());
+app.use(bodyParser.json());
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Authentication middleware — consistent { success, message } response format
+// Authentication middleware
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Access token required' });
+    return res.status(401).json({ error: 'Access token required' });
   }
 
   const sessionUser = activeSessions.get(token);
   if (!sessionUser) {
-    return res.status(403).json({ success: false, message: 'Invalid or expired session' });
+    return res.status(403).json({ error: 'Invalid or expired session' });
   }
 
   req.user = sessionUser;
@@ -87,9 +65,6 @@ app.post('/auth/logout', (req, res) => {
 
 // Materials API (Protected)
 app.use('/api/materials', authenticateToken, materialsRouter);
-
-// Community API (Protected)
-app.use('/api/community', authenticateToken, communityRouter);
 
 // In-memory OTP storage
 const otpStore = new Map();
@@ -126,7 +101,7 @@ async function sendOTPEmail(email, otp) {
       </div>
     `
   };
-
+  
   await transporter.sendMail(mailOptions);
 }
 
@@ -162,7 +137,7 @@ app.post('/auth/send-otp', async (req, res) => {
 
     res.json({ success: true, message: 'OTP sent to your email' });
   } catch (error) {
-    console.error('Send OTP error:', error.message);
+    console.error('Send OTP error:', error);
     res.status(500).json({ success: false, message: 'Failed to send OTP' });
   }
 });
@@ -216,7 +191,7 @@ app.post('/auth/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error.message);
+    console.error('Login error:', error);
     res.json({ success: false, message: 'Invalid email or password' });
   }
 });
@@ -226,10 +201,12 @@ app.post('/auth/verify-otp-signup', async (req, res) => {
   try {
     const { fullName, email, password, otp } = req.body;
 
+    // Validate input
     if (!fullName || !email || !password || !otp) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
+    // Verify OTP
     const storedOTP = otpStore.get(email);
     if (!storedOTP) {
       return res.status(400).json({ success: false, message: 'OTP not found or expired' });
@@ -244,11 +221,14 @@ app.post('/auth/verify-otp-signup', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
     }
 
+    // OTP verified, delete it
     otpStore.delete(email);
 
+    // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
     const userId = uuidv4();
 
+    // Insert user into database
     try {
       await db.query(
         `INSERT INTO users (user_id, full_name, email, password_hash, role)
@@ -256,74 +236,74 @@ app.post('/auth/verify-otp-signup', async (req, res) => {
         [userId, fullName, email, passwordHash]
       );
 
-      res.json({
-        success: true,
+      res.json({ 
+        success: true, 
         message: 'Account created successfully',
-        userId
+        userId 
       });
     } catch (dbError) {
-      if (dbError.code === '23505') {
+      if (dbError.code === '23505') { // PostgreSQL unique violation code
         return res.status(409).json({ success: false, message: 'Email already registered' });
       }
       throw dbError;
     }
   } catch (error) {
-    console.error('Verify OTP error:', error.message);
+    console.error('Verify OTP error:', error);
     res.status(500).json({ success: false, message: 'Failed to create account' });
   }
 });
 
-// Gemini AI endpoint — API key from env, fixed response parsing
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCGe_4efn5LSsp1_1IKF9_jen3nM-bpdaQ';
+// Gemini AI endpoint
+const GEMINI_API_KEY = "AIzaSyCGe_4efn5LSsp1_1IKF9_jen3nM-bpdaQ";
 
-app.post('/api/ask', authenticateToken, async (req, res) => {
-  let parts = req.body.parts;
-  if (!parts && req.body.question) {
-    parts = [{ text: req.body.question }];
-  }
-
-  if (!parts || !parts.length) {
-    return res.status(400).json({ answer: 'No question or content provided.' });
-  }
-
-  try {
-    const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
-      {
-        contents: [{ parts: parts }]
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-goog-api-key': GEMINI_API_KEY
-        },
-        timeout: 30000
-      }
-    );
-
-    let answer = 'No answer found.';
-    const candidates = response.data?.candidates;
-    if (candidates && candidates.length > 0) {
-      // Correct parsing: candidates[n].content.parts[n].text
-      const parts = candidates[0]?.content?.parts;
-      if (parts && parts.length > 0) {
-        answer = parts.map(p => p.text || '').join('\n');
-      }
+app.post("/api/ask", authenticateToken, async (req, res) => {
+    let parts = req.body.parts;
+    if (!parts && req.body.question) {
+        parts = [{ text: req.body.question }];
+    }
+    
+    if (!parts || !parts.length) {
+        return res.status(400).json({ answer: "No question or content provided." });
     }
 
-    res.json({ answer });
+    try {
+        const response = await axios.post(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+            {
+                contents: [{ parts: parts }]
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-goog-api-key": GEMINI_API_KEY
+                }
+            }
+        );
 
-  } catch (err) {
-    console.error('Gemini API error:', err.response?.data || err.message);
-    res.status(500).json({ answer: 'Error contacting Gemini API.' });
-  }
+        console.log("Full Gemini API response:", JSON.stringify(response.data, null, 2));
+
+        let answer = "No answer found.";
+        if (response.data?.candidates?.length) {
+            answer = response.data.candidates.map(candidate => {
+                if (candidate?.content?.length) {
+                    return candidate.content.map(c => c.text).join("\n");
+                }
+                return "";
+            }).join("\n");
+        }
+
+        res.json({ answer });
+
+    } catch (err) {
+        console.error("Gemini API error:", err.response?.data || err.message);
+        res.status(500).json({ answer: "Error contacting Gemini API." });
+    }
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`✅ StudyHub Backend Server running on port ${PORT}`);
   console.log(`✅ Auth API: http://localhost:${PORT}/auth/*`);
   console.log(`✅ Materials API: http://localhost:${PORT}/api/materials`);
-  console.log(`✅ Community API: http://localhost:${PORT}/api/community`);
   console.log(`✅ Gemini AI API: http://localhost:${PORT}/api/ask`);
 });

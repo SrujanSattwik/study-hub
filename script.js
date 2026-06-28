@@ -139,21 +139,19 @@ document.head.appendChild(style);
 
 // Close mobile menu when clicking on a link
 document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
-    if (hamburger) hamburger.classList.remove('active');
-    if (navMenu) navMenu.classList.remove('active');
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
 }));
 
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        if (window.scrollY > 100) {
-            navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-            navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
-        } else {
-            navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-            navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
-        }
+    if (window.scrollY > 100) {
+        navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+        navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
+    } else {
+        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+        navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
     }
 });
 
@@ -190,16 +188,13 @@ if (statsSection) {
 // Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        if (href && href !== '#' && href.startsWith('#')) {
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
     });
 });
@@ -339,8 +334,8 @@ document.head.appendChild(style);
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         // Close mobile menu if open
-        if (hamburger) hamburger.classList.remove('active');
-        if (navMenu) navMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
     }
 });
 
@@ -485,7 +480,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// Hamburger menu toggle (already handled above)
+// Hamburger menu toggle
+hamburger = document.querySelector(".hamburger");
+const navLinks = document.querySelector(".nav-links");
+
+hamburger.addEventListener("click", () => {
+    navLinks.classList.toggle("open");
+    hamburger.classList.toggle("active");
+});
 
   
 
