@@ -79,14 +79,27 @@ const AuthSession = {
         const isProtected = this.PROTECTED_PATHS.some(p => pageName.includes(p));
         const hasSession = this.isLoggedIn();
 
+        console.debug(`[AUTH] checkAccessControl: pageName=${pageName}, isProtected=${isProtected}, hasSession=${hasSession}`);
+
         if (isProtected && !hasSession) {
-            console.warn('Unauthorized access. Redirecting to login page...');
+            console.warn(`[AUTH] Unauthorized. Redirecting to login. Protected page, no session. Destination: ${this.pagesDir}login.html`);
             window.location.href = `${this.pagesDir}login.html`;
+            return;
         }
 
-        // Validate session with backend on load if logged in
+        // F2 FIX: Only validate session with backend if it hasn't been checked recently.
+        // Avoids a network round-trip on every page navigation (common case: session is fine).
         if (hasSession) {
-            this.validateBackendSession();
+            const FRESHNESS_MS = 5 * 60 * 1000; // 5 minutes
+            const lastValidated = parseInt(sessionStorage.getItem('studyhub_session_validated') || '0', 10);
+            const isFresh = Date.now() - lastValidated < FRESHNESS_MS;
+
+            if (!isFresh) {
+                console.debug('[AUTH] Session stale or first check — validating with backend...');
+                this.validateBackendSession();
+            } else {
+                console.debug('[AUTH] Session fresh — skipping backend validation.');
+            }
         }
     },
 
@@ -94,22 +107,27 @@ const AuthSession = {
     async validateBackendSession() {
         try {
             const token = this.getToken();
+            console.debug(`[AUTH] Sending session validation to ${this.API_BASE}/auth/session`);
             const res = await fetch(`${this.API_BASE}/auth/session`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
             if (!res.ok) {
-                // Token invalid or expired
-                console.error('Session validation failed. Logging out...');
+                console.error(`[AUTH] Session validation failed (status ${res.status}). Logging out...`);
                 this.logout(true);
+            } else {
+                // Mark session as freshly validated so other tabs / pages skip the check
+                sessionStorage.setItem('studyhub_session_validated', Date.now().toString());
+                console.debug('[AUTH] Session validated successfully.');
             }
         } catch (err) {
-            console.error('Failed to validate session with backend:', err);
+            console.error('[AUTH] Failed to validate session with backend:', err);
         }
     },
 
     // Handle session logout
     async logout(silent = false) {
+        console.debug(`[AUTH] logout() called. silent=${silent}`);
         if (!silent) {
             try {
                 const token = this.getToken();
@@ -118,16 +136,23 @@ const AuthSession = {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
             } catch (err) {
-                console.error('Failed to contact logout endpoint:', err);
+                console.error('[AUTH] Failed to contact logout endpoint:', err);
             }
         }
         
+        // Clear session freshness marker
+        sessionStorage.removeItem('studyhub_session_validated');
+
+        // Clear cache and prefetch state
+        if (window.SWRCache) window.SWRCache.clear();
+        if (window.Prefetcher) window.Prefetcher.clear();
+
         // Clean session keys
         localStorage.removeItem(this.TOKEN_KEY);
         localStorage.removeItem(this.USER_KEY);
         localStorage.removeItem('studyhub_current_user'); // also reset onboarding mock login key
         
-        // Redirect to login page
+        console.debug(`[AUTH] Redirecting to: ${this.pagesDir}login.html`);
         window.location.href = `${this.pagesDir}login.html`;
     },
 
@@ -148,10 +173,9 @@ const AuthSession = {
 
         const response = await fetch(finalUrl, options);
         
-        // Handle auth expiration
+        // Handle auth expiration / permission warning without forcing page redirect
         if (response.status === 401 || response.status === 403) {
-            console.warn('Session expired or unauthorized. Performing logout...');
-            this.logout(true);
+            console.warn(`[AUTH] API request returned status ${response.status} for ${finalUrl}. Keeping page active.`);
         }
 
         return response;

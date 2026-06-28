@@ -204,6 +204,7 @@
         </div>
     </div>
 
+    <script src="../../assets/js/auth-session.js"></script>
     <script src="../../assets/js/script.js"></script>
     <script src="../../assets/js/materials-manager.js"></script>
     <script>
@@ -212,18 +213,18 @@
         const sortSelect = document.querySelectorAll('.filter-select')[2];
         const searchInput = document.getElementById('searchInput');
         const materialsList = document.getElementById('materialsList');
-        const items = Array.from(document.querySelectorAll('.material-item'));
 
         function filterMaterials() {
             const subject = subjectFilter.value.toLowerCase();
             const level = levelFilter.value.toLowerCase();
             const search = searchInput.value.toLowerCase();
+            const items = Array.from(materialsList.querySelectorAll('.material-item'));
 
             items.forEach(item => {
-                const itemSubject = item.dataset.subject;
-                const itemLevel = item.dataset.level;
-                const itemTitle = item.dataset.title;
-                const itemAuthor = item.dataset.author;
+                const itemSubject = (item.dataset.subject || '').toLowerCase();
+                const itemLevel = (item.dataset.level || '').toLowerCase();
+                const itemTitle = (item.dataset.title || '').toLowerCase();
+                const itemAuthor = (item.dataset.author || '').toLowerCase();
 
                 const matchSubject = subject === 'all subjects' || itemSubject === subject;
                 const matchLevel = level.includes('all') || itemLevel === level.split(' ')[0].toLowerCase();
@@ -235,6 +236,7 @@
 
         function sortMaterials() {
             const sortValue = sortSelect.value;
+            const items = Array.from(materialsList.querySelectorAll('.material-item'));
             const sortedItems = [...items];
 
             if (sortValue === 'A-Z') {
@@ -306,6 +308,5 @@
         // Initialize dynamic materials loading
         initMaterialsPage('video');
     </script>
-<script src="../../assets/js/auth-session.js"></script>
 </body>
 </html>

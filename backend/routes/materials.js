@@ -1,9 +1,11 @@
+'use strict';
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db/postgres');
+const cache = require('../db/cache');
 
 const UPLOADS_DIR = path.join(__dirname, '../uploads');
 
@@ -21,7 +23,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ 
+const upload = multer({
     storage,
     limits: { fileSize: 500 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
@@ -49,77 +51,124 @@ const detectTypeAndFormat = (file, link) => {
     return { type: 'notes', format: 'link' };
 };
 
-// GET /api/materials - Paginated fetch from PostgreSQL DB (Filtered by user)
+// Row mapper — avoids repeated object construction in hot path
+function mapMaterialRow(row) {
+    return {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        type: row.type,
+        format: row.format,
+        filePath: row.file_path,
+        link: row.link,
+        thumbnail: row.thumbnail,
+        downloadCount: row.download_count || 0,
+        author: row.author || 'Anonymous',
+        createdAt: row.created_at,
+        subject: row.subject,
+        difficulty: row.difficulty,
+    };
+}
+
+// Build a stable cache key for the list endpoint
+function listCacheKey(type, userId, page, limit) {
+    return `mat:${type || 'all'}:${userId || 'any'}:${page}:${limit}`;
+}
+
+// ---------------------------------------------------------------
+// GET /api/materials
+// B1 FIX: SQL-level LIMIT/OFFSET instead of full-table fetch + JS slice.
+//         Uses COUNT(*) OVER() window function for total count in one pass.
+// B7 FIX: 15-second TTL cache per (type, user_id, page, limit) combination.
+// ---------------------------------------------------------------
 router.get('/', async (req, res) => {
     try {
-        const { type, page = 1, limit = 5 } = req.query;
-        const userId = req.user.user_id;
-        
-        let queryStr = 'SELECT * FROM materials WHERE user_id = $1';
-        const binds = [userId];
-        
+        const { type, page = 1, limit = 5, user_id } = req.query;
+        const pageNum  = Math.max(1, parseInt(page,  10) || 1);
+        const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 5)); // guard against abuse
+        const offset   = (pageNum - 1) * limitNum;
+
+        // ── Cache check ──────────────────────────────────────────────────────
+        const cKey = listCacheKey(type, user_id, pageNum, limitNum);
+        const cached = cache.get(cKey);
+        if (cached) {
+            return res.json(cached);
+        }
+
+        // ── Build query with SQL pagination ──────────────────────────────────
+        // COUNT(*) OVER() is computed once by the planner — no second round-trip.
+        let queryStr = `
+            SELECT id, title, description, type, format, file_path, link, thumbnail,
+                   download_count, created_at, author, subject, difficulty,
+                   COUNT(*) OVER() AS total_count
+            FROM materials
+        `;
+        const binds = [];
+        const conditions = [];
+
         if (type) {
-            queryStr += ' AND type = $2';
+            conditions.push(`type = $${binds.length + 1}`);
             binds.push(type);
         }
-        
-        queryStr += ' ORDER BY created_at DESC';
-        
+        if (user_id) {
+            conditions.push(`user_id = $${binds.length + 1}`);
+            binds.push(user_id);
+        }
+        if (conditions.length > 0) {
+            queryStr += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        queryStr += ` ORDER BY created_at DESC LIMIT $${binds.length + 1} OFFSET $${binds.length + 2}`;
+        binds.push(limitNum, offset);
+
+        const { start: _s, ...rest } = {}; // discard
+        const queryStart = process.hrtime.bigint();
         const result = await db.query(queryStr, binds);
-        const materials = result.rows.map(row => ({
-            id: row.id,
-            title: row.title,
-            description: row.description,
-            type: row.type,
-            format: row.format,
-            filePath: row.file_path,
-            link: row.link,
-            thumbnail: row.thumbnail,
-            downloadCount: row.download_count || 0,
-            author: row.author || 'Anonymous',
-            createdAt: row.created_at
-        }));
-        
-        // Pagination
-        const pageNum = parseInt(page);
-        const limitNum = parseInt(limit);
-        const startIndex = (pageNum - 1) * limitNum;
-        const endIndex = startIndex + limitNum;
-        const paginatedMaterials = materials.slice(startIndex, endIndex);
-        
-        res.json({
-            page: pageNum,
-            totalPages: Math.ceil(materials.length / limitNum),
-            totalItems: materials.length,
-            materials: paginatedMaterials
-        });
+        const queryMs = Number(process.hrtime.bigint() - queryStart) / 1e6;
+
+        const totalItems = result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0;
+        const materials  = result.rows.map(mapMaterialRow);
+        const totalPages = Math.ceil(totalItems / limitNum);
+
+        const payload = { page: pageNum, totalPages, totalItems, materials };
+
+        // Cache for 15 seconds — short enough to reflect new uploads promptly
+        cache.set(cKey, payload, 15);
+
+        if (queryMs > 50) {
+            console.warn(`[MATERIALS] Slow list query: ${queryMs.toFixed(1)}ms`);
+        }
+
+        res.json(payload);
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ error: 'Failed to fetch materials' });
     }
 });
 
-// POST /api/materials - Upload material to PostgreSQL DB
+// ---------------------------------------------------------------
+// POST /api/materials — Upload material to PostgreSQL DB
+// ---------------------------------------------------------------
 router.post('/', upload.single('file'), async (req, res) => {
     try {
         console.log('📥 Received request body:', req.body);
-        const { title, description, link, type: manualType, author } = req.body;
+        const { title, description, link, type: manualType, author, subject, difficulty } = req.body;
         const file = req.file;
         console.log('👤 Author value:', author);
-        
+
         if (!title) return res.status(400).json({ error: 'Title is required' });
         if (!file && !link) return res.status(400).json({ error: 'Either file or link is required' });
-        
-        const { type, format } = manualType ? 
+
+        const { type, format } = manualType ?
             { type: manualType, format: file ? path.extname(file.originalname).slice(1) : 'link' } :
             detectTypeAndFormat(file, link);
-        
+
         const id = uuidv4();
         const filePath = file ? `/uploads/${type === 'textbook' ? 'textbooks' : type === 'video' ? 'videos' : type === 'audio' ? 'audio' : 'notes'}/${file.filename}` : null;
-        
+
         await db.query(
-            `INSERT INTO materials (id, title, description, type, format, file_path, link, thumbnail, download_count, created_at, author, user_id)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, $10, $11)`,
+            `INSERT INTO materials (id, title, description, type, format, file_path, link, thumbnail, download_count, created_at, author, user_id, subject, difficulty)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, $10, $11, $12, $13)`,
             [
                 id,
                 title.trim(),
@@ -131,10 +180,16 @@ router.post('/', upload.single('file'), async (req, res) => {
                 null,
                 0,
                 (author || 'Anonymous').trim(),
-                req.user.user_id
+                req.user.user_id,
+                subject || null,
+                difficulty || null
             ]
         );
-        
+
+        // Invalidate all cached list pages for this type so the new item appears immediately
+        cache.delByPrefix(`mat:${type}:`);
+        cache.delByPrefix('mat:all:');
+
         res.status(201).json({
             id,
             title: title.trim(),
@@ -146,7 +201,9 @@ router.post('/', upload.single('file'), async (req, res) => {
             thumbnail: null,
             downloadCount: 0,
             author: (author || 'Anonymous').trim(),
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            subject: subject || null,
+            difficulty: difficulty || null
         });
     } catch (error) {
         console.error('Database error:', error);
@@ -154,25 +211,24 @@ router.post('/', upload.single('file'), async (req, res) => {
     }
 });
 
-// POST /api/materials/:id/download - Increment download count in PostgreSQL DB
+// ---------------------------------------------------------------
+// POST /api/materials/:id/download
+// B2 FIX: Merge UPDATE + SELECT into single RETURNING query — saves one DB round-trip.
+// ---------------------------------------------------------------
 router.post('/:id/download', async (req, res) => {
     try {
         const { id } = req.params;
-        
-        await db.query(
-            'UPDATE materials SET download_count = download_count + 1 WHERE id = $1',
-            [id]
-        );
-        
+
+        // Single query: atomically increment and return new count
         const result = await db.query(
-            'SELECT download_count FROM materials WHERE id = $1',
+            'UPDATE materials SET download_count = download_count + 1 WHERE id = $1 RETURNING download_count',
             [id]
         );
-        
+
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Material not found' });
         }
-        
+
         res.json({ downloadCount: result.rows[0].download_count });
     } catch (error) {
         console.error('Database error:', error);

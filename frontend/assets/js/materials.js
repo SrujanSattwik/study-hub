@@ -1,60 +1,82 @@
-const API_URL = 'http://localhost:3001/api/materials';
+const SK_MATERIAL = `
+<div class="sk-material">
+    <div class="sk sk-material__img"></div>
+    <div class="sk-material__body">
+        <div class="sk sk-material__title"></div>
+        <div class="sk sk-material__desc"></div>
+        <div class="sk sk-material__desc-2"></div>
+        <div class="sk-material__footer">
+            <div class="sk sk-material__author"></div>
+            <div class="sk sk-material__btn"></div>
+        </div>
+    </div>
+</div>`;
 
-// Fetch and render materials
+function showMaterialsSkeletons() {
+    const container = document.getElementById('materials-container');
+    if (container && (!container.children.length || container.querySelector('.no-materials'))) {
+        container.innerHTML = SK_MATERIAL.repeat(6);
+    }
+}
+
+// Fetch and render materials with SWR caching & skeletons
 async function loadMaterials(filters = {}) {
+    const container = document.getElementById('materials-container');
+    showMaterialsSkeletons();
+
     try {
         const params = new URLSearchParams(filters);
-        console.log('🔍 Loading materials with filters:', filters);
-        console.log('🌐 API URL:', `${API_URL}?${params}`);
-        
-        const response = await AuthSession.fetchWithAuth(`${API_URL}?${params}`);
-        console.log('📡 Response status:', response.status);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ Response error:', errorText);
-            throw new Error('Failed to fetch');
+        const url = `/api/materials?${params}`;
+        const cacheKey = `materials:${params.toString()}`;
+
+        // 1. SWR Instant Cache Render
+        if (window.SWRCache) {
+            const cachedData = SWRCache.get(cacheKey);
+            if (cachedData) {
+                const materials = cachedData.materials || cachedData;
+                renderMaterials(materials);
+            }
         }
-        
-        const data = await response.json();
-        console.log('📦 Raw data received:', data);
-        
-        // Handle both paginated and non-paginated responses
+
+        // 2. Fetch Fresh Data (background revalidate or fresh)
+        let data;
+        if (window.SWRCache) {
+            data = await SWRCache.fetch(cacheKey, url, {
+                staleMs: 15_000,
+                onRevalidate: (freshData) => {
+                    const materials = freshData.materials || freshData;
+                    renderMaterials(materials);
+                }
+            });
+        } else {
+            const response = await AuthSession.fetchWithAuth(url);
+            if (!response.ok) throw new Error('Failed to fetch materials');
+            data = await response.json();
+        }
+
         const materials = data.materials || data;
-        console.log('✅ Materials array:', materials);
-        console.log('📊 Total materials count:', materials.length);
-        
         renderMaterials(materials);
     } catch (error) {
-        console.error('💥 Error loading materials:', error);
-        const container = document.getElementById('materials-container');
-        if (container) container.innerHTML = '<p class="no-materials">Failed to load materials. Check console for details.</p>';
+        console.error('Error loading materials:', error);
+        if (container && !container.querySelectorAll('.material-card').length) {
+            container.innerHTML = '<p class="no-materials">Failed to load materials. Please refresh.</p>';
+        }
     }
 }
 
 // Render materials as cards
 function renderMaterials(materials) {
-    console.log('🎨 Rendering materials:', materials);
     const container = document.getElementById('materials-container');
-    
-    if (!container) {
-        console.error('❌ Container not found: materials-container');
-        return;
-    }
-    
-    console.log('✅ Container found:', container);
+    if (!container) return;
 
-    if (materials.length === 0) {
-        console.log('⚠️ No materials to display');
+    if (!materials || materials.length === 0) {
         container.innerHTML = '<p class="no-materials">No materials found. Be the first to add one!</p>';
         return;
     }
-    
-    console.log(`📝 Rendering ${materials.length} material cards...`);
 
     container.innerHTML = materials.map(material => `
         <div class="material-card" data-type="${material.type || material.category || ''}" data-category="${material.category || material.type || ''}" data-difficulty="${(material.difficulty || '').toLowerCase()}" data-title="${escapeHtml(material.title).toLowerCase()}" data-description="${escapeHtml(material.description || '').toLowerCase()}">
-            <img src="${material.thumbnailUrl || material.thumbnail || 'https://via.placeholder.com/400x250/6366f1/ffffff?text=Study+Material'}" alt="${escapeHtml(material.title)}" class="thumbnail" onerror="this.src='https://via.placeholder.com/400x250/6366f1/ffffff?text=Study+Material'">
+            <img src="${material.thumbnailUrl || material.thumbnail || 'https://via.placeholder.com/400x250/6366f1/ffffff?text=Study+Material'}" alt="${escapeHtml(material.title)}" class="thumbnail" loading="lazy" onerror="this.src='https://via.placeholder.com/400x250/6366f1/ffffff?text=Study+Material'">
             <div class="card-content">
                 <h3>${escapeHtml(material.title)}</h3>
                 <p class="desc">${escapeHtml(material.description || '')}</p>
@@ -74,51 +96,54 @@ function renderMaterials(materials) {
         </div>
     `).join('');
     
-    console.log('✅ Materials rendered successfully!');
+    if (typeof applyReveal === 'function') {
+        applyReveal(container);
+    } else if (window.applyReveal) {
+        window.applyReveal(container);
+    }
 }
 
-// Handle download action
+// Handle download action (Optimistic UI)
 async function handleDownload(materialId, link) {
-    console.log('Download clicked for material:', materialId);
+    const countElement = document.getElementById(`download-count-${materialId}`);
+    let prevCount = 0;
+    if (countElement) {
+        const match = countElement.textContent.match(/\d+/);
+        prevCount = match ? parseInt(match[0], 10) : 0;
+        countElement.innerHTML = `<i class="fas fa-download"></i> ${prevCount + 1}`;
+    }
+
+    // Immediately trigger view/download
+    if (link && link !== '#') {
+        window.open(link, '_blank');
+    }
+
     try {
-        const response = await AuthSession.fetchWithAuth(`${API_URL}/${materialId}/download`, {
+        const response = await AuthSession.fetchWithAuth(`/api/materials/${materialId}/download`, {
             method: 'POST'
         });
         
-        console.log('API Response status:', response.status);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error:', errorText);
-            throw new Error('Failed to update download count');
+        if (response.ok) {
+            const data = await response.json();
+            if (countElement && typeof data.downloadCount !== 'undefined') {
+                countElement.innerHTML = `<i class="fas fa-download"></i> ${data.downloadCount}`;
+            }
+            if (window.SWRCache) SWRCache.invalidatePrefix('materials:');
+        } else if (countElement) {
+            countElement.innerHTML = `<i class="fas fa-download"></i> ${prevCount}`;
         }
-        
-        const data = await response.json();
-        console.log('Download count updated:', data.downloadCount);
-        
-        // Update the download count in UI
-        const countElement = document.getElementById(`download-count-${materialId}`);
-        console.log('Count element found:', countElement);
-        if (countElement) {
-            countElement.innerHTML = `<i class="fas fa-download"></i> ${data.downloadCount}`;
-            console.log('UI updated with count:', data.downloadCount);
-        } else {
-            console.error('Count element not found for ID:', `download-count-${materialId}`);
-        }
-        
-        // Trigger the actual download/view
-        window.open(link, '_blank');
     } catch (error) {
         console.error('Error updating download count:', error);
-        // Still open the link even if count update fails
-        window.open(link, '_blank');
+        if (countElement) {
+            countElement.innerHTML = `<i class="fas fa-download"></i> ${prevCount}`;
+        }
     }
 }
 
 // Submit new material
 async function submitMaterial(formData) {
     try {
-        const response = await AuthSession.fetchWithAuth(API_URL, {
+        const response = await AuthSession.fetchWithAuth('/api/materials', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
@@ -131,6 +156,7 @@ async function submitMaterial(formData) {
 
         const newMaterial = await response.json();
         showToast('Material added successfully!', 'success');
+        if (window.SWRCache) SWRCache.invalidatePrefix('materials:');
         return newMaterial;
     } catch (error) {
         console.error('Error submitting material:', error);
