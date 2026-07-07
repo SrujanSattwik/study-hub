@@ -1,63 +1,32 @@
-# StudyClub Frontend
+# React + TypeScript + Vite
 
-This directory contains all frontend files for the StudyClub application.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Structure
+Currently, two official plugins are available:
 
-```
-frontend/
-├── index.html                 # Main landing page
-├── pages/                     # All application pages
-│   ├── about.html
-│   ├── community.html
-│   ├── get-started.html
-│   ├── KnowNook.html         # AI Chat feature
-│   ├── login.html
-│   ├── materials.html
-│   ├── resources.html
-│   ├── study-bite.html
-│   ├── cheat-note-creation.html
-│   ├── syllabus-scheduler.html
-│   ├── index-dashboard.html
-│   ├── components-catalog.html
-│   └── materials/            # Materials subpages
-│       ├── textbooks.html
-│       ├── video-lectures.html
-│       ├── study-notes.html
-│       ├── audio-content.html
-│       ├── infographics.html
-│       └── practice-tests.html
-└── assets/
-    ├── css/                  # All stylesheets
-    │   ├── style.css        # Main stylesheet
-    │   ├── components.css
-    │   ├── dashboard.css
-    │   ├── layout.css
-    │   └── variables.css
-    ├── js/                   # All JavaScript files
-    │   ├── script.js        # Main script
-    │   ├── knownook-chat.js # AI chat functionality
-    │   └── layout.js
-    └── img/                  # Images and icons (empty for now)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
 
-## Running the Application
-
-1. Open `index.html` in a web browser to start
-2. For AI chat features (KnowNook), ensure the backend server is running
-3. All navigation links are relative and will work from any location
-
-## Path Structure
-
-- **Root (index.html)**: Uses `pages/` prefix for navigation, `assets/` for resources
-- **Pages**: Use `../` to go back to root, direct names for sibling pages
-- **Materials subpages**: Use `../../` for root, `../` for parent pages directory
-
-## Features
-
-- Responsive design
-- AI-powered chat (KnowNook)
-- Study materials management
-- Community features
-- Progress tracking
-- And more...
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

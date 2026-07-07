@@ -1,0 +1,89 @@
+version: "3.9"
+
+# ─── Networks ──────────────────────────────────────────────────────────────────
+networks:
+  studyclub-net:
+    driver: bridge
+
+# ─── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  uploads_data:
+
+# ─── Services ──────────────────────────────────────────────────────────────────
+services:
+
+  # ── PostgreSQL Database ──────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: studyclub_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-study_club}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - studyclub-net
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-study_club}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ── Backend API ──────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .                        # Repo root — gives access to /prisma
+      dockerfile: backend/Dockerfile
+    container_name: studyclub_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # Use container name as hostname inside Docker network
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-study_club}
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_EXPIRY: ${ACCESS_TOKEN_EXPIRY:-15m}
+      REFRESH_TOKEN_EXPIRY_DAYS: ${REFRESH_TOKEN_EXPIRY_DAYS:-30}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - studyclub-net
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ── Frontend (Nginx) ─────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .                        # Repo root
+      dockerfile: frontend/Dockerfile
+      args:
+        # Bake the backend API URL into the Vite bundle at build time
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+    container_name: studyclub_frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - studyclub-net
+    ports:
+      - "80:80"
