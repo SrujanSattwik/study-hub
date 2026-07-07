@@ -61,7 +61,16 @@ async function broadcastPresenceToGroups(
   }
 }
 
+export let ioInstance: Server | null = null;
+
+export function broadcastGroupEvent(groupId: string, eventName: string, payload: any) {
+  if (ioInstance) {
+    ioInstance.to(`group_${groupId}`).emit(eventName, payload);
+  }
+}
+
 export function initSocket(io: Server) {
+  ioInstance = io;
   const ioAny = io as any;
   if (ioAny._communitySocketInitialized) return;
   ioAny._communitySocketInitialized = true;

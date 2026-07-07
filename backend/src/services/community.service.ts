@@ -9,6 +9,7 @@ import {
 } from "../utils/errors";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
+import { broadcastGroupEvent } from "./socket.service";
 
 export class CommunityService {
   // ─── Membership ─────────────────────────────────────────────────────────────
@@ -525,6 +526,7 @@ export class CommunityService {
     description: string,
     category?: string,
     meetingSchedule?: string,
+    icon?: string,
   ) {
     const groupId = uuidv4();
     const coverMap: Record<string, string> = {
@@ -545,7 +547,7 @@ export class CommunityService {
     };
 
     const finalCategory = category ?? "other";
-    const finalIcon = iconMap[finalCategory] ?? "fas fa-users";
+    const finalIcon = icon || iconMap[finalCategory] || "fas fa-users";
     const finalCover = coverMap[finalCategory] ?? coverMap.languages;
     const schedule = meetingSchedule ?? "Not scheduled";
     const logId = uuidv4();
@@ -857,7 +859,390 @@ export class CommunityService {
         (${materialId}, ${groupId}, ${categoryId ?? null}, ${title}, ${description ?? ""}, ${filePath}, ${fileName}, ${fileSize}, ${fileType}, ${userId}, ${tags ?? ""})
     `;
 
+    broadcastGroupEvent(groupId, "materialUploaded", { materialId });
     return { materialId };
+  }
+
+  async deleteGroupMaterial(userId: string, groupId: string, materialId: string) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const material = await prisma.groupMaterial.findUnique({
+      where: { id: materialId }
+    });
+
+    if (!material) throw new NotFoundError("Material not found");
+
+    if (material.uploadedBy !== userId && role !== 'owner' && role !== 'admin') {
+      throw new ForbiddenError("Unauthorized to delete this material");
+    }
+
+    await prisma.groupMaterial.delete({
+      where: { id: materialId }
+    });
+
+    broadcastGroupEvent(groupId, "materialDeleted", { materialId });
+  }
+
+  async trackGroupMaterialDownload(userId: string, groupId: string, materialId: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    await prisma.groupMaterial.update({
+      where: { id: materialId },
+      data: {
+        downloadCount: { increment: 1 }
+      }
+    });
+  }
+
+  async getGroupAnnouncements(userId: string, groupId: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    return prisma.groupAnnouncement.findMany({
+      where: { groupId },
+      orderBy: [
+        { pinned: 'desc' },
+        { createdAt: 'desc' }
+      ],
+      include: {
+        creator: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+  }
+
+  async createGroupAnnouncement(userId: string, groupId: string, title: string, content: string, pinned = false) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+    if (role !== 'owner' && role !== 'admin' && role !== 'moderator') {
+      throw new ForbiddenError("Only creator/admins/moderators can post announcements");
+    }
+
+    const id = uuidv4();
+    const announcement = await prisma.groupAnnouncement.create({
+      data: {
+        id,
+        groupId,
+        title,
+        content,
+        createdBy: userId,
+        pinned
+      },
+      include: {
+        creator: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    broadcastGroupEvent(groupId, "announcementCreated", announcement);
+    return announcement;
+  }
+
+  async updateGroupAnnouncement(userId: string, groupId: string, announcementId: string, title: string, content: string, pinned = false) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+    if (role !== 'owner' && role !== 'admin' && role !== 'moderator') {
+      throw new ForbiddenError("Only creator/admins/moderators can edit announcements");
+    }
+
+    const announcement = await prisma.groupAnnouncement.update({
+      where: { id: announcementId },
+      data: {
+        title,
+        content,
+        pinned
+      },
+      include: {
+        creator: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    broadcastGroupEvent(groupId, "announcementUpdated", announcement);
+    return announcement;
+  }
+
+  async deleteGroupAnnouncement(userId: string, groupId: string, announcementId: string) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+    if (role !== 'owner' && role !== 'admin' && role !== 'moderator') {
+      throw new ForbiddenError("Only creator/admins/moderators can delete announcements");
+    }
+
+    await prisma.groupAnnouncement.delete({
+      where: { id: announcementId }
+    });
+
+    broadcastGroupEvent(groupId, "announcementDeleted", { announcementId });
+  }
+
+  async getGroupQuestions(userId: string, groupId: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    return prisma.question.findMany({
+      where: { groupId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        },
+        answers: {
+          orderBy: { createdAt: 'asc' },
+          include: {
+            user: {
+              select: {
+                fullName: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async createGroupQuestion(userId: string, groupId: string, title: string, description: string, subject?: string, tags?: string, attachmentUrl?: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    const id = uuidv4();
+    const question = await prisma.question.create({
+      data: {
+        id,
+        groupId,
+        userId,
+        title,
+        description,
+        subject: subject || null,
+        tags: tags || null,
+        attachmentUrl: attachmentUrl || null
+      },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        },
+        answers: true
+      }
+    });
+
+    broadcastGroupEvent(groupId, "questionCreated", question);
+    return question;
+  }
+
+  async updateGroupQuestionStatus(userId: string, groupId: string, questionId: string, isSolved: boolean) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const question = await prisma.question.findUnique({
+      where: { id: questionId }
+    });
+
+    if (!question) throw new NotFoundError("Question not found");
+
+    if (question.userId !== userId && role !== 'owner' && role !== 'admin') {
+      throw new ForbiddenError("Unauthorized to update this question status");
+    }
+
+    const updated = await prisma.question.update({
+      where: { id: questionId },
+      data: { isSolved },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        },
+        answers: {
+          include: {
+            user: {
+              select: {
+                fullName: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    broadcastGroupEvent(groupId, "questionUpdated", updated);
+    return updated;
+  }
+
+  async deleteGroupQuestion(userId: string, groupId: string, questionId: string) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const question = await prisma.question.findUnique({
+      where: { id: questionId }
+    });
+
+    if (!question) throw new NotFoundError("Question not found");
+
+    if (question.userId !== userId && role !== 'owner' && role !== 'admin') {
+      throw new ForbiddenError("Unauthorized to delete this question");
+    }
+
+    await prisma.question.delete({
+      where: { id: questionId }
+    });
+
+    broadcastGroupEvent(groupId, "questionDeleted", { questionId });
+  }
+
+  async createGroupAnswer(userId: string, groupId: string, questionId: string, content: string, attachmentUrl?: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    const id = uuidv4();
+    const answer = await prisma.questionAnswer.create({
+      data: {
+        id,
+        questionId,
+        userId,
+        content,
+        attachmentUrl: attachmentUrl || null
+      },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    broadcastGroupEvent(groupId, "answerCreated", { questionId, answer });
+    return answer;
+  }
+
+  async deleteGroupAnswer(userId: string, groupId: string, answerId: string) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const answer = await prisma.questionAnswer.findUnique({
+      where: { id: answerId }
+    });
+
+    if (!answer) throw new NotFoundError("Answer not found");
+
+    if (answer.userId !== userId && role !== 'owner' && role !== 'admin') {
+      throw new ForbiddenError("Unauthorized to delete this answer");
+    }
+
+    await prisma.questionAnswer.delete({
+      where: { id: answerId }
+    });
+
+    broadcastGroupEvent(groupId, "answerDeleted", { questionId: answer.questionId, answerId });
+  }
+
+  async getGroupMeetings(userId: string, groupId: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    return prisma.groupMeeting.findMany({
+      where: { groupId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        host: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+  }
+
+  async createGroupMeeting(userId: string, groupId: string, title: string) {
+    if (!(await this.isGroupMember(userId, groupId)))
+      throw new ForbiddenError("Access denied");
+
+    // Close any previous active meetings hosted by this user in this group
+    await prisma.groupMeeting.updateMany({
+      where: { groupId, hostId: userId, status: 'active' },
+      data: { status: 'ended', endedAt: new Date() }
+    });
+
+    const id = uuidv4();
+    const meeting = await prisma.groupMeeting.create({
+      data: {
+        id,
+        groupId,
+        title,
+        hostId: userId,
+        status: 'active'
+      },
+      include: {
+        host: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    broadcastGroupEvent(groupId, "meetingStarted", meeting);
+    return meeting;
+  }
+
+  async endGroupMeeting(userId: string, groupId: string, meetingId: string) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const meeting = await prisma.groupMeeting.findUnique({
+      where: { id: meetingId }
+    });
+
+    if (!meeting) throw new NotFoundError("Meeting not found");
+
+    if (meeting.hostId !== userId && role !== 'owner' && role !== 'admin') {
+      throw new ForbiddenError("Only host or group admin can end this meeting");
+    }
+
+    const updated = await prisma.groupMeeting.update({
+      where: { id: meetingId },
+      data: {
+        status: 'ended',
+        endedAt: new Date()
+      },
+      include: {
+        host: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    broadcastGroupEvent(groupId, "meetingEnded", updated);
+    return updated;
   }
 }
 

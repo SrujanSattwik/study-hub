@@ -78,12 +78,14 @@ export const Community: React.FC = () => {
       description: string;
       category: string;
       meetingSchedule?: string;
+      icon?: string;
     }) =>
       communityService.createGroup(
         newGroup.name,
         newGroup.description,
         newGroup.category,
-        newGroup.meetingSchedule
+        newGroup.meetingSchedule,
+        newGroup.icon
       ),
     onSuccess: (res) => {
       setToastMessage("Community created successfully!");
@@ -122,6 +124,7 @@ export const Community: React.FC = () => {
       description: commDesc,
       category: commCategory,
       meetingSchedule: "Not scheduled",
+      icon: commIcon
     });
   };
 
@@ -578,13 +581,42 @@ export const Community: React.FC = () => {
             </div>
           </div>
 
-          <Input
-            id="comm-icon-modal"
-            label="Icon Class (Optional)"
-            value={commIcon}
-            onChange={(e) => setCommIcon(e.target.value)}
-            placeholder="e.g. fas fa-calculator"
-          />
+          <div className="space-y-2">
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider">
+              Select Group Icon
+            </label>
+            <div className="grid grid-cols-5 gap-2">
+              {[
+                { name: 'Study Group', class: 'fas fa-users', emoji: '👥' },
+                { name: 'Books', class: 'fas fa-book', emoji: '📚' },
+                { name: 'Programming', class: 'fas fa-code', emoji: '💻' },
+                { name: 'Science', class: 'fas fa-flask', emoji: '🧪' },
+                { name: 'Mathematics', class: 'fas fa-calculator', emoji: '📐' },
+                { name: 'Creative', class: 'fas fa-paint-brush', emoji: '🎨' },
+                { name: 'Languages', class: 'fas fa-globe-americas', emoji: '🌎' },
+                { name: 'Knowledge', class: 'fas fa-brain', emoji: '🧠' },
+                { name: 'Projects', class: 'fas fa-rocket', emoji: '🚀' },
+                { name: 'Challenges', class: 'fas fa-trophy', emoji: '🏆' },
+              ].map((iconOpt) => {
+                const isSelected = commIcon === iconOpt.class;
+                return (
+                  <button
+                    key={iconOpt.class}
+                    type="button"
+                    onClick={() => setCommIcon(iconOpt.class)}
+                    className={`flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all ${
+                      isSelected
+                        ? 'border-indigo-600 bg-indigo-50/50 text-indigo-600 font-bold'
+                        : 'border-gray-250 bg-white text-gray-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="text-md mb-1">{iconOpt.emoji}</span>
+                    <span className="text-[9px] font-bold truncate w-full leading-none tracking-tight">{iconOpt.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </form>
       </Modal>
 

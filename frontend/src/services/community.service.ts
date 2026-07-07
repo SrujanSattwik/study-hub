@@ -38,8 +38,8 @@ export const communityService = {
     return res.data.groups;
   },
 
-  createGroup: async (name: string, description: string, category?: string, meetingSchedule?: string): Promise<{ groupId: string }> => {
-    const res = await api.post('/api/community/groups', { name, description, category, meetingSchedule });
+  createGroup: async (name: string, description: string, category?: string, meetingSchedule?: string, icon?: string): Promise<{ groupId: string }> => {
+    const res = await api.post('/api/community/groups', { name, description, category, meetingSchedule, icon });
     return res.data;
   },
 
@@ -105,6 +105,76 @@ export const communityService = {
         'Content-Type': 'multipart/form-data',
       },
     });
+  },
+
+  deleteGroupMaterial: async (groupId: string, materialId: string): Promise<void> => {
+    await api.delete(`/api/community/groups/${groupId}/materials/${materialId}`);
+  },
+
+  trackGroupMaterialDownload: async (groupId: string, materialId: string): Promise<void> => {
+    await api.post(`/api/community/groups/${groupId}/materials/${materialId}/download`);
+  },
+
+  getGroupAnnouncements: async (groupId: string): Promise<any[]> => {
+    const res = await api.get(`/api/community/groups/${groupId}/announcements`);
+    return res.data.announcements;
+  },
+
+  createGroupAnnouncement: async (groupId: string, title: string, content: string, pinned = false): Promise<any> => {
+    const res = await api.post(`/api/community/groups/${groupId}/announcements`, { title, content, pinned });
+    return res.data.announcement;
+  },
+
+  updateGroupAnnouncement: async (groupId: string, announcementId: string, title: string, content: string, pinned = false): Promise<any> => {
+    const res = await api.patch(`/api/community/groups/${groupId}/announcements/${announcementId}`, { title, content, pinned });
+    return res.data.announcement;
+  },
+
+  deleteGroupAnnouncement: async (groupId: string, announcementId: string): Promise<void> => {
+    await api.delete(`/api/community/groups/${groupId}/announcements/${announcementId}`);
+  },
+
+  getGroupQuestions: async (groupId: string): Promise<any[]> => {
+    const res = await api.get(`/api/community/groups/${groupId}/questions`);
+    return res.data.questions;
+  },
+
+  createGroupQuestion: async (groupId: string, title: string, description: string, subject?: string, tags?: string, attachmentUrl?: string): Promise<any> => {
+    const res = await api.post(`/api/community/groups/${groupId}/questions`, { title, description, subject, tags, attachmentUrl });
+    return res.data.question;
+  },
+
+  updateGroupQuestionStatus: async (groupId: string, questionId: string, isSolved: boolean): Promise<any> => {
+    const res = await api.patch(`/api/community/groups/${groupId}/questions/${questionId}`, { isSolved });
+    return res.data.question;
+  },
+
+  deleteGroupQuestion: async (groupId: string, questionId: string): Promise<void> => {
+    await api.delete(`/api/community/groups/${groupId}/questions/${questionId}`);
+  },
+
+  createGroupAnswer: async (groupId: string, questionId: string, content: string, attachmentUrl?: string): Promise<any> => {
+    const res = await api.post(`/api/community/groups/${groupId}/questions/${questionId}/answers`, { content, attachmentUrl });
+    return res.data.answer;
+  },
+
+  deleteGroupAnswer: async (groupId: string, answerId: string): Promise<void> => {
+    await api.delete(`/api/community/groups/${groupId}/answers/${answerId}`);
+  },
+
+  getGroupMeetings: async (groupId: string): Promise<any[]> => {
+    const res = await api.get(`/api/community/groups/${groupId}/meetings`);
+    return res.data.meetings;
+  },
+
+  createGroupMeeting: async (groupId: string, title: string): Promise<any> => {
+    const res = await api.post(`/api/community/groups/${groupId}/meetings`, { title });
+    return res.data.meeting;
+  },
+
+  endGroupMeeting: async (groupId: string, meetingId: string): Promise<any> => {
+    const res = await api.patch(`/api/community/groups/${groupId}/meetings/${meetingId}/end`);
+    return res.data.meeting;
   },
 };
 export default communityService;

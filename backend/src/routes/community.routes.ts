@@ -112,6 +112,28 @@ router.post(
   upload.single("file"),
   communityController.uploadGroupMaterial,
 );
+router.delete("/groups/:id/materials/:materialId", communityController.deleteGroupMaterial);
+router.post("/groups/:id/materials/:materialId/download", communityController.trackGroupMaterialDownload);
+
+// Group Announcements
+router.get("/groups/:id/announcements", communityController.getGroupAnnouncements);
+router.post("/groups/:id/announcements", communityController.createGroupAnnouncement);
+router.patch("/groups/:id/announcements/:announcementId", communityController.updateGroupAnnouncement);
+router.delete("/groups/:id/announcements/:announcementId", communityController.deleteGroupAnnouncement);
+
+// Q&A Board
+router.get("/groups/:id/questions", communityController.getGroupQuestions);
+router.post("/groups/:id/questions", communityController.createGroupQuestion);
+router.patch("/groups/:id/questions/:questionId", communityController.updateGroupQuestionStatus);
+router.delete("/groups/:id/questions/:questionId", communityController.deleteGroupQuestion);
+router.post("/groups/:id/questions/:questionId/answers", communityController.createGroupAnswer);
+router.delete("/groups/:id/answers/:answerId", communityController.deleteGroupAnswer);
+
+// Meetings
+router.get("/groups/:id/meetings", communityController.getGroupMeetings);
+router.post("/groups/:id/meetings", communityController.createGroupMeeting);
+router.patch("/groups/:id/meetings/:meetingId/end", communityController.endGroupMeeting);
+
 
 // Feed / Posts
 router.get("/feed", communityController.getFeed);

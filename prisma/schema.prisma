@@ -159,7 +159,9 @@ model GroupAnnouncement {
   title       String     @db.VarChar(255)
   content     String     @db.Text
   createdBy   String     @map("created_by") @db.VarChar(36)
+  pinned      Boolean    @default(false)
   createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at")
 
   group       StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
   creator     User       @relation(fields: [createdBy], references: [id], onDelete: Cascade)
@@ -342,7 +344,9 @@ model Question {
   isSolved   Boolean          @default(false) @map("is_solved")
   priority   String           @default("medium") @db.VarChar(20)
   viewsCount Int              @default(0) @map("views_count")
+  attachmentUrl String?        @map("attachment_url") @db.VarChar(500)
   createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @default(now()) @updatedAt @map("updated_at")
 
   group      StudyGroup       @relation(fields: [groupId], references: [id], onDelete: Cascade)
   user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -358,6 +362,7 @@ model QuestionAnswer {
   userId      String             @map("user_id") @db.VarChar(36)
   content     String             @db.Text
   isAccepted  Boolean            @default(false) @map("is_accepted")
+  attachmentUrl String?          @map("attachment_url") @db.VarChar(500)
   createdAt   DateTime           @default(now()) @map("created_at")
 
   question    Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
@@ -425,6 +430,7 @@ model GroupMaterial {
   uploadedBy  String?            @map("uploaded_by") @db.VarChar(36)
   tags        String?            @db.Text
   isFavorite  Boolean            @default(false) @map("is_favorite")
+  downloadCount Int              @default(0) @map("download_count")
   createdAt   DateTime           @default(now()) @map("created_at")
 
   group       StudyGroup         @relation(fields: [groupId], references: [id], onDelete: Cascade)
