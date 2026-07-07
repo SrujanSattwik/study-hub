@@ -15,20 +15,20 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyle = 'inline-flex items-center justify-center font-semibold rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  const baseStyle = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none select-none';
 
   const variants = {
-    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-md shadow-indigo-200',
-    secondary: 'bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 focus:ring-indigo-500',
-    danger: 'bg-rose-500 text-white hover:bg-rose-600 focus:ring-rose-500 shadow-md shadow-rose-200',
-    success: 'bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-500 shadow-md shadow-emerald-200',
-    ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-800 focus:ring-gray-300',
+    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 active:bg-indigo-800',
+    secondary: 'bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 focus:ring-indigo-500 hover:border-gray-300 shadow-sm active:bg-gray-100',
+    danger: 'bg-rose-500 text-white hover:bg-rose-600 focus:ring-rose-500 shadow-lg shadow-rose-500/10 hover:shadow-rose-500/20 active:bg-rose-700',
+    success: 'bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-500 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:bg-emerald-700',
+    ghost: 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 focus:ring-gray-300 active:bg-gray-100',
   };
 
   const sizes = {
-    sm: 'px-4 py-1.5 text-xs',
-    md: 'px-6 py-2.5 text-sm',
-    lg: 'px-8 py-3.5 text-base',
+    sm: 'px-3.5 py-1.5 text-xs',
+    md: 'px-5 py-2.5 text-sm',
+    lg: 'px-7 py-3.5 text-base',
   };
 
   return (

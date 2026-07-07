@@ -64,7 +64,6 @@ export const Community: React.FC = () => {
       setToastMessage("Successfully joined the study group!");
       queryClient.invalidateQueries({ queryKey: ["communityBundle"] });
       queryClient.invalidateQueries({ queryKey: ["exploreGroupsList"] });
-      // Instantly open the workspace
       setActiveGroupId(groupId);
     },
     onError: () => {
@@ -97,7 +96,7 @@ export const Community: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ["communityBundle"] });
       queryClient.invalidateQueries({ queryKey: ["exploreGroupsList"] });
       if (res.groupId) {
-        setActiveGroupId(res.groupId); // Instantly enter space
+        setActiveGroupId(res.groupId);
       }
     },
     onError: (err: any) => {
@@ -169,62 +168,59 @@ export const Community: React.FC = () => {
   } = bundle || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-slide-up">
       {/* Banner */}
-      <section className="p-8 bg-indigo-600 text-white rounded-2xl flex justify-between items-center flex-wrap gap-4 shadow-sm">
-        <div>
-          <h2 className="text-xl font-bold">Community Study Hub</h2>
-          <p className="text-xs text-indigo-100 mt-1">
-            Collaborate in live study groups, check upcoming schedules, and
-            complete daily tasks.
-          </p>
+      <section className="p-8 bg-white border border-slate-200 rounded-2xl relative overflow-hidden shadow-sm">
+        <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl opacity-50" />
+        <div className="relative flex justify-between items-center flex-wrap gap-4">
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900 font-heading tracking-tight">Community Study Hub</h2>
+            <p className="text-xs text-gray-400 font-semibold mt-1">
+              Collaborate in live study groups, check upcoming schedules, and complete daily tasks.
+            </p>
+          </div>
+          <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)}>
+            <i className="fas fa-plus mr-2" /> Create Community
+          </Button>
         </div>
-        <Button variant="secondary" onClick={() => setIsCreateOpen(true)}>
-          <i className="fas fa-plus mr-2" /> Create Community
-        </Button>
       </section>
 
       {/* Stats Widgets */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <Card>
-          <div className="text-2xl font-extrabold text-indigo-600">
-            {stats?.activeMeetings || 0}
-          </div>
-          <div className="text-[10px] uppercase font-bold text-gray-400 mt-1 tracking-wider">
+        <div className="bg-white border border-slate-200 hover:border-indigo-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between h-28 transition-all duration-200 hover:shadow-md">
+          <div className="text-2xl font-black text-indigo-600 font-heading">{stats?.activeMeetings || 0}</div>
+          <div className="text-[9px] uppercase font-black text-gray-400 mt-2 tracking-widest">
             Live Meetings
           </div>
-        </Card>
-        <Card>
-          <div className="text-2xl font-extrabold text-purple-600">
-            {stats?.onlineUsers || 0}
-          </div>
-          <div className="text-[10px] uppercase font-bold text-gray-400 mt-1 tracking-wider">
+        </div>
+        <div className="bg-white border border-slate-200 hover:border-purple-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between h-28 transition-all duration-200 hover:shadow-md">
+          <div className="text-2xl font-black text-purple-600 font-heading">{stats?.onlineUsers || 0}</div>
+          <div className="text-[9px] uppercase font-black text-gray-400 mt-2 tracking-widest">
             Users Online
           </div>
-        </Card>
-        <Card>
-          <div className="text-2xl font-extrabold text-teal-600">
-            {stats?.materialsShared || 0}
-          </div>
-          <div className="text-[10px] uppercase font-bold text-gray-400 mt-1 tracking-wider">
+        </div>
+        <div className="bg-white border border-slate-200 hover:border-teal-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between h-28 transition-all duration-200 hover:shadow-md">
+          <div className="text-2xl font-black text-teal-600 font-heading">{stats?.materialsShared || 0}</div>
+          <div className="text-[9px] uppercase font-black text-gray-400 mt-2 tracking-widest">
             Files Shared
           </div>
-        </Card>
-        <Card>
-          <div className="text-2xl font-extrabold text-emerald-600">
-            {stats?.upcomingEvents || 0}
-          </div>
-          <div className="text-[10px] uppercase font-bold text-gray-400 mt-1 tracking-wider">
+        </div>
+        <div className="bg-white border border-slate-200 hover:border-emerald-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between h-28 transition-all duration-200 hover:shadow-md">
+          <div className="text-2xl font-black text-emerald-600 font-heading">{stats?.upcomingEvents || 0}</div>
+          <div className="text-[9px] uppercase font-black text-gray-400 mt-2 tracking-widest">
             Upcoming Events
           </div>
-        </Card>
+        </div>
       </section>
 
       {/* Explore, Search & Filter Bar */}
-      <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
-        <h3 className="text-base font-bold text-gray-900">Search Communities</h3>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+      <section className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6 relative overflow-hidden">
+        <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50/50 blur-3xl opacity-50" />
+        <div className="relative space-y-1">
+          <h3 className="text-sm font-extrabold text-gray-900 tracking-tight leading-none uppercase tracking-widest text-[10px] text-gray-400">Search Communities</h3>
+        </div>
+        <div className="relative grid grid-cols-1 gap-4 pt-2">
+          <div>
             <Input
               id="comm-search"
               value={searchTerm}
@@ -232,14 +228,14 @@ export const Community: React.FC = () => {
               placeholder="Search by community name, description, category..."
             />
           </div>
-          <div className="flex flex-wrap gap-4 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Category Select */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-gray-500">Category:</span>
+            <div>
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Category</label>
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="px-3.5 py-2.5 border border-gray-200 bg-white rounded-xl text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold"
               >
                 <option value="all">All Categories</option>
                 <option value="mathematics">Mathematics</option>
@@ -251,12 +247,12 @@ export const Community: React.FC = () => {
             </div>
 
             {/* Sort Select */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-gray-500">Sort By:</span>
+            <div>
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Sort By</label>
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="px-3.5 py-2.5 border border-gray-200 bg-white rounded-xl text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold"
               >
                 <option value="popular">Popularity</option>
                 <option value="newest">Newest</option>
@@ -271,10 +267,24 @@ export const Community: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Explore Communities Grid */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">Explore Groups</h3>
+            <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Explore Groups</h3>
             {isExploreLoading ? (
-              <div className="py-10 flex justify-center">
-                <Loader size="sm" label="Searching communities..." />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-pulse">
+                {[1, 2, 4].map((i) => (
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm h-48 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="h-10 w-10 rounded-xl bg-slate-100 shimmer-skeleton" />
+                        <div className="h-4 w-12 bg-slate-150 rounded-full" />
+                      </div>
+                      <div className="h-4 w-3/4 bg-slate-100 rounded" />
+                    </div>
+                    <div className="flex justify-between items-center mt-4 pt-3 border-t border-slate-100">
+                      <div className="h-3 w-16 bg-slate-100 rounded" />
+                      <div className="h-8 w-24 bg-slate-150 rounded-xl" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : isExploreError ? (
               <div className="p-6 text-center text-xs text-red-500 font-semibold bg-white border border-red-100 rounded-2xl">
@@ -289,27 +299,27 @@ export const Community: React.FC = () => {
                   return (
                     <Card
                       key={g.group_id}
-                      className="flex flex-col justify-between h-48 border border-gray-200"
+                      className="flex flex-col justify-between h-48 border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all duration-300"
                     >
                       <div>
                         <div className="flex justify-between items-start mb-2">
-                          <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                            <i className={`${g.icon || "fas fa-users"} text-lg`} />
+                          <div className="h-9 w-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100/50">
+                            <i className={`${g.icon || "fas fa-users"} text-md`} />
                           </div>
                           <span className="text-[9px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
                             {g.category || "other"}
                           </span>
                         </div>
-                        <h4 className="font-extrabold text-gray-900 text-sm leading-tight">
+                        <h4 className="font-extrabold text-gray-900 text-sm leading-tight line-clamp-1">
                           {g.name}
                         </h4>
-                        <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">
+                        <p className="text-xs text-gray-400 font-medium mt-1.5 line-clamp-2 leading-relaxed">
                           {g.description}
                         </p>
                       </div>
 
-                      <div className="flex justify-between items-center mt-4">
-                        <span className="text-[10px] font-extrabold text-gray-400">
+                      <div className="flex justify-between items-center mt-4 border-t border-slate-100 pt-3">
+                        <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">
                           {g.member_count ?? 0} members
                         </span>
                         {isJoined ? (
@@ -339,7 +349,7 @@ export const Community: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div className="text-center py-12 bg-white border border-gray-200 rounded-2xl">
+              <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <i className="fas fa-search text-3xl text-gray-300 mb-3" />
                 <p className="text-sm font-semibold text-gray-500">
                   No communities found matching your filters.
@@ -350,22 +360,22 @@ export const Community: React.FC = () => {
 
           {/* My Joined Groups */}
           <Card title="My Joined Groups">
-            <div className="divide-y divide-gray-150">
+            <div className="divide-y divide-slate-100">
               {joinedGroups.length > 0 ? (
                 joinedGroups.map((g) => (
                   <div
                     key={g.group_id}
-                    className="py-4 flex items-center justify-between gap-4 hover:bg-gray-50/30 transition-colors"
+                    className="py-3.5 flex items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors px-1"
                   >
-                    <div className="flex gap-3 items-center">
-                      <div className="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <div className="flex gap-3.5 items-center">
+                      <div className="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center">
                         <i className={`${g.icon} text-lg`} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900 text-sm leading-none">
+                        <h4 className="font-extrabold text-gray-900 text-sm leading-none">
                           {g.name}
                         </h4>
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-1.5 block">
+                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5 block">
                           {g.category} • {g.member_count} members
                         </span>
                       </div>
@@ -392,22 +402,22 @@ export const Community: React.FC = () => {
         <div className="space-y-6">
           {/* Suggested Groups (Not Joined) */}
           <Card title="Suggested Groups to Join">
-            <div className="divide-y divide-gray-150">
+            <div className="divide-y divide-slate-100">
               {suggestedGroups.length > 0 ? (
                 suggestedGroups.map((g) => (
                   <div
                     key={g.group_id}
-                    className="py-4 flex items-center justify-between gap-4"
+                    className="py-3.5 flex items-center justify-between gap-4 px-1"
                   >
-                    <div className="flex gap-3 items-center">
-                      <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <div className="flex gap-3.5 items-center">
+                      <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center">
                         <i className={`${g.icon} text-lg`} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900 text-sm leading-none">
+                        <h4 className="font-extrabold text-gray-900 text-sm leading-none">
                           {g.name}
                         </h4>
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-1.5 block">
+                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5 block">
                           {g.category} • {g.member_count} members
                         </span>
                       </div>
@@ -440,18 +450,18 @@ export const Community: React.FC = () => {
                 events.map((ev) => (
                   <div
                     key={ev.event_id}
-                    className="p-3 border border-gray-150 rounded-xl space-y-1.5 bg-gray-50/50"
+                    className="p-3.5 border border-slate-200 rounded-xl space-y-2 bg-slate-50/50 hover:border-slate-350 transition-colors"
                   >
                     <div className="flex items-center gap-2">
-                      <i className={`${ev.group_icon} text-xs text-indigo-500`} />
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      <i className={`${ev.group_icon} text-[10px] text-indigo-500`} />
+                      <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
                         {ev.group_name}
                       </span>
                     </div>
-                    <h4 className="font-bold text-gray-900 text-xs">
+                    <h4 className="font-extrabold text-gray-900 text-xs leading-snug">
                       {ev.title}
                     </h4>
-                    <p className="text-[9px] text-gray-500 font-medium">
+                    <p className="text-[9px] text-gray-400 font-semibold">
                       Date: {new Date(ev.event_date).toLocaleString()} •
                       Location: {ev.location}
                     </p>
@@ -469,19 +479,19 @@ export const Community: React.FC = () => {
           <Card title="Daily Goals" icon="fas fa-trophy">
             <div className="space-y-4">
               {challenges.map((c) => (
-                <div key={c.id} className="space-y-1.5">
+                <div key={c.id} className="space-y-2">
                   <div className="flex justify-between items-center text-xs font-bold">
                     <span className="text-gray-900">{c.title}</span>
-                    <span className="text-indigo-600">{c.reward}</span>
+                    <span className="text-indigo-600 text-[10px] uppercase font-extrabold bg-indigo-50 px-2 py-0.5 rounded-full">{c.reward}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-indigo-600"
                         style={{ width: `${c.progress}%` }}
                       />
                     </div>
-                    <span className="text-[10px] font-semibold text-gray-400">
+                    <span className="text-[10px] font-extrabold text-gray-400">
                       {c.progress}%
                     </span>
                   </div>
@@ -523,13 +533,13 @@ export const Community: React.FC = () => {
           />
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
               Description
             </label>
             <textarea
               value={commDesc}
               onChange={(e) => setCommDesc(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-24"
+              className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all duration-200 h-24"
               placeholder="What is this community about? Provide details..."
               required
             />
@@ -537,13 +547,13 @@ export const Community: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
                 Category/Subject
               </label>
               <select
                 value={commCategory}
                 onChange={(e) => setCommCategory(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold"
               >
                 <option value="mathematics">Mathematics</option>
                 <option value="science">Science</option>
@@ -554,13 +564,13 @@ export const Community: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
                 Visibility
               </label>
               <select
                 value={commVisibility}
                 onChange={(e) => setCommVisibility(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold"
               >
                 <option value="public">Public</option>
                 <option value="private">Private</option>

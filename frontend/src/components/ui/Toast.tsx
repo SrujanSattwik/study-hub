@@ -22,9 +22,9 @@ export const Toast: React.FC<ToastProps> = ({
   }, [onClose, duration]);
 
   const bgColors = {
-    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    error: 'bg-rose-50 text-rose-800 border-rose-200',
-    info: 'bg-blue-50 text-blue-800 border-blue-200',
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-250',
+    error: 'bg-rose-50 text-rose-800 border-rose-250',
+    info: 'bg-blue-50 text-blue-800 border-blue-250',
   };
 
   const icons = {
@@ -35,15 +35,15 @@ export const Toast: React.FC<ToastProps> = ({
 
   return (
     <div
-      className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg animate-bounce ${bgColors[type]}`}
+      className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4.5 py-3 rounded-xl border shadow-xl animate-slide-up ${bgColors[type]}`}
     >
-      <i className={`fas ${icons[type]} text-lg`} />
-      <span className="text-sm font-semibold">{message}</span>
+      <i className={`fas ${icons[type]} text-md`} />
+      <span className="text-xs font-extrabold tracking-tight">{message}</span>
       <button
         onClick={onClose}
-        className="ml-2 rounded-lg p-0.5 text-gray-400 hover:bg-black/5 hover:text-gray-600 transition-colors"
+        className="ml-3 rounded-lg p-0.5 text-gray-400 hover:bg-black/5 hover:text-gray-600 transition-colors"
       >
-        <i className="fas fa-times" />
+        <i className="fas fa-times text-xs" />
       </button>
     </div>
   );

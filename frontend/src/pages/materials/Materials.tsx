@@ -254,8 +254,28 @@ export const Materials: React.FC = () => {
 
       {/* Materials List */}
       {isLoading ? (
-        <div className="py-20 flex justify-center">
-          <Loader size="md" label="Retrieving study materials..." />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between h-56 animate-pulse"
+            >
+              <div className="space-y-4">
+                <div className="flex justify-between items-start">
+                  <div className="h-10 w-10 rounded-xl bg-slate-100 shimmer-skeleton" />
+                  <div className="h-4 w-12 bg-slate-150 rounded-full" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 w-3/4 bg-slate-100 rounded" />
+                  <div className="h-3 w-5/6 bg-slate-150 rounded" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-4 border-t border-slate-100 pt-3">
+                <div className="h-3 w-20 bg-slate-100 rounded" />
+                <div className="h-8 w-24 bg-slate-150 rounded-xl" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : isError ? (
         <div className="text-center py-20 bg-white border border-red-100 rounded-2xl">
