@@ -15,4 +15,7 @@ export const getMaterialsQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(5),
   user_id: z.string().uuid().optional(),
+  search: z.string().optional(),
+  subject: z.string().optional(),
+  sort: z.string().optional(),
 });

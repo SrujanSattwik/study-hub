@@ -87,7 +87,7 @@ export class CommunityController {
   async listGroups(req: Request, res: Response, next: NextFunction) {
     try {
       const query = getGroupsQuerySchema.parse(req.query);
-      const groups = await communityService.listGroups(query.category, query.search);
+      const groups = await communityService.listGroups(query.category, query.search, query.sort);
       res.json({ success: true, groups });
     } catch (err) {
       next(err);

@@ -9,11 +9,21 @@ export interface GetMaterialsResponse {
 }
 
 export const materialService = {
-  getMaterials: async (type?: string, page = 1, limit = 5): Promise<GetMaterialsResponse> => {
+  getMaterials: async (
+    type?: string,
+    page = 1,
+    limit = 5,
+    search?: string,
+    subject?: string,
+    sort?: string
+  ): Promise<GetMaterialsResponse> => {
     const params = new URLSearchParams();
     if (type) params.append('type', type);
     params.append('page', page.toString());
     params.append('limit', limit.toString());
+    if (search) params.append('search', search);
+    if (subject) params.append('subject', subject);
+    if (sort) params.append('sort', sort);
     
     const res = await api.get(`/api/materials?${params.toString()}`);
     return res.data;

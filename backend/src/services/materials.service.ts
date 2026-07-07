@@ -18,8 +18,16 @@ export interface MaterialInput {
 }
 
 export class MaterialsService {
-  private static listCacheKey(type?: string, userId?: string, page?: number, limit?: number): string {
-    return `mat:${type || 'all'}:${userId || 'any'}:${page}:${limit}`;
+  private static listCacheKey(
+    type?: string,
+    userId?: string,
+    page?: number,
+    limit?: number,
+    search?: string,
+    subject?: string,
+    sort?: string
+  ): string {
+    return `mat:${type || 'all'}:${userId || 'any'}:${page}:${limit}:${search || ''}:${subject || ''}:${sort || ''}`;
   }
 
   private static detectTypeAndFormat(file?: Express.Multer.File, link?: string) {
@@ -38,13 +46,21 @@ export class MaterialsService {
     return { type: 'notes', format: 'link' };
   }
 
-  async list(type?: string, page = 1, limit = 5, userId?: string) {
+  async list(
+    type?: string,
+    page = 1,
+    limit = 5,
+    userId?: string,
+    search?: string,
+    subject?: string,
+    sort?: string
+  ) {
     const pageNum = Math.max(1, page);
     const limitNum = Math.min(100, Math.max(1, limit));
     const offset = (pageNum - 1) * limitNum;
 
     // Cache check
-    const cKey = MaterialsService.listCacheKey(type, userId, pageNum, limitNum);
+    const cKey = MaterialsService.listCacheKey(type, userId, pageNum, limitNum, search, subject, sort);
     const cached = cache.get(cKey);
     if (cached) {
       return cached;
@@ -52,24 +68,38 @@ export class MaterialsService {
 
     const start = process.hrtime.bigint();
 
+    // Construct search/where clauses
+    const whereClause: any = {
+      type: type || undefined,
+      userId: userId || undefined,
+      subject: subject ? { equals: subject, mode: 'insensitive' } : undefined,
+    };
+
+    if (search) {
+      const searchPattern = search.trim();
+      whereClause.OR = [
+        { title: { contains: searchPattern, mode: 'insensitive' } },
+        { description: { contains: searchPattern, mode: 'insensitive' } },
+        { author: { contains: searchPattern, mode: 'insensitive' } },
+        { subject: { contains: searchPattern, mode: 'insensitive' } },
+      ];
+    }
+
+    // Sorting
+    const orderByClause = sort === 'downloads'
+      ? { downloadCount: 'desc' as const }
+      : { createdAt: 'desc' as const };
+
     // Use Prisma model calls for clean type safety
     const [materialsRaw, totalItems] = await Promise.all([
       prisma.material.findMany({
-        where: {
-          type: type || undefined,
-          userId: userId || undefined,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        where: whereClause,
+        orderBy: orderByClause,
         take: limitNum,
         skip: offset,
       }),
       prisma.material.count({
-        where: {
-          type: type || undefined,
-          userId: userId || undefined,
-        },
+        where: whereClause,
       }),
     ]);
 

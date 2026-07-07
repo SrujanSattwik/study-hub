@@ -478,8 +478,8 @@ export class CommunityService {
    * Dynamic group listing with optional category + search filters.
    * Uses Prisma.sql fragments for safe parameterized dynamic WHERE clause.
    */
-  async listGroups(category?: string, search?: string) {
-    const cKey = `explore:${category ?? "all"}:${search ?? ""}`;
+  async listGroups(category?: string, search?: string, sort?: string) {
+    const cKey = `explore:${category ?? "all"}:${search ?? ""}:${sort ?? "popular"}`;
     const hit = cache.get(cKey);
     if (hit) return hit;
 
@@ -490,7 +490,7 @@ export class CommunityService {
     if (search) {
       const pattern = `%${search}%`;
       conditions.push(
-        Prisma.sql`(sg.name ILIKE ${pattern} OR sg.description ILIKE ${pattern})`,
+        Prisma.sql`(sg.name ILIKE ${pattern} OR sg.description ILIKE ${pattern} OR sg.category ILIKE ${pattern})`,
       );
     }
 
@@ -498,6 +498,10 @@ export class CommunityService {
       conditions.length > 0
         ? Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`
         : Prisma.empty;
+
+    const orderByClause = sort === 'newest'
+      ? Prisma.sql`ORDER BY sg.created_at DESC`
+      : Prisma.sql`ORDER BY COALESCE(mc.cnt, 0) DESC`;
 
     const rows = await prisma.$queryRaw<any[]>(Prisma.sql`
       SELECT sg.group_id, sg.name, sg.description, sg.category,
@@ -509,7 +513,7 @@ export class CommunityService {
         WHERE status = 'approved' GROUP BY group_id
       ) mc ON sg.group_id = mc.group_id
       ${whereClause}
-      ORDER BY COALESCE(mc.cnt, 0) DESC
+      ${orderByClause}
     `);
     cache.set(cKey, rows, 30);
     return rows;

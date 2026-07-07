@@ -9,7 +9,8 @@ export const createGroupSchema = z.object({
 
 export const getGroupsQuerySchema = z.object({
   category: z.string().optional(),
-  search: z.string().optional()
+  search: z.string().optional(),
+  sort: z.string().optional()
 });
 
 export const createPostSchema = z.object({

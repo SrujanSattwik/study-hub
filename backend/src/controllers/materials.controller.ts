@@ -13,7 +13,10 @@ export class MaterialsController {
         query.type,
         query.page,
         query.limit,
-        query.user_id
+        query.user_id,
+        query.search,
+        query.subject,
+        query.sort
       );
       res.json(result);
     } catch (err) {

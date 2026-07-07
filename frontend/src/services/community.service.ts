@@ -29,10 +29,11 @@ export const communityService = {
     return res.data.bundle;
   },
 
-  listGroups: async (category?: string, search?: string): Promise<StudyGroup[]> => {
+  listGroups: async (category?: string, search?: string, sort?: string): Promise<StudyGroup[]> => {
     const params = new URLSearchParams();
     if (category) params.append('category', category);
     if (search) params.append('search', search);
+    if (sort) params.append('sort', sort);
     const res = await api.get(`/api/community/groups?${params.toString()}`);
     return res.data.groups;
   },

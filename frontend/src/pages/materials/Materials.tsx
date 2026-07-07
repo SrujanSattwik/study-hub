@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import materialService from "../../services/material.service";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
@@ -8,11 +8,18 @@ import Modal from "../../components/ui/Modal";
 import Loader from "../../components/ui/Loader";
 import Toast from "../../components/ui/Toast";
 import { API_URL } from "../../services/api";
+import useDebounce from "../../hooks/useDebounce";
 
 export const Materials: React.FC = () => {
+  const queryClient = useQueryClient();
   const [filterType, setFilterType] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+  // Search & Filter States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [subjectFilter, setSubjectFilter] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   // Form Fields
   const [title, setTitle] = useState("");
@@ -27,11 +34,27 @@ export const Materials: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
 
+  const debouncedSearch = useDebounce(searchTerm, 400);
+
   // 1. TanStack Query for materials list
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["materials", filterType, page],
+    queryKey: [
+      "materials",
+      filterType,
+      page,
+      debouncedSearch,
+      subjectFilter,
+      sortBy,
+    ],
     queryFn: () =>
-      materialService.getMaterials(filterType || undefined, page, 5),
+      materialService.getMaterials(
+        filterType || undefined,
+        page,
+        6, // Show 6 items per page for better grid alignment
+        debouncedSearch || undefined,
+        subjectFilter || undefined,
+        sortBy
+      ),
   });
 
   // 2. Upload Mutation
@@ -42,12 +65,12 @@ export const Materials: React.FC = () => {
       setToastMessage("Study material uploaded successfully!");
       setIsUploadOpen(false);
       resetForm();
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["materials"] });
     },
     onError: (err: any) => {
       setToastType("error");
       setToastMessage(
-        err.response?.data?.message || "Failed to upload material",
+        err.response?.data?.message || "Failed to upload material"
       );
     },
   });
@@ -87,11 +110,11 @@ export const Materials: React.FC = () => {
   const handleDownload = async (
     materialId: string,
     filePath: string | null,
-    linkPath: string | null,
+    linkPath: string | null
   ) => {
     try {
       await materialService.trackDownload(materialId);
-      refetch(); // Refresh list to update download count
+      queryClient.invalidateQueries({ queryKey: ["materials"] }); // Refresh list to update download count
 
       if (filePath) {
         window.open(`${API_URL}${filePath}`, "_blank");
@@ -105,33 +128,104 @@ export const Materials: React.FC = () => {
   };
 
   const categories = [
-    { label: "All Resources", value: "" },
-    { label: "Textbooks", value: "textbook" },
-    { label: "Videos", value: "video" },
-    { label: "Audio", value: "audio" },
-    { label: "Study Notes", value: "notes" },
+    { label: "All Resources", value: "", icon: "fas fa-folder-open", color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Textbooks", value: "textbook", icon: "fas fa-book", color: "text-indigo-600", bg: "bg-indigo-50" },
+    { label: "Videos", value: "video", icon: "fas fa-video", color: "text-purple-600", bg: "bg-purple-50" },
+    { label: "Audio", value: "audio", icon: "fas fa-headphones", color: "text-teal-600", bg: "bg-teal-50" },
+    { label: "Study Notes", value: "notes", icon: "fas fa-sticky-note", color: "text-amber-500", bg: "bg-amber-50" },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header Panel */}
-      <section className="p-8 bg-indigo-50 border border-indigo-100 rounded-2xl flex justify-between items-center flex-wrap gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">
-            Study Materials Hub
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Access, download, and share textbooks, videos, lectures, and
-            revision notes.
-          </p>
+    <div className="space-y-8">
+      {/* Unified Hero & Search Card */}
+      <section className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm space-y-6 relative overflow-hidden">
+        {/* Background gradient subtle glow */}
+        <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl opacity-50" />
+        <div className="absolute -left-24 -bottom-24 h-48 w-48 rounded-full bg-purple-50 blur-3xl opacity-50" />
+
+        <div className="relative flex justify-between items-start flex-wrap gap-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-extrabold text-gray-900 font-heading">
+              Study Materials Hub
+            </h2>
+            <p className="text-sm text-gray-600">
+              Access, download, and share textbooks, videos, lectures, and revision notes.
+            </p>
+          </div>
+          <Button variant="primary" onClick={() => setIsUploadOpen(true)}>
+            <i className="fas fa-upload mr-2" /> Upload Material
+          </Button>
         </div>
-        <Button variant="primary" onClick={() => setIsUploadOpen(true)}>
-          <i className="fas fa-upload mr-2" /> Upload Material
-        </Button>
+
+        <div className="relative grid grid-cols-1 gap-4 pt-4 border-t border-gray-100">
+          <div>
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Search Resource</label>
+            <Input
+              id="mat-search"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Search by title, description, subject, or author..."
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Subject Filter */}
+            <div>
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Subject</label>
+              <input
+                type="text"
+                value={subjectFilter}
+                onChange={(e) => {
+                  setSubjectFilter(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="e.g. Physics"
+                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            {/* Type Dropdown */}
+            <div>
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Resource Type</label>
+              <select
+                value={filterType}
+                onChange={(e) => {
+                  setFilterType(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
+              >
+                <option value="">All Types</option>
+                <option value="textbook">Textbook</option>
+                <option value="video">Video Lecture</option>
+                <option value="audio">Audio Guide</option>
+                <option value="notes">Study Notes</option>
+              </select>
+            </div>
+
+            {/* Sort Select */}
+            <div>
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Sort By</label>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
+              >
+                <option value="newest">Newest Released</option>
+                <option value="downloads">Most Downloaded</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-150 pb-4">
+      {/* Category Cards */}
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {categories.map((c) => (
           <button
             key={c.label}
@@ -139,16 +233,24 @@ export const Materials: React.FC = () => {
               setFilterType(c.value);
               setPage(1);
             }}
-            className={`px-4 py-2 text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all ${
-              filterType === c.value
-                ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-                : "bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+            className={`border rounded-2xl p-4 shadow-sm flex flex-col items-center text-center justify-between h-28 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ${
+              filterType === c.value ? 'border-indigo-600 bg-indigo-50/20' : 'bg-white border-gray-200'
             }`}
           >
-            {c.label}
+            <div className={`h-8 w-8 rounded-xl flex items-center justify-center ${c.bg} ${c.color}`}>
+              <i className={`${c.icon} text-sm`} />
+            </div>
+            <div className="mt-2 w-full">
+              <h4 className="text-xs font-extrabold text-gray-900 leading-tight truncate">{c.label}</h4>
+              {filterType === c.value && data?.totalItems !== undefined && (
+                <span className="text-[10px] text-indigo-600 font-bold mt-1 block">
+                  {data.totalItems} Files
+                </span>
+              )}
+            </div>
           </button>
         ))}
-      </div>
+      </section>
 
       {/* Materials List */}
       {isLoading ? (
@@ -169,66 +271,104 @@ export const Materials: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {data?.materials && data.materials.length > 0 ? (
-            data.materials.map((m) => (
-              <div
-                key={m.id}
-                className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center justify-between gap-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex gap-4 items-start">
-                  <div className="h-12 w-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 text-xl">
-                    <i
-                      className={
-                        m.type === "textbook"
-                          ? "fas fa-book"
-                          : m.type === "video"
-                            ? "fas fa-video"
-                            : m.type === "audio"
-                              ? "fas fa-volume-up"
-                              : "fas fa-file-alt"
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="font-bold text-gray-900 text-sm">
-                      {m.title}
-                    </h3>
-                    {m.description && (
-                      <p className="text-xs text-gray-500 max-w-lg">
-                        {m.description}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-3 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                      <span>By: {m.author}</span>
-                      <span>•</span>
-                      <span>Format: {m.format || "Link"}</span>
-                      <span>•</span>
-                      <span>Downloads: {m.downloadCount}</span>
-                      {m.subject && (
-                        <>
-                          <span>•</span>
-                          <span className="text-indigo-500">{m.subject}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data.materials.map((m) => {
+                const typeIcons: Record<string, { icon: string; color: string; bg: string }> = {
+                  textbook: { icon: "fas fa-book", color: "text-indigo-600", bg: "bg-indigo-50" },
+                  video: { icon: "fas fa-video", color: "text-purple-600", bg: "bg-purple-50" },
+                  audio: { icon: "fas fa-volume-up", color: "text-teal-600", bg: "bg-teal-50" },
+                  notes: { icon: "fas fa-file-alt", color: "text-amber-500", bg: "bg-amber-50" },
+                };
+                const meta = typeIcons[m.type || "notes"] || typeIcons.notes;
 
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleDownload(m.id, m.filePath, m.link)}
-                >
-                  <i className="fas fa-download mr-2" /> Download
-                </Button>
-              </div>
-            ))
+                return (
+                  <Card
+                    key={m.id}
+                    className="flex flex-col justify-between border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="space-y-4">
+                      {/* Header: Icon & File Type / Format */}
+                      <div className="flex justify-between items-start">
+                        <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${meta.bg} ${meta.color}`}>
+                          <i className={`${meta.icon} text-lg`} />
+                        </div>
+                        <span className="text-[10px] font-extrabold text-gray-400 bg-gray-50 border border-gray-150 px-2 py-0.5 rounded-full uppercase">
+                          {m.format || m.type || "notes"}
+                        </span>
+                      </div>
+
+                      {/* Title & Description */}
+                      <div className="space-y-1.5">
+                        <h3 className="font-extrabold text-gray-900 text-sm leading-tight line-clamp-1" title={m.title}>
+                          {m.title}
+                        </h3>
+                        {m.description ? (
+                          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed min-h-[32px]">
+                            {m.description}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-gray-400 italic line-clamp-2 leading-relaxed min-h-[32px]">
+                            No description provided.
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Meta badges: Subject, Uploaded By, Date */}
+                      <div className="space-y-2 border-t border-gray-100 pt-3">
+                        {m.subject && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Subject:</span>
+                            <span className="text-indigo-600 font-extrabold text-[11px] truncate bg-indigo-50/50 px-2 py-0.5 rounded-md">
+                              {m.subject}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Uploaded:</span>
+                          <span className="text-gray-700 font-bold truncate">
+                            {m.author || "Anonymous"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Date:</span>
+                          <span className="text-gray-500 font-medium">
+                            {new Date(m.createdAt).toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer: Downloads Count & Action button */}
+                    <div className="flex items-center justify-between gap-4 border-t border-gray-100 pt-3 mt-4">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
+                        <i className="fas fa-download text-gray-400" />
+                        <span>{m.downloadCount} downloads</span>
+                      </div>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleDownload(m.id, m.filePath, m.link)}
+                      >
+                        <i className="fas fa-download mr-1.5" /> Download
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           ) : (
             <div className="text-center py-20 bg-white border border-gray-200 rounded-2xl">
               <i className="fas fa-folder-open text-4xl text-gray-300 mb-4" />
               <p className="text-sm font-semibold text-gray-500">
-                No materials found in this category.
+                No materials match your filters. Try resetting search or filters.
               </p>
             </div>
           )}
@@ -377,4 +517,5 @@ export const Materials: React.FC = () => {
     </div>
   );
 };
+
 export default Materials;
