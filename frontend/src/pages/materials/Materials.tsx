@@ -50,7 +50,7 @@ export const Materials: React.FC = () => {
       materialService.getMaterials(
         filterType || undefined,
         page,
-        6, // Show 6 items per page for better grid alignment
+        8, // Show 8 items per page for balanced columns alignment
         debouncedSearch || undefined,
         subjectFilter || undefined,
         sortBy
@@ -114,7 +114,7 @@ export const Materials: React.FC = () => {
   ) => {
     try {
       await materialService.trackDownload(materialId);
-      queryClient.invalidateQueries({ queryKey: ["materials"] }); // Refresh list to update download count
+      queryClient.invalidateQueries({ queryKey: ["materials"] });
 
       if (filePath) {
         window.open(`${API_URL}${filePath}`, "_blank");
@@ -136,134 +136,118 @@ export const Materials: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Unified Hero & Search Card */}
-      <section className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm space-y-6 relative overflow-hidden">
-        {/* Background gradient subtle glow */}
-        <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl opacity-50" />
-        <div className="absolute -left-24 -bottom-24 h-48 w-48 rounded-full bg-purple-50 blur-3xl opacity-50" />
-
-        <div className="relative flex justify-between items-start flex-wrap gap-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-extrabold text-gray-900 font-heading">
-              Study Materials Hub
-            </h2>
-            <p className="text-sm text-gray-600">
-              Access, download, and share textbooks, videos, lectures, and revision notes.
-            </p>
-          </div>
-          <Button variant="primary" onClick={() => setIsUploadOpen(true)}>
-            <i className="fas fa-upload mr-2" /> Upload Material
-          </Button>
+    <div className="space-y-6 animate-slide-up w-full">
+      {/* Header Info Panel */}
+      <div className="flex justify-between items-center flex-wrap gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <h2 className="text-[28px] font-bold text-gray-900 tracking-tight leading-tight font-heading">
+            Study Materials Hub
+          </h2>
+          <p className="text-[14px] text-gray-500 mt-1">
+            Access, download, and share textbooks, videos, lectures, and revision notes.
+          </p>
         </div>
+        <Button variant="primary" size="sm" onClick={() => setIsUploadOpen(true)}>
+          <i className="fas fa-upload mr-2" /> Upload Material
+        </Button>
+      </div>
 
-        <div className="relative grid grid-cols-1 gap-4 pt-4 border-t border-gray-100">
-          <div>
-            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Search Resource</label>
-            <Input
-              id="mat-search"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Search by title, description, subject, or author..."
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Subject Filter */}
-            <div>
-              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Subject</label>
-              <input
-                type="text"
-                value={subjectFilter}
-                onChange={(e) => {
-                  setSubjectFilter(e.target.value);
-                  setPage(1);
-                }}
-                placeholder="e.g. Physics"
-                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            {/* Type Dropdown */}
-            <div>
-              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Resource Type</label>
-              <select
-                value={filterType}
-                onChange={(e) => {
-                  setFilterType(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
-              >
-                <option value="">All Types</option>
-                <option value="textbook">Textbook</option>
-                <option value="video">Video Lecture</option>
-                <option value="audio">Audio Guide</option>
-                <option value="notes">Study Notes</option>
-              </select>
-            </div>
-
-            {/* Sort Select */}
-            <div>
-              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Sort By</label>
-              <select
-                value={sortBy}
-                onChange={(e) => {
-                  setSortBy(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
-              >
-                <option value="newest">Newest Released</option>
-                <option value="downloads">Most Downloaded</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Category Cards */}
-      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {categories.map((c) => (
-          <button
-            key={c.label}
-            onClick={() => {
-              setFilterType(c.value);
+      {/* Compact Professional Toolbar */}
+      <div className="flex flex-col md:flex-row gap-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm items-stretch">
+        <div className="flex-1">
+          <Input
+            id="mat-search"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
               setPage(1);
             }}
-            className={`border rounded-2xl p-4 shadow-sm flex flex-col items-center text-center justify-between h-28 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ${
-              filterType === c.value ? 'border-indigo-600 bg-indigo-50/20' : 'bg-white border-gray-200'
-            }`}
+            placeholder="Search materials..."
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          <input
+            type="text"
+            value={subjectFilter}
+            onChange={(e) => {
+              setSubjectFilter(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Subject (e.g. Physics)"
+            className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-44 font-semibold text-gray-700 placeholder-gray-400"
+          />
+          <select
+            value={filterType}
+            onChange={(e) => {
+              setFilterType(e.target.value);
+              setPage(1);
+            }}
+            className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-semibold"
           >
-            <div className={`h-8 w-8 rounded-xl flex items-center justify-center ${c.bg} ${c.color}`}>
-              <i className={`${c.icon} text-sm`} />
-            </div>
-            <div className="mt-2 w-full">
-              <h4 className="text-xs font-extrabold text-gray-900 leading-tight truncate">{c.label}</h4>
-              {filterType === c.value && data?.totalItems !== undefined && (
-                <span className="text-[10px] text-indigo-600 font-bold mt-1 block">
-                  {data.totalItems} Files
-                </span>
-              )}
-            </div>
-          </button>
-        ))}
+            <option value="">All Types</option>
+            <option value="textbook">Textbook</option>
+            <option value="video">Video Lecture</option>
+            <option value="audio">Audio Guide</option>
+            <option value="notes">Study Notes</option>
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => {
+              setSortBy(e.target.value);
+              setPage(1);
+            }}
+            className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-semibold"
+          >
+            <option value="newest">Newest Released</option>
+            <option value="downloads">Most Downloaded</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Category selector cards - 100px max height */}
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {categories.map((c) => {
+          const isActive = filterType === c.value;
+          return (
+            <button
+              key={c.label}
+              onClick={() => {
+                setFilterType(c.value);
+                setPage(1);
+              }}
+              className={`border rounded-2xl p-4 shadow-sm flex items-center gap-3.5 h-[90px] hover:border-indigo-300 transition-all duration-200 text-left ${
+                isActive ? 'border-indigo-600 bg-indigo-50/20 shadow-sm' : 'bg-white border-slate-200'
+              }`}
+            >
+              <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${c.bg} ${c.color} border border-slate-100`}>
+                <i className={`${c.icon} text-base`} />
+              </div>
+              <div className="overflow-hidden">
+                <h4 className="text-[14px] font-bold text-gray-900 leading-none truncate">{c.label}</h4>
+                {isActive && data?.totalItems !== undefined && (
+                  <span className="text-[11px] text-indigo-600 font-extrabold mt-1.5 block">
+                    {data.totalItems} Files
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </section>
 
-      {/* Materials List */}
+      {/* Materials List Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between h-56 animate-pulse"
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col justify-between h-64 animate-pulse"
             >
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
-                  <div className="h-10 w-10 rounded-xl bg-slate-100 shimmer-skeleton" />
-                  <div className="h-4 w-12 bg-slate-150 rounded-full" />
+                  <div className="h-8 w-16 bg-slate-100 rounded-full shimmer-skeleton" />
+                  <div className="h-3 w-8 bg-slate-150 rounded" />
                 </div>
                 <div className="space-y-2">
                   <div className="h-4 w-3/4 bg-slate-100 rounded" />
@@ -271,21 +255,21 @@ export const Materials: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-between items-center mt-4 border-t border-slate-100 pt-3">
-                <div className="h-3 w-20 bg-slate-100 rounded" />
-                <div className="h-8 w-24 bg-slate-150 rounded-xl" />
+                <div className="h-3 w-16 bg-slate-100 rounded" />
+                <div className="h-8 w-20 bg-slate-150 rounded-xl" />
               </div>
             </div>
           ))}
         </div>
       ) : isError ? (
-        <div className="text-center py-20 bg-white border border-red-100 rounded-2xl">
+        <div className="text-center py-20 bg-white border border-red-100 rounded-2xl shadow-sm">
           <i className="fas fa-exclamation-circle text-4xl text-red-300 mb-4" />
           <p className="text-sm font-semibold text-gray-500 mb-3">
             Failed to load study materials.
           </p>
           <button
             onClick={() => refetch()}
-            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 underline"
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 underline font-heading"
           >
             Try again
           </button>
@@ -293,7 +277,7 @@ export const Materials: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {data?.materials && data.materials.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {data.materials.map((m) => {
                 const typeIcons: Record<string, { icon: string; color: string; bg: string }> = {
                   textbook: { icon: "fas fa-book", color: "text-indigo-600", bg: "bg-indigo-50" },
@@ -306,78 +290,64 @@ export const Materials: React.FC = () => {
                 return (
                   <Card
                     key={m.id}
-                    className="flex flex-col justify-between border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200"
+                    className="flex flex-col justify-between border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-sm transition-all duration-200 h-64"
                   >
-                    <div className="space-y-4">
-                      {/* Header: Icon & File Type / Format */}
-                      <div className="flex justify-between items-start">
-                        <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${meta.bg} ${meta.color}`}>
-                          <i className={`${meta.icon} text-lg`} />
-                        </div>
-                        <span className="text-[10px] font-extrabold text-gray-400 bg-gray-50 border border-gray-150 px-2 py-0.5 rounded-full uppercase">
-                          {m.format || m.type || "notes"}
+                    <div className="space-y-3">
+                      {/* Badge / Type Header */}
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          {m.type}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase">
+                          {m.format || 'Link'}
                         </span>
                       </div>
 
                       {/* Title & Description */}
-                      <div className="space-y-1.5">
-                        <h3 className="font-extrabold text-gray-900 text-sm leading-tight line-clamp-1" title={m.title}>
+                      <div className="space-y-1">
+                        <h4 className="text-[15px] font-semibold text-gray-900 tracking-tight leading-snug line-clamp-1" title={m.title}>
                           {m.title}
-                        </h3>
-                        {m.description ? (
-                          <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed min-h-[32px]">
-                            {m.description}
-                          </p>
-                        ) : (
-                          <p className="text-xs text-gray-400 italic line-clamp-2 leading-relaxed min-h-[32px]">
-                            No description provided.
-                          </p>
-                        )}
+                        </h4>
+                        <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 h-8 font-medium">
+                          {m.description || 'No description provided.'}
+                        </p>
                       </div>
 
-                      {/* Meta badges: Subject, Uploaded By, Date */}
-                      <div className="space-y-2 border-t border-gray-100 pt-3">
+                      {/* Dense metadata list */}
+                      <div className="space-y-1.5 text-xs border-t border-slate-100 pt-2.5">
                         {m.subject && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Subject:</span>
-                            <span className="text-indigo-600 font-extrabold text-[11px] truncate bg-indigo-50/50 px-2 py-0.5 rounded-md">
-                              {m.subject}
-                            </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-400 font-semibold w-12 shrink-0">Subject:</span>
+                            <span className="text-indigo-600 font-extrabold truncate">{m.subject}</span>
                           </div>
                         )}
-
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Uploaded:</span>
-                          <span className="text-gray-700 font-bold truncate">
-                            {m.author || "Anonymous"}
-                          </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-gray-400 font-semibold w-12 shrink-0">Uploaded:</span>
+                          <span className="text-gray-600 font-bold truncate">{m.author || 'Anonymous'}</span>
                         </div>
-
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Date:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-gray-400 font-semibold w-12 shrink-0">Date:</span>
                           <span className="text-gray-500 font-medium">
                             {new Date(m.createdAt).toLocaleDateString(undefined, {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
+                              year: 'numeric', month: 'short', day: 'numeric'
                             })}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Footer: Downloads Count & Action button */}
-                    <div className="flex items-center justify-between gap-4 border-t border-gray-100 pt-3 mt-4">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
-                        <i className="fas fa-download text-gray-400" />
-                        <span>{m.downloadCount} downloads</span>
-                      </div>
+                    {/* Footer downloads & action */}
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 mt-3">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                        {m.downloadCount} DLs
+                      </span>
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => handleDownload(m.id, m.filePath, m.link)}
+                        className="py-1 px-3 text-xs h-8"
                       >
-                        <i className="fas fa-download mr-1.5" /> Download
+                        Download
                       </Button>
                     </div>
                   </Card>
@@ -385,7 +355,7 @@ export const Materials: React.FC = () => {
               })}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white border border-gray-200 rounded-2xl">
+            <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl shadow-sm">
               <i className="fas fa-folder-open text-4xl text-gray-300 mb-4" />
               <p className="text-sm font-semibold text-gray-500">
                 No materials match your filters. Try resetting search or filters.
@@ -451,26 +421,26 @@ export const Materials: React.FC = () => {
           />
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
               Description
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-24"
+              className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all duration-200 h-24"
               placeholder="Provide a brief summary of the resource..."
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
                 Resource Type
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold"
               >
                 <option value="notes">Study Notes</option>
                 <option value="textbook">Textbook</option>
@@ -515,7 +485,7 @@ export const Materials: React.FC = () => {
           />
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
               Upload File
             </label>
             <input

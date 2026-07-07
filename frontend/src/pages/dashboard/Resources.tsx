@@ -188,17 +188,13 @@ export const Resources: React.FC = () => {
 
   // Filtering Logic
   const filteredResources = allResources.filter(res => {
-    // Search filter
     const matchesSearch =
       res.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       res.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       res.category.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       (res.details && res.details.some(d => d.toLowerCase().includes(debouncedSearch.toLowerCase())));
 
-    // Category filter
     const matchesCategory = filterCategory === 'all' || res.category === filterCategory;
-
-    // Type filter
     const matchesType = filterType === 'all' || res.type === filterType;
 
     return matchesSearch && matchesCategory && matchesType;
@@ -209,7 +205,6 @@ export const Resources: React.FC = () => {
     if (sortBy === 'newest') {
       return (a.isNew ? 1 : 0) - (b.isNew ? 1 : 0);
     }
-    // Popularity
     return (b.isPopular ? 1 : 0) - (a.isPopular ? 1 : 0);
   });
 
@@ -222,117 +217,98 @@ export const Resources: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Unified Hero & Search Card */}
-      <section className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm space-y-6 relative overflow-hidden">
-        {/* Background gradient subtle glow */}
-        <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-indigo-50 blur-3xl opacity-50" />
-        <div className="absolute -left-24 -bottom-24 h-48 w-48 rounded-full bg-purple-50 blur-3xl opacity-50" />
-
-        <div className="relative space-y-1">
-          <h2 className="text-2xl font-extrabold text-gray-900 font-heading">
+    <div className="space-y-6 animate-slide-up w-full">
+      {/* Welcome banner */}
+      <section className="flex justify-between items-center border-b border-slate-200 pb-4">
+        <div>
+          <h2 className="text-[28px] font-bold text-gray-900 tracking-tight leading-tight font-heading">
             Study Resources
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-[14px] text-gray-500 mt-1">
             Discover tools, apps, and resources to enhance your learning experience.
           </p>
         </div>
-
-        <div className="relative grid grid-cols-1 gap-4 pt-4 border-t border-gray-100">
-          <div>
-            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Search Resource</label>
-            <Input
-              id="res-search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by title, description, keywords..."
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Category Filter */}
-            <div>
-              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Category</label>
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
-              >
-                <option value="all">All Categories</option>
-                <option value="Study Apps">Study Apps</option>
-                <option value="Software Tools">Software Tools</option>
-                <option value="Online Platforms">Online Platforms</option>
-                <option value="Audio Resources">Audio Resources</option>
-                <option value="Study Groups">Study Groups</option>
-                <option value="Study Tips">Study Tips</option>
-              </select>
-            </div>
-
-            {/* Type Filter */}
-            <div>
-              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Resource Type</label>
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
-              >
-                <option value="all">All Types</option>
-                <option value="App">App</option>
-                <option value="Tool">Tool</option>
-                <option value="Site">Site</option>
-                <option value="Audio">Audio</option>
-                <option value="Group">Group</option>
-                <option value="Tip">Tip</option>
-              </select>
-            </div>
-
-            {/* Sort Select */}
-            <div>
-              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">Sort By</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
-              >
-                <option value="popular">Popularity</option>
-                <option value="newest">Newest Released</option>
-              </select>
-            </div>
-          </div>
-        </div>
       </section>
 
-      {/* Category Overview Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Categories Overview Bar (100px max height) */}
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {categoriesOverview.map((cat) => (
           <button
             key={cat.title}
             onClick={() => setFilterCategory(cat.title)}
-            className={`border rounded-2xl p-6 shadow-sm flex items-start gap-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-              filterCategory === cat.title ? 'border-indigo-600 bg-indigo-50/20 shadow-sm' : 'bg-white border-gray-200'
+            className={`border rounded-2xl p-4 shadow-sm flex items-center gap-3 h-[90px] hover:border-indigo-300 transition-all duration-200 text-left ${
+              filterCategory === cat.title ? 'border-indigo-600 bg-indigo-50/20 shadow-sm' : 'bg-white border-slate-200'
             }`}
           >
-            <div className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 ${cat.bg} ${cat.color}`}>
-              <i className={`${cat.icon} text-lg`} />
+            <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${cat.bg} ${cat.color} border border-slate-100`}>
+              <i className={`${cat.icon} text-base`} />
             </div>
-            <div className="space-y-1 overflow-hidden">
-              <div className="flex justify-between items-baseline gap-2">
-                <h4 className="text-sm font-extrabold text-gray-900 truncate leading-none">{cat.title}</h4>
-                <span className="text-[9px] font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full shrink-0">
-                  {cat.count}
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 leading-normal line-clamp-2">
-                {cat.description}
-              </p>
+            <div className="overflow-hidden">
+              <h4 className="text-[14px] font-bold text-gray-900 leading-none truncate">{cat.title}</h4>
+              <span className="text-[11px] text-gray-400 font-semibold block mt-1.5">{cat.count}</span>
             </div>
           </button>
         ))}
       </section>
 
-      {/* Catalog Grid */}
+      {/* Search & Filters Toolbar */}
+      <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row gap-3 items-stretch">
+        <div className="flex-1">
+          <Input
+            id="res-search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search resources..."
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Category Filter */}
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-semibold"
+          >
+            <option value="all">All Categories</option>
+            <option value="Study Apps">Study Apps</option>
+            <option value="Software Tools">Software Tools</option>
+            <option value="Online Platforms">Online Platforms</option>
+            <option value="Audio Resources">Audio Resources</option>
+            <option value="Study Groups">Study Groups</option>
+            <option value="Study Tips">Study Tips</option>
+          </select>
+
+          {/* Type Filter */}
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-semibold"
+          >
+            <option value="all">All Types</option>
+            <option value="App">App</option>
+            <option value="Tool">Tool</option>
+            <option value="Site">Site</option>
+            <option value="Audio">Audio</option>
+            <option value="Group">Group</option>
+            <option value="Tip">Tip</option>
+          </select>
+
+          {/* Sort Select */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-3.5 py-2.5 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-semibold"
+          >
+            <option value="popular">Popularity</option>
+            <option value="newest">Newest Released</option>
+          </select>
+        </div>
+      </section>
+
+      {/* Resources Result Listing */}
       <section className="space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900">Resource Catalog</h3>
+          <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Resource Catalog</h3>
           {filterCategory !== 'all' && (
             <button
               onClick={() => {
@@ -340,7 +316,7 @@ export const Resources: React.FC = () => {
                 setFilterType('all');
                 setSearchTerm('');
               }}
-              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline"
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline font-heading uppercase"
             >
               Reset Filters
             </button>
@@ -348,7 +324,7 @@ export const Resources: React.FC = () => {
         </div>
 
         {sortedResources.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedResources.map((item) => {
               const typeColors: Record<string, { color: string; bg: string }> = {
                 App: { color: "text-indigo-600", bg: "bg-indigo-50" },
@@ -363,53 +339,51 @@ export const Resources: React.FC = () => {
               return (
                 <Card
                   key={item.id}
-                  className="flex flex-col justify-between border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200"
+                  className="flex flex-col justify-between border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-sm transition-all duration-200 h-64"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {/* Header: Icon & Category */}
                     <div className="flex justify-between items-start">
-                      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${meta.bg} ${meta.color}`}>
-                        <i className={`${item.icon} text-lg`} />
+                      <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color} border border-slate-100`}>
+                        <i className={`${item.icon} text-base`} />
                       </div>
-                      <span className="text-[10px] font-extrabold text-gray-400 bg-gray-50 border border-gray-150 px-2 py-0.5 rounded-full uppercase">
+                      <span className="text-[10px] font-extrabold text-gray-400 bg-gray-50 border border-slate-200 px-2 py-0.5 rounded-full uppercase">
                         {item.type}
                       </span>
                     </div>
 
                     {/* Title & Description */}
-                    <div className="space-y-1.5">
-                      <h3 className="font-extrabold text-gray-900 text-sm leading-tight line-clamp-1" title={item.title}>
+                    <div className="space-y-1">
+                      <h4 className="text-[15px] font-semibold text-gray-900 tracking-tight leading-snug line-clamp-1" title={item.title}>
                         {item.title}
-                      </h3>
-                      <p className="text-xs text-gray-600 leading-relaxed min-h-[32px] line-clamp-2">
+                      </h4>
+                      <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 h-8 font-medium">
                         {item.description}
                       </p>
                     </div>
 
                     {/* Metadata: Category & Tags */}
-                    <div className="space-y-2 border-t border-gray-100 pt-3">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Category:</span>
-                        <span className="text-gray-700 font-bold truncate">
-                          {item.category}
-                        </span>
+                    <div className="space-y-1.5 text-xs border-t border-slate-100 pt-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-gray-400 font-semibold w-12 shrink-0">Category:</span>
+                        <span className="text-gray-700 font-bold truncate leading-none mt-0.5">{item.category}</span>
                       </div>
 
                       {item.isNew && (
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Status:</span>
-                          <span className="text-[9px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-gray-400 font-semibold w-12 shrink-0">Status:</span>
+                          <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase leading-none">
                             New
                           </span>
                         </div>
                       )}
 
                       {item.details && item.details.length > 0 && (
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-gray-400 font-semibold text-[10px] uppercase w-16 shrink-0">Tags:</span>
-                          <div className="flex flex-wrap gap-1 overflow-hidden max-h-[18px]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-gray-400 font-semibold w-12 shrink-0">Tags:</span>
+                          <div className="flex flex-wrap gap-1 overflow-hidden max-h-[16px] leading-none">
                             {item.details.map((tag) => (
-                              <span key={tag} className="text-[9px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+                              <span key={tag} className="text-[9px] font-bold text-gray-400 bg-slate-100 px-1 py-0.5 rounded leading-none">
                                 #{tag}
                               </span>
                             ))}
@@ -420,19 +394,20 @@ export const Resources: React.FC = () => {
                   </div>
 
                   {/* Footer: Rating, Users count & Open/View button */}
-                  <div className="flex items-center justify-between gap-4 border-t border-gray-100 pt-3.5 mt-4">
-                    <div className="flex flex-col text-[10px] text-gray-400 font-bold uppercase">
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 mt-3">
+                    <div className="flex flex-col text-[10px] text-gray-400 font-bold uppercase select-none leading-none gap-0.5">
                       <span className="flex items-center gap-1 text-amber-500 text-xs">
                         <i className="fas fa-star" /> {item.rating}
                       </span>
-                      <span className="mt-0.5">{item.users}</span>
+                      <span>{item.users}</span>
                     </div>
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => handleOpenResource(item.link, item.title)}
+                      className="py-1 px-3 text-xs h-8"
                     >
-                      Open <i className="fas fa-external-link-alt ml-1.5 text-[10px]" />
+                      Open <i className="fas fa-external-link-alt ml-1 text-[9px]" />
                     </Button>
                   </div>
                 </Card>
@@ -440,7 +415,7 @@ export const Resources: React.FC = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white border border-gray-250 rounded-2xl">
+          <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl shadow-sm">
             <i className="fas fa-folder-open text-4xl text-gray-300 mb-4" />
             <p className="text-sm font-semibold text-gray-500">
               No resources match your filters.

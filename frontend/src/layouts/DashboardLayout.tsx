@@ -84,22 +84,26 @@ export const DashboardLayout: React.FC = () => {
   );
 
   return (
-    <div className="h-screen w-screen bg-slate-50 flex overflow-hidden font-body">
+    <div className="h-screen w-screen bg-slate-50 flex overflow-hidden font-body text-[14px]">
       {/* Sidebar */}
       <aside
         className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 z-30 h-full shrink-0 ${
-          isSidebarOpen ? 'w-64' : 'w-20'
+          isSidebarOpen ? 'w-72' : 'w-[70px]'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 px-5 border-b border-slate-100 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2.5 font-extrabold text-indigo-600 select-none">
-            <i className="fas fa-graduation-cap text-2xl text-indigo-600" />
-            {isSidebarOpen && <span className="text-gray-900 text-sm tracking-tight font-heading font-black">StudyClub</span>}
+        <div className="h-16 px-5 border-b border-slate-100 flex items-center justify-between shrink-0">
+          <Link to="/dashboard" className="flex items-center gap-3 font-extrabold text-indigo-600 select-none">
+            <i className="fas fa-graduation-cap text-2xl text-indigo-600 shrink-0" />
+            {isSidebarOpen && (
+              <span className="text-gray-900 text-sm tracking-tight font-heading font-black whitespace-nowrap overflow-hidden text-ellipsis">
+                StudyClub
+              </span>
+            )}
           </Link>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 hidden md:block transition-colors"
+            className="p-1.5 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 hidden md:block transition-colors shrink-0"
           >
             <i className={`fas ${isSidebarOpen ? 'fa-angle-left' : 'fa-angle-right'} text-sm`} />
           </button>
@@ -113,33 +117,41 @@ export const DashboardLayout: React.FC = () => {
               <button
                 key={item.name}
                 onClick={() => navigate(item.path)}
-                className={`w-full flex items-center gap-4.5 px-4.5 py-3 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-all select-none relative group ${
+                className={`w-full flex items-center h-[46px] px-4 rounded-xl text-[14px] font-medium transition-all select-none relative group ${
                   isActive
-                    ? 'bg-indigo-50/50 text-indigo-600'
-                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-indigo-50/50 text-indigo-600 font-semibold'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
                 title={item.name}
               >
-                {/* Active left indicator bar */}
                 {isActive && (
                   <div className="absolute left-0 top-2.5 bottom-2.5 w-1 bg-indigo-600 rounded-r" />
                 )}
-                <i className={`${item.icon} text-md ${isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
-                {isSidebarOpen && <span className="truncate">{item.name}</span>}
+                {/* Fixed width icon container to align texts perfectly */}
+                <div className="w-5 flex items-center justify-center shrink-0">
+                  <i className={`${item.icon} text-[16px] ${isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'} transition-colors`} />
+                </div>
+                {isSidebarOpen && (
+                  <span className="ml-[14px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+                    {item.name}
+                  </span>
+                )}
               </button>
             );
           })}
         </nav>
 
         {/* User Card / Logout */}
-        <div className="p-3.5 border-t border-slate-100 space-y-3">
+        <div className="p-3.5 border-t border-slate-100 space-y-3 shrink-0">
           {isSidebarOpen && user && (
             <div className="flex items-center gap-3 px-2 py-1.5">
               <div className="h-9 w-9 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                 {user.full_name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 overflow-hidden">
-                <p className="text-xs font-extrabold text-gray-900 truncate leading-none">{user.full_name}</p>
+                <p className="text-xs font-extrabold text-gray-900 truncate leading-none whitespace-nowrap overflow-hidden text-ellipsis">
+                  {user.full_name}
+                </p>
                 <span className="text-[9px] uppercase font-black text-gray-400 tracking-widest mt-1 block">
                   {user.role}
                 </span>
@@ -148,11 +160,17 @@ export const DashboardLayout: React.FC = () => {
           )}
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center gap-4 px-4.5 py-3 rounded-xl text-xs font-extrabold tracking-wide uppercase text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors select-none`}
+            className="w-full flex items-center h-[46px] px-4 rounded-xl text-[14px] font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors select-none"
             title="Log Out"
           >
-            <i className="fas fa-sign-out-alt text-md text-rose-500" />
-            {isSidebarOpen && <span>Logout</span>}
+            <div className="w-5 flex items-center justify-center shrink-0">
+              <i className="fas fa-sign-out-alt text-[16px] text-rose-500" />
+            </div>
+            {isSidebarOpen && (
+              <span className="ml-[14px] whitespace-nowrap overflow-hidden text-ellipsis">
+                Logout
+              </span>
+            )}
           </button>
         </div>
       </aside>
@@ -163,7 +181,7 @@ export const DashboardLayout: React.FC = () => {
         <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-[10px] text-gray-400 font-extrabold uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[10px] text-gray-400 font-extrabold uppercase tracking-wider select-none">
               <Link to="/dashboard" className="hover:text-indigo-600 transition-colors">Workspace</Link>
               <span>/</span>
               <span className="text-gray-900">{getHeaderTitle()}</span>
@@ -174,7 +192,7 @@ export const DashboardLayout: React.FC = () => {
             {/* Search Trigger */}
             <button
               onClick={() => setIsCommandPaletteOpen(true)}
-              className="hidden md:flex items-center gap-3 px-3.5 py-2 w-64 text-left border border-slate-200 hover:border-slate-300 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-gray-400 text-xs font-bold transition-all"
+              className="hidden sm:flex items-center gap-3 px-3.5 py-2 w-64 md:w-80 lg:w-96 text-left border border-slate-200 hover:border-slate-350 bg-slate-50/50 hover:bg-slate-50 rounded-xl text-gray-400 text-xs font-semibold transition-all select-none"
             >
               <i className="fas fa-search text-xs text-gray-400" />
               <span>Search workspace...</span>
@@ -310,9 +328,9 @@ export const DashboardLayout: React.FC = () => {
           </div>
         </header>
 
-        {/* Content Outlet */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-6xl mx-auto h-full">
+        {/* Content Outlet (Occupies 100% of workspace width, removes max-width limits) */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <div className="w-full h-full">
             <Outlet />
           </div>
         </main>
