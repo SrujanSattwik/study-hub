@@ -1,3 +1,4 @@
+'use strict';
 const { Pool } = require('pg');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -8,7 +9,7 @@ const pool = process.env.DATABASE_URL
       statement_timeout: 15000,          // 15s query timeout
       connectionTimeoutMillis: 5000,     // 5s to acquire a connection
       idleTimeoutMillis: 30000,          // 30s idle before closing
-      max: 30,                           // bumped from 20 for concurrent load
+      max: 30,                           // bumped for concurrent load
       keepAlive: true,                   // prevents TCP teardown between queries
       keepAliveInitialDelayMillis: 10000
     })
@@ -21,7 +22,7 @@ const pool = process.env.DATABASE_URL
       statement_timeout: 15000,          // 15s query timeout
       connectionTimeoutMillis: 5000,     // 5s to acquire a connection
       idleTimeoutMillis: 30000,          // 30s idle before closing
-      max: 30,                           // bumped from 20 for concurrent load
+      max: 30,                           // bumped for concurrent load
       keepAlive: true,                   // prevents TCP teardown between queries
       keepAliveInitialDelayMillis: 10000
     });
@@ -45,9 +46,6 @@ async function query(text, params) {
  * Timed query — returns { rows, rowCount, queryMs }
  * Used by profiling middleware and home-bundle to measure DB overhead precisely.
  * Slow queries (>100ms) trigger a warning log automatically.
- * @param {string} text
- * @param {Array} [params]
- * @returns {Promise<{ rows: any[], rowCount: number, queryMs: number }>}
  */
 async function timedQuery(text, params) {
   const start = process.hrtime.bigint();
@@ -64,8 +62,21 @@ async function timedQuery(text, params) {
   }
 }
 
+/**
+ * Verifies active database connectivity.
+ */
+async function testConnection() {
+  try {
+    const res = await pool.query('SELECT NOW() AS current_time');
+    return { success: true, time: res.rows[0].current_time };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   query,
   timedQuery,
+  testConnection,
   pool
 };

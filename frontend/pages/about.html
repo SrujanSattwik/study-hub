@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/materials.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>About Us - StudyClub</title>
     <link rel="stylesheet" href="src/css/dashboard.css">
+    <link rel="stylesheet" href="src/css/community-styles.css">
+    <link rel="stylesheet" href="../assets/css/skeletons.css">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -17,230 +19,203 @@
         <header class="topbar"></header>
 
         <main class="main-content">
-        <!-- Page Header -->
-        <section class="search-section">
-            <div class="container">
-                <div class="search-content">
-                    <h2 class="page-title">About StudyClub</h2>
-                    <p class="page-subtitle">Empowering students worldwide to achieve their academic dreams</p>
-                </div>
-            </div>
-            
-        </section>
+            <div class="content-container">
+                <!-- Page Header / Hero -->
+                <section class="search-section" style="padding: 2rem 0; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: var(--radius-xl); margin-bottom: var(--spacing-xl); border: 1px solid var(--gray-200);">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+                        <div class="search-content">
+                            <h2 class="page-title" style="font-size: 2rem; font-weight: 800; color: var(--gray-900); margin-bottom: var(--spacing-xs);">About StudyClub</h2>
+                            <p class="page-subtitle" style="color: var(--gray-600); font-size: 1rem;">Empowering students worldwide to achieve their academic dreams</p>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- Our Story -->
-        <section class="our-story">
-            <div class="container">
-                <div class="story-content">
-                    <div class="story-text">
-                        <h2>Our Story</h2>
-                        <p>StudyClub was born from a simple yet powerful idea: every student deserves access to the best learning resources and a supportive community to help them succeed.</p>
-                        <p>Founded in 2024 by a team of educators, technologists, and students, we recognized that traditional learning methods often left students feeling isolated and overwhelmed. We set out to create a platform that would not only provide comprehensive study materials but also foster meaningful connections between learners.</p>
-                        <p>Today, StudyClub serves thousands of students worldwide, offering innovative tools, collaborative learning spaces, and a community that celebrates academic achievement.</p>
-                    </div>
-                    <div class="story-image">
-                        <div class="image-placeholder">
-                            <i class="fas fa-rocket"></i>
-                            <span>Our Journey</span>
+                <!-- Our Story -->
+                <section class="our-story" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm); margin-bottom: var(--spacing-2xl);">
+                    <div class="container">
+                        <div class="story-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-xl); align-items: center;">
+                            <div class="story-text">
+                                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-book-open" style="color: var(--primary);"></i> Our Story
+                                </h2>
+                                <p style="font-size: 0.95rem; color: var(--gray-600); line-height: 1.7; margin-bottom: var(--spacing-md);">StudyClub was born from a simple yet powerful idea: every student deserves access to the best learning resources and a supportive community to help them succeed.</p>
+                                <p style="font-size: 0.95rem; color: var(--gray-600); line-height: 1.7; margin-bottom: var(--spacing-md);">Founded in 2024 by a team of educators, technologists, and students, we recognized that traditional learning methods often left students feeling isolated and overwhelmed. We set out to create a platform that would not only provide comprehensive study materials but also foster meaningful connections between learners.</p>
+                                <p style="font-size: 0.95rem; color: var(--gray-600); line-height: 1.7; margin: 0;">Today, StudyClub serves thousands of students worldwide, offering innovative tools, collaborative learning spaces, and a community that celebrates academic achievement.</p>
+                            </div>
+                            <div class="story-image">
+                                <div class="image-placeholder" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border: 2px dashed var(--primary); border-radius: var(--radius-xl); height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary);">
+                                    <i class="fas fa-rocket" style="font-size: 3rem; margin-bottom: 12px;"></i>
+                                    <span style="font-weight: 700; font-size: 1.1rem;">Our Journey</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                </div>
-            </div>
-        </section>
-        
+                </section>
 
-        <!-- Mission & Values -->
-        <section class="mission-values">
-            <div class="container">
-                <div class="mission-grid">
-                    <div class="mission-card">
-                        <div class="mission-icon">
-                            <i class="fas fa-bullseye"></i>
+                <!-- Mission & Values -->
+                <section class="mission-values" style="margin-bottom: var(--spacing-2xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-compass" style="color: var(--primary);"></i> Mission & Values
+                    </h3>
+                    <div class="mission-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-md);">
+                        <div class="mission-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm);">
+                            <div class="mission-icon" style="font-size: 1.75rem; color: var(--primary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Our Mission</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); line-height: 1.6;">To democratize education by providing accessible, high-quality learning resources and fostering a supportive community that empowers every student to reach their full potential.</p>
                         </div>
-                        <h3>Our Mission</h3>
-                        <p>To democratize education by providing accessible, high-quality learning resources and fostering a supportive community that empowers every student to reach their full potential.</p>
-                    </div>
-                    
-                    <div class="mission-card">
-                        <div class="mission-icon">
-                            <i class="fas fa-eye"></i>
+                        
+                        <div class="mission-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm);">
+                            <div class="mission-icon" style="font-size: 1.75rem; color: var(--secondary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Our Vision</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); line-height: 1.6;">A world where every student has the tools, resources, and community support they need to achieve their academic goals and unlock their true potential.</p>
                         </div>
-                        <h3>Our Vision</h3>
-                        <p>A world where every student has the tools, resources, and community support they need to achieve their academic goals and unlock their true potential.</p>
-                    </div>
-                    
-                    <div class="mission-card">
-                        <div class="mission-icon">
-                            <i class="fas fa-heart"></i>
+                        
+                        <div class="mission-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm);">
+                            <div class="mission-icon" style="font-size: 1.75rem; color: var(--accent); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Our Values</h3>
+                            <ul style="list-style: none; padding: 0; font-size: 0.88rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 6px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Accessibility for all learners</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Quality educational content</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Community-driven learning</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Innovation in education</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Student success first</li>
+                            </ul>
                         </div>
-                        <h3>Our Values</h3>
-                        <ul>
-                            <li>Accessibility for all learners</li>
-                            <li>Quality educational content</li>
-                            <li>Community-driven learning</li>
-                            <li>Innovation in education</li>
-                            <li>Student success first</li>
-                        </ul>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Team Section -->
-        <section class="team-section">
-            <div class="container">
-                <h2 class="section-title">Meet Our Team</h2>
-                <div class="team-grid">
-                    <div class="team-member">
-                        <div class="member-avatar">
-                            <i class="fas fa-user"></i>
+                <!-- Team Section -->
+                <section class="team-section" style="margin-bottom: var(--spacing-2xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-users" style="color: var(--primary);"></i> Meet Our Team
+                    </h3>
+                    <div class="team-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--spacing-md);">
+                        <div class="team-member" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="member-avatar" style="width: 70px; height: 70px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--primary); margin: 0 auto 12px;">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 2px;">Srujan Sattwik</h3>
+                            <p class="member-role" style="font-size: 0.82rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 8px;">Founder & CEO</p>
+                            <p class="member-bio" style="font-size: 0.85rem; color: var(--gray-600); margin: 0;">Passionate about creating innovative learning platforms and empowering students.</p>
                         </div>
-                        <h3>Srujan Sattwik</h3>
-                        <p class="member-role">Founder & CEO</p>
-                        <p class="member-bio">Former educator with 10+ years experience in educational technology and student success.</p>
-                    </div>
-                    
-                    <div class="team-member">
-                        <div class="member-avatar">
-                            <i class="fas fa-user"></i>
+                        
+                        <div class="team-member" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="member-avatar" style="width: 70px; height: 70px; background: rgba(139, 92, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--secondary); margin: 0 auto 12px;">
+                                <i class="fas fa-user-gear"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 2px;">Kusum Sethi</h3>
+                            <p class="member-role" style="font-size: 0.82rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; margin-bottom: 8px;">CTO</p>
+                            <p class="member-bio" style="font-size: 0.85rem; color: var(--gray-600); margin: 0;">Tech enthusiast passionate about building high-scale architecture and tools.</p>
                         </div>
-                        <h3>Kusum Sethi</h3>
-                        <p class="member-role">CTO</p>
-                        <p class="member-bio">Tech enthusiast passionate about creating innovative learning platforms and tools.</p>
-                    </div>
-                    
-                    <div class="team-member">
-                        <div class="member-avatar">
-                            <i class="fas fa-user"></i>
+                        
+                        <div class="team-member" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="member-avatar" style="width: 70px; height: 70px; background: rgba(236, 72, 153, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--accent); margin: 0 auto 12px;">
+                                <i class="fas fa-user-pen"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 2px;">Biswas Mohanty</h3>
+                            <p class="member-role" style="font-size: 0.82rem; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 8px;">Head of Content</p>
+                            <p class="member-bio" style="font-size: 0.85rem; color: var(--gray-600); margin: 0;">Curriculum specialist dedicated to creating engaging educational resources.</p>
                         </div>
-                        <h3>Biswas Mohanty</h3>
-                        <p class="member-role">Head of Content</p>
-                        <p class="member-bio">Curriculum specialist dedicated to creating engaging and effective learning materials.</p>
-                    </div>
-                    
-                    <div class="team-member">
-                        <div class="member-avatar">
-                            <i class="fas fa-user"></i>
+                        
+                        <div class="team-member" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="member-avatar" style="width: 70px; height: 70px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--success); margin: 0 auto 12px;">
+                                <i class="fas fa-user-group"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 2px;">Sangita</h3>
+                            <p class="member-role" style="font-size: 0.82rem; font-weight: 700; color: var(--success); text-transform: uppercase; margin-bottom: 8px;">Community Manager</p>
+                            <p class="member-bio" style="font-size: 0.85rem; color: var(--gray-600); margin: 0;">Building and nurturing our vibrant student community and study groups.</p>
                         </div>
-                        <h3>Sangita</h3>
-                        <p class="member-role">Community Manager</p>
-                        <p class="member-bio">Building and nurturing our vibrant student community and study groups.</p>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Achievements -->
-        <section class="achievements">
-            <div class="container">
-                <h2 class="section-title">Our Achievements</h2>
-                <div class="achievements-grid">
-                    <div class="achievement-card">
-                        <div class="achievement-number">10,000+</div>
-                        <div class="achievement-label">Active Students</div>
+                <!-- Achievements -->
+                <section class="achievements" style="margin-bottom: var(--spacing-2xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-trophy" style="color: var(--warning);"></i> Our Achievements
+                    </h3>
+                    <div class="achievements-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                        <div class="achievement-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="achievement-number" style="font-size: 2rem; font-weight: 800; color: var(--primary);">10,000+</div>
+                            <div class="achievement-label" style="font-size: 0.85rem; color: var(--gray-600); text-transform: uppercase; font-weight: 600;">Active Students</div>
+                        </div>
+                        
+                        <div class="achievement-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="achievement-number" style="font-size: 2rem; font-weight: 800; color: var(--secondary);">500+</div>
+                            <div class="achievement-label" style="font-size: 0.85rem; color: var(--gray-600); text-transform: uppercase; font-weight: 600;">Study Groups</div>
+                        </div>
+                        
+                        <div class="achievement-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="achievement-number" style="font-size: 2rem; font-weight: 800; color: var(--success);">95%</div>
+                            <div class="achievement-label" style="font-size: 0.85rem; color: var(--gray-600); text-transform: uppercase; font-weight: 600;">Success Rate</div>
+                        </div>
+                        
+                        <div class="achievement-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-align: center; box-shadow: var(--shadow-sm);">
+                            <div class="achievement-number" style="font-size: 2rem; font-weight: 800; color: var(--accent);">50+</div>
+                            <div class="achievement-label" style="font-size: 0.85rem; color: var(--gray-600); text-transform: uppercase; font-weight: 600;">Countries</div>
+                        </div>
                     </div>
-                    
-                    <div class="achievement-card">
-                        <div class="achievement-number">500+</div>
-                        <div class="achievement-label">Study Groups</div>
-                    </div>
-                    
-                    <div class="achievement-card">
-                        <div class="achievement-number">95%</div>
-                        <div class="achievement-label">Success Rate</div>
-                    </div>
-                    
-                    <div class="achievement-card">
-                        <div class="achievement-number">50+</div>
-                        <div class="achievement-label">Countries</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Contact Section -->
-        <section class="contact-section">
-            <div class="container">
-                <h2 class="section-title">Get in Touch</h2>
-                <div class="contact-content">
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <div>
-                                <h4>Email</h4>
-                                <p>hello@studyclub.com</p>
+                <!-- Contact Section -->
+                <section class="contact-section" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-paper-plane" style="color: var(--primary);"></i> Get in Touch
+                    </h3>
+                    <div class="contact-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-xl);">
+                        <div class="contact-info" style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                            <div class="contact-item" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 44px; height: 44px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem;">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Email</h4>
+                                    <p style="font-size: 0.88rem; color: var(--gray-600); margin: 0;">hello@studyclub.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 44px; height: 44px; background: rgba(139, 92, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--secondary); font-size: 1.2rem;">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Phone</h4>
+                                    <p style="font-size: 0.88rem; color: var(--gray-600); margin: 0;">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 44px; height: 44px; background: rgba(236, 72, 153, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.2rem;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">Address</h4>
+                                    <p style="font-size: 0.88rem; color: var(--gray-600); margin: 0;">123 Education Street<br>Learning City, LC 12345</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <div>
-                                <h4>Phone</h4>
-                                <p>+1 (555) 123-4567</p>
-                            </div>
-                        </div>
-                        
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div>
-                                <h4>Address</h4>
-                                <p>123 Education Street<br>Learning City, LC 12345</p>
-                            </div>
+                        <div class="contact-form" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: var(--spacing-md);">Send us a Message</h3>
+                            <form style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                                <input type="text" placeholder="Your Name" required style="padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                                <input type="email" placeholder="Your Email" required style="padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                                <textarea placeholder="Your Message" rows="4" required style="padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none; resize: vertical;"></textarea>
+                                <button type="submit" class="btn btn-primary" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; align-self: flex-start;">Send Message</button>
+                            </form>
                         </div>
                     </div>
-                    
-                    <div class="contact-form">
-                        <h3>Send us a Message</h3>
-                        <form>
-                            <input type="text" placeholder="Your Name" required>
-                            <input type="email" placeholder="Your Email" required>
-                            <textarea placeholder="Your Message" rows="5" required></textarea>
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </form>
-                    </div>
-                </div>
+                </section>
             </div>
-        </section>
-            </main>
+        </main>
     </div>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>StudyClub</span>
-                    </div>
-                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 StudyClub. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     <script src="../assets/js/script.js"></script>
     <script src="../assets/js/auth-session.js"></script>
 </body>
-</html> 
+</html>

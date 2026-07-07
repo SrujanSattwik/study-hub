@@ -8,6 +8,7 @@ const axios = require('axios');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const db = require('./db/postgres');
+const { initDatabase } = require('./db/init');
 const materialsRouter = require('./routes/materials');
 const communityRouter = require('./routes/community');
 const activeSessions = require('./db/sessions');
@@ -320,10 +321,20 @@ app.post('/api/ask', authenticateToken, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`✅ StudyHub Backend Server running on port ${PORT}`);
   console.log(`✅ Auth API: http://localhost:${PORT}/auth/*`);
   console.log(`✅ Materials API: http://localhost:${PORT}/api/materials`);
   console.log(`✅ Community API: http://localhost:${PORT}/api/community`);
   console.log(`✅ Gemini AI API: http://localhost:${PORT}/api/ask`);
+
+  // Verify database connection & initialize tables on boot
+  const dbStatus = await db.testConnection();
+  if (dbStatus.success) {
+    console.log(`🐘 PostgreSQL DB connected successfully (${dbStatus.time})`);
+    await initDatabase(false);
+  } else {
+    console.warn(`⚠️ Database Connection Warning: ${dbStatus.error}`);
+    console.warn(`   Please ensure PostgreSQL is running and credentials in backend/.env are valid.`);
+  }
 });

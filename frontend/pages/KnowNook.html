@@ -6,9 +6,11 @@
     <title>KnowNook | AI Study Assistant</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="src/css/dashboard.css">
+    <link rel="stylesheet" href="src/css/community-styles.css">
+    <link rel="stylesheet" href="../assets/css/skeletons.css">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -17,117 +19,105 @@
         <header class="topbar"></header>
 
         <main class="main-content">
-        <section class="hero-section kn-hero">
-            <div class="container hero-content">
-                <h1>Welcome to KnowNook</h1>
-                <p>Your AI-powered study assistant. Ask questions, upload images, and get instant help with your studies.</p>
-                <a href="#chat" class="btn btn-primary">Start Chatting</a>
-            </div>
-        </section>
+            <div class="content-container">
+                <!-- Page Header / Hero -->
+                <section class="search-section" style="padding: 2rem 0; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: var(--radius-xl); margin-bottom: var(--spacing-xl); border: 1px solid var(--gray-200);">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+                        <div class="search-content">
+                            <h2 style="font-size: 2rem; font-weight: 800; color: var(--gray-900); margin-bottom: var(--spacing-xs); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-robot" style="color: var(--primary);"></i> Welcome to KnowNook AI
+                            </h2>
+                            <p style="color: var(--gray-600); font-size: 1rem; margin-bottom: var(--spacing-md);">Your intelligent AI-powered study assistant. Ask questions, upload diagrams, and accelerate your learning.</p>
+                            <a href="#chat" class="btn" style="background: var(--primary); color: white; padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-full); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-comments"></i> Start Chatting
+                            </a>
+                        </div>
+                    </div>
+                </section>
 
-        <section class="kn-chat-section" id="chat">
-            <div class="container">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <h3>KnowNook AI</h3>
-                        <p>Powered by Gemini 2.0 Flash</p>
-                    </div>
-                    <div class="chat-box" id="chat-box">
-                        <div class="message bot">
-                            <div class="message-avatar">
-                                <i class="fas fa-robot"></i>
+                <!-- AI Chat Section -->
+                <section class="kn-chat-section" id="chat" style="margin-bottom: var(--spacing-2xl);">
+                    <div class="container">
+                        <div class="chat-container" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); overflow: hidden;">
+                            <div class="chat-header" style="background: var(--gray-50); padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 38px; height: 38px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem;">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <div>
+                                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin: 0;">KnowNook AI Assistant</h3>
+                                        <p style="font-size: 0.8rem; color: var(--gray-600); margin: 0;">Powered by Google Gemini AI</p>
+                                    </div>
+                                </div>
+                                <span style="background: rgba(16, 185, 129, 0.1); color: var(--success); font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 4px;">
+                                    <i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online
+                                </span>
                             </div>
-                            <div class="message-content">
-                                <p>Hello! I'm KnowNook AI, powered by Google Gemini. I can help you with:</p>
-                                <p>📚 Study questions and explanations<br>
-                                🖼️ Image analysis (upload screenshots, diagrams, problems)<br>
-                                💡 Homework help and concept clarification<br>
-                                📝 Note-taking and summarization</p>
-                                <p>Just type your question or upload an image to get started!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <form id="chat-form" class="chat-form">
-                            <label for="file-upload" class="file-upload-btn" title="Upload image">
-                                <i class="fas fa-paperclip"></i>
-                            </label>
-                            <input type="file" id="file-upload" accept="image/*" hidden>
-                            <textarea id="chat-input" placeholder="Type your question here..." rows="1"></textarea>
-                            <button type="submit" id="send-btn" class="send-btn" title="Send message">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <section id="features" class="features-section kn-features">
-            <div class="container">
-                <h2>KnowNook Features</h2>
-                <div class="features-container">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-brain"></i>
+                            <div class="chat-box" id="chat-box" style="padding: var(--spacing-lg); min-height: 380px; max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: var(--spacing-md); background: #fafafa;">
+                                <div class="message bot" style="display: flex; gap: 12px; max-width: 85%;">
+                                    <div class="message-avatar" style="width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <div class="message-content" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: var(--spacing-md); box-shadow: 0 2px 4px rgba(0,0,0,0.02); color: var(--gray-900); font-size: 0.92rem; line-height: 1.6;">
+                                        <p style="font-weight: 600; margin-bottom: 8px;">Hello! I'm KnowNook AI. How can I assist your study session today?</p>
+                                        <p style="margin-bottom: 8px;">📚 <strong>Study Explanations:</strong> Break down complex topics<br>
+                                        🖼️ <strong>Image Analysis:</strong> Upload problems or diagrams<br>
+                                        💡 <strong>Homework Guidance:</strong> Instant concept clarification<br>
+                                        📝 <strong>Summarization:</strong> Quick revision points</p>
+                                        <p style="margin: 0; color: var(--gray-600); font-size: 0.85rem;">Type your question or attach an image below!</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-input-container" style="padding: var(--spacing-md); background: white; border-top: 1px solid var(--gray-200);">
+                                <form id="chat-form" class="chat-form" style="display: flex; align-items: center; gap: var(--spacing-sm); background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-full); padding: 6px 12px;">
+                                    <label for="file-upload" class="file-upload-btn" title="Upload image" style="cursor: pointer; color: var(--gray-600); font-size: 1.1rem; padding: 6px; hover: color: var(--primary);">
+                                        <i class="fas fa-paperclip"></i>
+                                    </label>
+                                    <input type="file" id="file-upload" accept="image/*" hidden>
+                                    <textarea id="chat-input" placeholder="Ask KnowNook anything..." rows="1" style="flex-grow: 1; border: none; background: transparent; outline: none; font-family: inherit; font-size: 0.92rem; resize: none; padding: 6px 0; max-height: 100px;"></textarea>
+                                    <button type="submit" id="send-btn" class="send-btn" title="Send message" style="background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: var(--transition);">
+                                        <i class="fas fa-paper-plane" style="font-size: 0.9rem;"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <h3>AI-Powered Answers</h3>
-                        <p>Get instant, accurate answers to your study questions powered by Google Gemini AI.</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-image"></i>
+                </section>
+
+                <!-- Features Section -->
+                <section id="features" class="features-section kn-features" style="margin-bottom: var(--spacing-xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-sparkles" style="color: var(--primary);"></i> Capabilities & Features
+                    </h3>
+                    <div class="features-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--spacing-md);">
+                        <div class="feature-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm);">
+                            <div class="feature-icon" style="font-size: 1.75rem; color: var(--primary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">AI-Powered Answers</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600);">Get instant, accurate answers to your study questions powered by Google Gemini AI.</p>
                         </div>
-                        <h3>Image Analysis</h3>
-                        <p>Upload screenshots, diagrams, or problem images for detailed explanations and solutions.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
+                        <div class="feature-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm);">
+                            <div class="feature-icon" style="font-size: 1.75rem; color: var(--secondary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Image Analysis</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600);">Upload screenshots, diagrams, or problem images for detailed explanations and solutions.</p>
                         </div>
-                        <h3>Interactive Chat</h3>
-                        <p>Have natural conversations with AI to clarify concepts and deepen your understanding.</p>
+                        <div class="feature-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm);">
+                            <div class="feature-icon" style="font-size: 1.75rem; color: var(--accent); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Interactive Chat</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600);">Have natural conversations with AI to clarify concepts and deepen your understanding.</p>
+                        </div>
                     </div>
-                </div>
+                </section>
             </div>
-        </section>
-            </main>
+        </main>
     </div>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>StudyClub</span>
-                    </div>
-                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="community.html">Community</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 StudyClub. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     <script src="../assets/js/knownook-chat.js"></script>
     <script src="../assets/js/script.js"></script>

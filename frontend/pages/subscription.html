@@ -4,136 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>StudyClub - Your Learning Sanctuary</title>
     <title>Subscription Plans - StudyClub</title>
-    <style>
-        .pricing-section { padding: 90px 20px; max-width: 1200px; margin: 0 auto; margin-top: 25px; }
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px; }
-        .pricing-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; position: relative; }
-        .pricing-card.featured { border: 3px solid #6366f1; transform: scale(1.05); }
-        .pricing-card h3 { font-size: 1.8rem; margin-bottom: 10px; }
-        .pricing-card .price { font-size: 2.5rem; font-weight: bold; color: #6366f1; margin: 20px 0; }
-        .pricing-card .price span { font-size: 1rem; color: #666; }
-        .pricing-card ul { list-style: none; padding: 0; margin: 30px 0; text-align: left; }
-        .pricing-card ul li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .pricing-card ul li i { color: #10b981; margin-right: 10px; }
-        .btn-subscribe { width: 100%; padding: 15px; background: #6366f1; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
-        .btn-subscribe:hover { background: #4f46e5; }
-        .btn-subscribe.current { background: #10b981; }
-        .badge { position: absolute; top: 20px; right: 20px; background: #6366f1; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; }
-        .manage-account { max-width: 800px; margin: 60px auto; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .manage-account h2 { margin-bottom: 30px; color: #333; }
-        .account-info { display: grid; gap: 20px; margin-bottom: 30px; }
-        .info-row { display: flex; justify-content: space-between; padding: 15px; background: #f9fafb; border-radius: 8px; }
-        .info-row label { font-weight: 600; color: #666; }
-        .info-row span { color: #333; }
-        .account-actions { display: grid; gap: 15px; margin-top: 30px; }
-        .action-btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
-        .action-btn.primary { background: #6366f1; color: white; }
-        .action-btn.primary:hover { background: #4f46e5; }
-        .action-btn.danger { background: #ef4444; color: white; }
-        .action-btn.danger:hover { background: #dc2626; }
-        .action-btn.secondary { background: #f3f4f6; color: #333; }
-        .action-btn.secondary:hover { background: #e5e7eb; }
-    </style>
+    <link rel="stylesheet" href="src/css/dashboard.css">
+    <link rel="stylesheet" href="src/css/community-styles.css">
+    <link rel="stylesheet" href="../assets/css/skeletons.css">
 </head>
 <body>
-    
-     <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <i class="fas fa-graduation-cap"></i>
-                <span>StudyClub</span>
+    <div class="dashboard-layout">
+        <aside class="sidebar"></aside>
 
-            </div>
-            <ul class="nav-menu">
-                <li><a href="../index.html" class="btn btn-secondary">home</a></li>
-                <li><a href="pages/about.html" class="nav-link">About</a></li>
-                <li><a href="pages/login.html" class="nav-link btn-login" onclick="openLoginModal(); return false;">Login</a></li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+        <header class="topbar"></header>
 
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Hero Header Section -->
+                <section class="search-section" style="padding: 2rem 0; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: var(--radius-xl); margin-bottom: var(--spacing-xl); border: 1px solid var(--gray-200);">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+                        <div class="search-content">
+                            <h2 style="font-size: 2rem; font-weight: 800; color: var(--gray-900); margin-bottom: var(--spacing-xs); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-crown" style="color: var(--primary);"></i> Subscription Plans & Account
+                            </h2>
+                            <p style="color: var(--gray-600); font-size: 1rem;">Choose the perfect learning tier to unlock unlimited study materials, AI assistance, and premium features.</p>
+                        </div>
+                    </div>
+                </section>
 
-    <div class="pricing-section">
-        <h1 style="text-align:center;">Choose Your Plan</h1>
-        <p style="text-align:center;color:#666;margin-top:10px;">Upgrade anytime to unlock more features</p>
-        
-        <div class="pricing-grid">
-            <div class="pricing-card">
-                <h3>Free</h3>
-                <div class="price">Rs 0/-<span>/month</span></div>
-                <ul>
-                    <li><i class="fas fa-check"></i> 10 AI queries per month</li>
-                    <li><i class="fas fa-check"></i> 5 material downloads</li>
-                    <li><i class="fas fa-check"></i> Basic features</li>
-                    <li><i class="fas fa-check"></i> Community access</li>
-                </ul>
-                <button class="btn-subscribe" onclick="selectPlan('free')">Current Plan</button>
+                <!-- Pricing Section -->
+                <section class="pricing-section" style="margin-bottom: var(--spacing-2xl);">
+                    <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg);">
+                        
+                        <!-- Free Plan Card -->
+                        <div class="pricing-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; text-align: center;">
+                            <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: 8px;">Free</h3>
+                            <div class="price" style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin: 16px 0;">Rs 0/-<span style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">/month</span></div>
+                            <ul style="list-style: none; padding: 0; margin: var(--spacing-md) 0; flex-grow: 1; text-align: left; font-size: 0.88rem; color: var(--gray-700); display: flex; flex-direction: column; gap: 10px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> 10 AI queries per month</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> 5 material downloads</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Basic features</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Community access</li>
+                            </ul>
+                            <button class="btn-subscribe" onclick="selectPlan('free')" style="width: 100%; padding: 12px; background: var(--gray-100); color: var(--gray-900); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: var(--transition);">Current Plan</button>
+                        </div>
+
+                        <!-- Pro Plan Card (Featured) -->
+                        <div class="pricing-card featured" style="background: white; border: 2px solid var(--primary); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15); display: flex; flex-direction: column; text-align: center; position: relative;">
+                            <span class="badge" style="position: absolute; top: -14px; right: 20px; background: var(--primary); color: white; padding: 4px 14px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px;">MOST POPULAR</span>
+                            <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: 8px;">Pro</h3>
+                            <div class="price" style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin: 16px 0;">Rs 29/-<span style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">/month</span></div>
+                            <ul style="list-style: none; padding: 0; margin: var(--spacing-md) 0; flex-grow: 1; text-align: left; font-size: 0.88rem; color: var(--gray-700); display: flex; flex-direction: column; gap: 10px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> 500 AI queries per month</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> 50 material downloads</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> All features unlocked</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Priority support</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Ad-free experience</li>
+                            </ul>
+                            <button class="btn-subscribe" onclick="selectPlan('pro')" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius-lg); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: var(--transition);">Upgrade to Pro</button>
+                        </div>
+
+                        <!-- Ultimate Plan Card -->
+                        <div class="pricing-card" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; text-align: center;">
+                            <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: 8px;">Ultimate</h3>
+                            <div class="price" style="font-size: 2.2rem; font-weight: 800; color: var(--secondary); margin: 16px 0;">Rs 79/-<span style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">/month</span></div>
+                            <ul style="list-style: none; padding: 0; margin: var(--spacing-md) 0; flex-grow: 1; text-align: left; font-size: 0.88rem; color: var(--gray-700); display: flex; flex-direction: column; gap: 10px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Unlimited AI queries</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Unlimited material downloads</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> All features & early access</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> 24/7 Premium support</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Custom study plans</li>
+                            </ul>
+                            <button class="btn-subscribe" onclick="selectPlan('ultimate')" style="width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: var(--radius-lg); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: var(--transition);">Upgrade to Ultimate</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Manage Account Section -->
+                <section class="manage-account" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm);">
+                    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-user-cog" style="color: var(--primary);"></i> Manage Account
+                    </h2>
+                    
+                    <div class="account-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-xl);">
+                        <div class="info-row" style="background: var(--gray-50); border: 1px solid var(--gray-200); padding: var(--spacing-md); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 4px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--gray-600); text-transform: uppercase;"><i class="fas fa-user" style="color: var(--primary); margin-right: 4px;"></i> Username</label>
+                            <span id="account-username" style="font-size: 1rem; font-weight: 700; color: var(--gray-900);">-</span>
+                        </div>
+                        <div class="info-row" style="background: var(--gray-50); border: 1px solid var(--gray-200); padding: var(--spacing-md); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 4px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--gray-600); text-transform: uppercase;"><i class="fas fa-envelope" style="color: var(--secondary); margin-right: 4px;"></i> Email</label>
+                            <span id="account-email" style="font-size: 1rem; font-weight: 700; color: var(--gray-900);">-</span>
+                        </div>
+                        <div class="info-row" style="background: var(--gray-50); border: 1px solid var(--gray-200); padding: var(--spacing-md); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 4px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--gray-600); text-transform: uppercase;"><i class="fas fa-crown" style="color: var(--warning); margin-right: 4px;"></i> Current Plan</label>
+                            <span id="account-plan" style="font-size: 1rem; font-weight: 700; color: var(--primary);">-</span>
+                        </div>
+                        <div class="info-row" style="background: var(--gray-50); border: 1px solid var(--gray-200); padding: var(--spacing-md); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 4px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--gray-600); text-transform: uppercase;"><i class="fas fa-calendar" style="color: var(--success); margin-right: 4px;"></i> Member Since</label>
+                            <span id="account-date" style="font-size: 1rem; font-weight: 700; color: var(--gray-900);">-</span>
+                        </div>
+                    </div>
+
+                    <div class="account-actions" style="display: flex; flex-wrap: wrap; gap: var(--spacing-md);">
+                        <button class="action-btn secondary" onclick="editProfile()" style="padding: 10px 20px; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); background: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--gray-800);"><i class="fas fa-edit"></i> Edit Profile</button>
+                        <button class="action-btn secondary" onclick="changePassword()" style="padding: 10px 20px; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); background: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: var(--gray-800);"><i class="fas fa-key"></i> Change Password</button>
+                        <button class="action-btn primary" onclick="manageSubscription()" style="padding: 10px 20px; border-radius: var(--radius-lg); border: none; background: var(--primary); color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem;"><i class="fas fa-credit-card"></i> Manage Subscription</button>
+                        <button class="action-btn danger" onclick="deleteAccount()" style="padding: 10px 20px; border-radius: var(--radius-lg); border: none; background: var(--error); color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; margin-left: auto;"><i class="fas fa-trash"></i> Delete Account</button>
+                    </div>
+                </section>
             </div>
-            
-            <div class="pricing-card featured">
-                <span class="badge">POPULAR</span>
-                <h3>Pro</h3>
-                <div class="price">Rs 29/-<span>/month</span></div>
-                <ul>
-                    <li><i class="fas fa-check"></i> 500 AI queries per month</li>
-                    <li><i class="fas fa-check"></i> 50 material downloads</li>
-                    <li><i class="fas fa-check"></i> All features</li>
-                    <li><i class="fas fa-check"></i> Priority support</li>
-                    <li><i class="fas fa-check"></i> Ad-free experience</li>
-                </ul>
-                <button class="btn-subscribe" onclick="selectPlan('pro')">Upgrade to Pro</button>
-            </div>
-            
-            <div class="pricing-card">
-                <h3>Ultimate</h3>
-                <div class="price">Rs 79/-<span>/month</span></div>
-                <ul>
-                    <li><i class="fas fa-check"></i> Unlimited AI queries</li>
-                    <li><i class="fas fa-check"></i> Unlimited downloads</li>
-                    <li><i class="fas fa-check"></i> All features</li>
-                    <li><i class="fas fa-check"></i> 24/7 support</li>
-                    <li><i class="fas fa-check"></i> Early access to new features</li>
-                    <li><i class="fas fa-check"></i> Custom study plans</li>
-                </ul>
-                <button class="btn-subscribe" onclick="selectPlan('ultimate')">Upgrade to Ultimate</button>
-            </div>
-        </div>
-    </div>
-    <div class="manage-account">
-        <h2><i class="fas fa-user-cog"></i> Manage Account</h2>
-        <div class="account-info">
-            <div class="info-row">
-                <label><i class="fas fa-user"></i> Username:</label>
-                <span id="account-username">-</span>
-            </div>
-            <div class="info-row">
-                <label><i class="fas fa-envelope"></i> Email:</label>
-                <span id="account-email">-</span>
-            </div>
-            <div class="info-row">
-                <label><i class="fas fa-crown"></i> Current Plan:</label>
-                <span id="account-plan">-</span>
-            </div>
-            <div class="info-row">
-                <label><i class="fas fa-calendar"></i> Member Since:</label>
-                <span id="account-date">-</span>
-            </div>
-        </div>
-        <div class="account-actions">
-            <button class="action-btn secondary" onclick="editProfile()"><i class="fas fa-edit"></i> Edit Profile</button>
-            <button class="action-btn secondary" onclick="changePassword()"><i class="fas fa-key"></i> Change Password</button>
-            <button class="action-btn primary" onclick="manageSubscription()"><i class="fas fa-credit-card"></i> Manage Subscription</button>
-            <button class="action-btn danger" onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete Account</button>
-        </div>
+        </main>
     </div>
 
     <script src="../assets/js/auth.js"></script>
@@ -151,7 +130,6 @@
             }
             
             if (confirm(`Upgrade to ${plan.toUpperCase()} plan?`)) {
-                // In real app, integrate payment gateway here
                 user.subscription = plan;
                 setCurrentUser(user);
                 alert('Plan upgraded successfully!');
@@ -201,7 +179,6 @@
             }
         }
         
-        // Update UI based on current plan
         window.onload = () => {
             const user = getCurrentUser();
             if (user) {
@@ -212,18 +189,20 @@
                 
                 const buttons = document.querySelectorAll('.btn-subscribe');
                 buttons.forEach(btn => {
-                    const plan = btn.onclick.toString().match(/'(\w+)'/)[1];
-                    if (plan === user.subscription) {
-                        btn.textContent = 'Current Plan';
-                        btn.className = 'btn-subscribe current';
-                        btn.onclick = null;
+                    const planStr = btn.getAttribute('onclick');
+                    if (planStr) {
+                        const match = planStr.match(/'(\w+)'/);
+                        if (match && match[1] === user.subscription) {
+                            btn.textContent = 'Current Plan';
+                            btn.style.background = 'var(--gray-100)';
+                            btn.style.color = 'var(--gray-700)';
+                            btn.style.border = '1px solid var(--gray-200)';
+                        }
                     }
                 });
-            } else {
-                window.location.href = 'login.html';
             }
         };
     </script>
-<script src="../assets/js/auth-session.js"></script>
+    <script src="../assets/js/auth-session.js"></script>
 </body>
 </html>

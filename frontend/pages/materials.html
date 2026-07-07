@@ -6,8 +6,9 @@
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/materials.css">
     <link rel="stylesheet" href="src/css/dashboard.css">
+    <link rel="stylesheet" href="src/css/community-styles.css">
     <link rel="stylesheet" href="../assets/css/skeletons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Study Materials - StudyClub</title>
 </head>
@@ -18,223 +19,189 @@
         <header class="topbar"></header>
 
         <main class="main-content">
-        <!-- Search Section -->
-        <section class="search-section">
-            <div class="container">
-                <div class="search-content">
-                    <h2>Find Your Perfect Study Material</h2>
-                    <p>Search through thousands of resources to find exactly what you need</p>
-                    <div class="search-box">
-                        <input type="text" placeholder="Search for subjects, topics, or materials...">
-                        <button class="search-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
+            <div class="content-container">
+                <!-- Search Section / Hero -->
+                <section class="search-section" style="padding: 2rem 0; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: var(--radius-xl); margin-bottom: var(--spacing-xl); border: 1px solid var(--gray-200);">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+                        <div class="search-content">
+                            <h2 style="font-size: 2rem; font-weight: 800; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Find Your Perfect Study Material</h2>
+                            <p style="color: var(--gray-600); font-size: 1rem; margin-bottom: var(--spacing-md);">Search through thousands of resources to find exactly what you need</p>
+                            <div class="search-box" style="display: flex; gap: var(--spacing-sm); max-width: 600px; position: relative;">
+                                <input type="text" placeholder="Search for subjects, topics, or materials..." style="width: 100%; padding: var(--spacing-sm) var(--spacing-xl); border-radius: var(--radius-full); border: 1px solid var(--gray-200); font-size: 0.95rem; outline: none; background: white;">
+                                <button class="search-btn" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Materials Categories -->
+                <section class="materials-section" style="margin-bottom: var(--spacing-2xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-layer-group" style="color: var(--primary);"></i> Explore Categories
+                    </h3>
+                    <div class="materials-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-md);">
+                        <a href="materials/textbooks.html" class="material-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--primary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Textbooks</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Comprehensive textbooks covering all major subjects and academic levels.</p>
+                            <div class="material-count" style="font-size: 0.8rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">500+ Books</div>
+                        </a>
+                        
+                        <a href="materials/video-lectures.html" class="material-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--secondary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Video Lectures</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">High-quality video content from expert educators and professors.</p>
+                            <div class="material-count" style="font-size: 0.8rem; font-weight: 700; color: var(--secondary); background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">1000+ Videos</div>
+                        </a>
+                        
+                        <a href="materials/study-notes.html" class="material-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--accent); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Study Notes</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Comprehensive study notes and summaries for quick revision.</p>
+                            <div class="material-count" style="font-size: 0.8rem; font-weight: 700; color: var(--accent); background: rgba(236, 72, 153, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">2000+ Notes</div>
+                        </a>
+                        
+                        <a href="materials/practice-tests.html" class="material-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--warning); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Practice Tests</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Mock exams and practice questions with detailed solutions.</p>
+                            <div class="material-count" style="font-size: 0.8rem; font-weight: 700; color: var(--warning); background: rgba(245, 158, 11, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">500+ Tests</div>
+                        </a>
+                        
+                        <a href="materials/infographics.html" class="material-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--success); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Infographics</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Visual learning materials and concept maps for better understanding.</p>
+                            <div class="material-count" style="font-size: 0.8rem; font-weight: 700; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">300+ Graphics</div>
+                        </a>
+                        
+                        <a href="materials/audio-content.html" class="material-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--primary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-podcast"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Audio Content</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Podcasts and audio lectures for learning on the go.</p>
+                            <div class="material-count" style="font-size: 0.8rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">200+ Audio</div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- User Submitted Materials -->
+                <section class="user-materials" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-folder-open" style="color: var(--primary);"></i> Community Shared Materials
+                    </h3>
+                    
+                    <!-- Filters -->
+                    <div class="filters-section" style="margin-bottom: var(--spacing-lg);">
+                        <div class="filters-row" style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                            <div class="filter-group" style="display: flex; align-items: center; gap: 8px;">
+                                <label for="category-filter" style="font-size: 0.85rem; font-weight: 600; color: var(--gray-700);">Category:</label>
+                                <select id="category-filter" style="padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); font-size: 0.85rem; outline: none; background: var(--gray-50);">
+                                    <option value="">All Categories</option>
+                                    <option value="textbook">Textbooks</option>
+                                    <option value="video">Video Lectures</option>
+                                    <option value="notes">Study Notes</option>
+                                    <option value="audio">Audio Content</option>
+                                </select>
+                            </div>
+                            <div class="filter-group" style="display: flex; align-items: center; gap: 8px;">
+                                <label for="difficulty-filter" style="font-size: 0.85rem; font-weight: 600; color: var(--gray-700);">Difficulty:</label>
+                                <select id="difficulty-filter" style="padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); font-size: 0.85rem; outline: none; background: var(--gray-50);">
+                                    <option value="">All Levels</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Materials Grid -->
+                    <div class="materials-container" id="materials-container">
+                        <p class="no-materials" style="color: var(--gray-600); font-size: 0.9rem;">Loading materials...</p>
+                    </div>
+                </section>
+
+                <!-- Add Material Button -->
+                <button class="add-material-btn" onclick="openModal()" title="Add Material" style="position: fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: white; border: none; width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; z-index: 100; transition: var(--transition);">
+                    <i class="fas fa-plus"></i>
+                </button>
+
+                <!-- Add Material Modal -->
+                <div id="add-material-modal" class="modal">
+                    <div class="modal-content" style="background: white; border-radius: var(--radius-xl); padding: var(--spacing-xl); max-width: 500px; margin: 2rem auto; position: relative;">
+                        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                            <h2 style="font-size: 1.25rem; font-weight: 700;">Add New Material</h2>
+                            <button class="close-modal" onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-600);">&times;</button>
+                        </div>
+                        <form id="add-material-form" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            <div class="form-group">
+                                <label for="title" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Title *</label>
+                                <input type="text" id="title" name="title" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="description" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Description</label>
+                                <textarea id="description" name="description" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none; min-height: 70px;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="category" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Category</label>
+                                <select id="category" name="category" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                                    <option value="General">General</option>
+                                    <option value="Textbooks">Textbooks</option>
+                                    <option value="Video Lectures">Video Lectures</option>
+                                    <option value="Study Notes">Study Notes</option>
+                                    <option value="Practice Tests">Practice Tests</option>
+                                    <option value="Infographics">Infographics</option>
+                                    <option value="Audio Content">Audio Content</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="author" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Author</label>
+                                <input type="text" id="author" name="author" placeholder="Your name" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="difficulty" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Difficulty</label>
+                                <select id="difficulty" name="difficulty" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tags" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Tags (comma-separated)</label>
+                                <input type="text" id="tags" name="tags" placeholder="math, calculus, tutorial" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="thumbnailUrl" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Thumbnail URL (optional)</label>
+                                <input type="url" id="thumbnailUrl" name="thumbnailUrl" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="link" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Resource Link *</label>
+                                <input type="url" id="link" name="link" required placeholder="https://example.com/resource" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); outline: none;">
+                            </div>
+                            <div class="form-actions" style="display: flex; justify-content: flex-end; gap: var(--spacing-sm); margin-top: var(--spacing-md);">
+                                <button type="button" class="btn-cancel" onclick="closeModal()" style="padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--gray-200); background: white; cursor: pointer;">Cancel</button>
+                                <button type="submit" class="btn-submit" style="padding: 8px 16px; border-radius: var(--radius-md); border: none; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">Add Material</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Materials Categories -->
-        <section class="materials-section">
-            <div class="container">
-                <div class="materials-grid">
-                    <a href="materials/textbooks.html" class="material-category">
-                        <div class="category-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <h3>Textbooks</h3>
-                        <p>Comprehensive textbooks covering all major subjects and academic levels.</p>
-                        <div class="material-count">500+ Books</div>
-                    </a>
-                    
-                    <a href="materials/video-lectures.html" class="material-category">
-                        <div class="category-icon">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <h3>Video Lectures</h3>
-                        <p>High-quality video content from expert educators and professors.</p>
-                        <div class="material-count">1000+ Videos</div>
-                    </a>
-                    
-                    <a href="materials/study-notes.html" class="material-category">
-                        <div class="category-icon">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <h3>Study Notes</h3>
-                        <p>Comprehensive study notes and summaries for quick revision.</p>
-                        <div class="material-count">2000+ Notes</div>
-                    </a>
-                    
-                    <a href="materials/practice-tests.html" class="material-category">
-                        <div class="category-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <h3>Practice Tests</h3>
-                        <p>Mock exams and practice questions with detailed solutions.</p>
-                        <div class="material-count">500+ Tests</div>
-                    </a>
-                    
-                    <a href="materials/infographics.html" class="material-category">
-                        <div class="category-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h3>Infographics</h3>
-                        <p>Visual learning materials and concept maps for better understanding.</p>
-                        <div class="material-count">300+ Graphics</div>
-                    </a>
-                    
-                    <a href="materials/audio-content.html" class="material-category">
-                        <div class="category-icon">
-                            <i class="fas fa-podcast"></i>
-                        </div>
-                        <h3>Audio Content</h3>
-                        <p>Podcasts and audio lectures for learning on the go.</p>
-                        <div class="material-count">200+ Audio</div>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- User Submitted Materials -->
-        <section class="user-materials">
-            <div class="container">
-                <h2 class="section-title">Community Materials</h2>
-                
-                <!-- Filters -->
-                <div class="filters-section">
-                    <div class="filters-row">
-                        <div class="filter-group">
-                            <label for="category-filter">Category</label>
-                            <select id="category-filter">
-                                <option value="">All Categories</option>
-                                <option value="textbook">Textbooks</option>
-                                <option value="video">Video Lectures</option>
-                                <option value="notes">Study Notes</option>
-                                <option value="audio">Audio Content</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="difficulty-filter">Difficulty</label>
-                            <select id="difficulty-filter">
-                                <option value="">All Levels</option>
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Materials Grid -->
-                <div class="materials-container" id="materials-container">
-                    <p class="no-materials">Loading materials...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Add Material Button -->
-        <button class="add-material-btn" onclick="openModal()" title="Add Material">
-            <i class="fas fa-plus"></i>
-        </button>
-
-        <!-- Add Material Modal -->
-        <div id="add-material-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Add New Material</h2>
-                    <button class="close-modal" onclick="closeModal()">&times;</button>
-                </div>
-                <form id="add-material-form">
-                    <div class="form-group">
-                        <label for="title">Title *</label>
-                        <input type="text" id="title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" name="description"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" name="category">
-                            <option value="General">General</option>
-                            <option value="Textbooks">Textbooks</option>
-                            <option value="Video Lectures">Video Lectures</option>
-                            <option value="Study Notes">Study Notes</option>
-                            <option value="Practice Tests">Practice Tests</option>
-                            <option value="Infographics">Infographics</option>
-                            <option value="Audio Content">Audio Content</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="author">Author</label>
-                        <input type="text" id="author" name="author" placeholder="Your name">
-                    </div>
-                    <div class="form-group">
-                        <label for="difficulty">Difficulty</label>
-                        <select id="difficulty" name="difficulty">
-                            <option value="Easy">Easy</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Hard">Hard</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tags">Tags (comma-separated)</label>
-                        <input type="text" id="tags" name="tags" placeholder="math, calculus, tutorial">
-                    </div>
-                    <div class="form-group">
-                        <label for="thumbnailUrl">Thumbnail URL (optional)</label>
-                        <input type="url" id="thumbnailUrl" name="thumbnailUrl" placeholder="https://example.com/image.jpg">
-                    </div>
-                    <div class="form-group">
-                        <label for="link">Resource Link *</label>
-                        <input type="url" id="link" name="link" required placeholder="https://example.com/resource">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                        <button type="submit" class="btn-submit">Add Material</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        
         </main>
     </div>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>StudyClub</span>
-                    </div>
-                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 StudyClub. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     <script src="../assets/js/script.js"></script>
     <script src="../assets/js/auth-session.js"></script>
@@ -242,4 +209,4 @@
     <script src="../assets/js/prefetch.js"></script>
     <script src="../assets/js/materials.js"></script>
 </body>
-</html> 
+</html>

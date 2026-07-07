@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/materials.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Study Resources - StudyClub</title>
     <link rel="stylesheet" href="src/css/dashboard.css">
+    <link rel="stylesheet" href="src/css/community-styles.css">
+    <link rel="stylesheet" href="../assets/css/skeletons.css">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -17,215 +19,183 @@
         <header class="topbar"></header>
 
         <main class="main-content">
-        <!-- Page Header -->
-        <section class="search-section">
-            <div class="container">
-                <div class="search-content">
-                    <h2 class="page-title">Study Resources</h2>
-                    <p class="page-subtitle">Discover tools, apps, and resources to enhance your learning experience</p>
-                    <div class="search-box">
-                        <input type="text" placeholder="Search for apps, software or resources...">
-                        <button class="search-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Resource Categories -->
-        <section class="resources-section">
-            <div class="container">
-                <div class="resources-grid">
-                    <div class="resource-category">
-                        <div class="category-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3>Study Apps</h3>
-                        <p>Mobile applications designed to boost productivity and learning efficiency.</p>
-                        <div class="resource-count">50+ Apps</div>
-                    </div>
-                    
-                    <div class="resource-category">
-                        <div class="category-icon">
-                            <i class="fas fa-laptop"></i>
-                        </div>
-                        <h3>Software Tools</h3>
-                        <p>Desktop applications and software for advanced study and research.</p>
-                        <div class="resource-count">30+ Tools</div>
-                    </div>
-                    
-                    <div class="resource-category">
-                        <div class="category-icon">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <h3>Online Platforms</h3>
-                        <p>Web-based learning platforms and educational websites.</p>
-                        <div class="resource-count">100+ Sites</div>
-                    </div>
-                    
-                    <div class="resource-category">
-                        <div class="category-icon">
-                            <i class="fas fa-headphones"></i>
-                        </div>
-                        <h3>Audio Resources</h3>
-                        <p>Podcasts, audiobooks, and audio study materials.</p>
-                        <div class="resource-count">200+ Audio</div>
-                    </div>
-                    
-                    <div class="resource-category">
-                        <div class="category-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3>Study Groups</h3>
-                        <p>Online study groups and collaborative learning spaces.</p>
-                        <div class="resource-count">150+ Groups</div>
-                    </div>
-                    
-                    <div class="resource-category">
-                        <div class="category-icon">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <h3>Study Tips</h3>
-                        <p>Proven study techniques and learning strategies.</p>
-                        <div class="resource-count">500+ Tips</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Featured Resources -->
-        <section class="featured-resources">
-            <div class="container">
-                <h2 class="section-title">Featured Resources</h2>
-                <div class="featured-grid">
-                    <div class="featured-item">
-                        <div class="featured-image">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="featured-content">
-                            <h3>Focus Timer</h3>
-                            <p>Pomodoro technique timer with customizable study sessions and breaks.</p>
-                            <div class="featured-meta">
-                                <span><i class="fas fa-star"></i> 4.8/5</span>
-                                <span><i class="fas fa-download"></i> 10k+ users</span>
+            <div class="content-container">
+                <!-- Page Header / Hero -->
+                <section class="search-section" style="padding: 2rem 0; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: var(--radius-xl); margin-bottom: var(--spacing-xl); border: 1px solid var(--gray-200);">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg);">
+                        <div class="search-content">
+                            <h2 class="page-title" style="font-size: 2rem; font-weight: 800; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Study Resources</h2>
+                            <p class="page-subtitle" style="color: var(--gray-600); font-size: 1rem; margin-bottom: var(--spacing-md);">Discover tools, apps, and resources to enhance your learning experience</p>
+                            <div class="search-box" style="display: flex; gap: var(--spacing-sm); max-width: 600px; position: relative;">
+                                <input type="text" placeholder="Search for apps, software or resources..." style="width: 100%; padding: var(--spacing-sm) var(--spacing-xl); border-radius: var(--radius-full); border: 1px solid var(--gray-200); font-size: 0.95rem; outline: none; background: white;">
+                                <button class="search-btn" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="featured-item">
-                        <div class="featured-image">
-                            <i class="fas fa-sticky-note"></i>
-                        </div>
-                        <div class="featured-content">
-                            <h3>NoteMaster Pro</h3>
-                            <p>Advanced note-taking app with cloud sync and collaborative features.</p>
-                            <div class="featured-meta">
-                                <span><i class="fas fa-star"></i> 4.9/5</span>
-                                <span><i class="fas fa-download"></i> 25k+ users</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="featured-item">
-                        <div class="featured-image">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="featured-content">
-                            <h3>Study Analytics</h3>
-                            <p>Track your learning progress with detailed analytics and insights.</p>
-                            <div class="featured-meta">
-                                <span><i class="fas fa-star"></i> 4.7/5</span>
-                                <span><i class="fas fa-download"></i> 15k+ users</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Resource Recommendations -->
-        <section class="recommendations">
-            <div class="container">
-                <h2 class="section-title">Personalized Recommendations</h2>
-                <div class="recommendations-grid">
-                    <div class="recommendation-card">
-                        <div class="rec-icon">
-                            <i class="fas fa-graduation-cap"></i>
+                <!-- Resource Categories -->
+                <section class="resources-section" style="margin-bottom: var(--spacing-2xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-th-large" style="color: var(--primary);"></i> Resource Categories
+                    </h3>
+                    <div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-md);">
+                        <div class="resource-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--primary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Study Apps</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Mobile applications designed to boost productivity and learning efficiency.</p>
+                            <div class="resource-count" style="font-size: 0.8rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">50+ Apps</div>
                         </div>
-                        <h3>For STEM Students</h3>
-                        <ul>
-                            <li>Wolfram Alpha - Computational knowledge engine</li>
-                            <li>Khan Academy - Free educational videos</li>
-                            <li>MIT OpenCourseWare - Free course materials</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="recommendation-card">
-                        <div class="rec-icon">
-                            <i class="fas fa-palette"></i>
+                        
+                        <div class="resource-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--secondary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Software Tools</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Desktop applications and software for advanced study and research.</p>
+                            <div class="resource-count" style="font-size: 0.8rem; font-weight: 700; color: var(--secondary); background: rgba(139, 92, 246, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">30+ Tools</div>
                         </div>
-                        <h3>For Arts & Humanities</h3>
-                        <ul>
-                            <li>Duolingo - Language learning platform</li>
-                            <li>Google Arts & Culture - Virtual museum tours</li>
-                            <li>Project Gutenberg - Free e-books</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="recommendation-card">
-                        <div class="rec-icon">
-                            <i class="fas fa-briefcase"></i>
+                        
+                        <div class="resource-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--accent); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Online Platforms</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Web-based learning platforms and educational websites.</p>
+                            <div class="resource-count" style="font-size: 0.8rem; font-weight: 700; color: var(--accent); background: rgba(236, 72, 153, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">100+ Sites</div>
                         </div>
-                        <h3>For Business Students</h3>
-                        <ul>
-                            <li>Harvard Business Review - Business insights</li>
-                            <li>Coursera - Professional courses</li>
-                            <li>LinkedIn Learning - Skill development</li>
-                        </ul>
+                        
+                        <div class="resource-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--warning); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-headphones"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Audio Resources</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Podcasts, audiobooks, and audio study materials.</p>
+                            <div class="resource-count" style="font-size: 0.8rem; font-weight: 700; color: var(--warning); background: rgba(245, 158, 11, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">200+ Audio</div>
+                        </div>
+                        
+                        <div class="resource-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--success); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Study Groups</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Online study groups and collaborative learning spaces.</p>
+                            <div class="resource-count" style="font-size: 0.8rem; font-weight: 700; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">150+ Groups</div>
+                        </div>
+                        
+                        <div class="resource-category" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                            <div class="category-icon" style="font-size: 1.75rem; color: var(--primary); margin-bottom: var(--spacing-sm);">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs);">Study Tips</h3>
+                            <p style="font-size: 0.88rem; color: var(--gray-600); flex-grow: 1; margin-bottom: var(--spacing-md);">Proven study techniques and learning strategies.</p>
+                            <div class="resource-count" style="font-size: 0.8rem; font-weight: 700; color: var(--primary); background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: var(--radius-full); width: fit-content;">500+ Tips</div>
+                        </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- Featured Resources -->
+                <section class="featured-resources" style="margin-bottom: var(--spacing-2xl);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-star" style="color: var(--warning);"></i> Featured Resources
+                    </h3>
+                    <div class="featured-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--spacing-md);">
+                        <div class="featured-item" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; gap: var(--spacing-md);">
+                            <div class="featured-image" style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary); flex-shrink: 0;">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="featured-content" style="flex-grow: 1;">
+                                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px;">Focus Timer</h3>
+                                <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 8px;">Pomodoro technique timer with customizable study sessions and breaks.</p>
+                                <div class="featured-meta" style="display: flex; gap: var(--spacing-md); font-size: 0.8rem; color: var(--gray-600);">
+                                    <span><i class="fas fa-star" style="color: var(--warning);"></i> 4.8/5</span>
+                                    <span><i class="fas fa-download" style="color: var(--primary);"></i> 10k+ users</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="featured-item" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; gap: var(--spacing-md);">
+                            <div class="featured-image" style="width: 50px; height: 50px; background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--secondary); flex-shrink: 0;">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <div class="featured-content" style="flex-grow: 1;">
+                                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px;">NoteMaster Pro</h3>
+                                <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 8px;">Advanced note-taking app with cloud sync and collaborative features.</p>
+                                <div class="featured-meta" style="display: flex; gap: var(--spacing-md); font-size: 0.8rem; color: var(--gray-600);">
+                                    <span><i class="fas fa-star" style="color: var(--warning);"></i> 4.9/5</span>
+                                    <span><i class="fas fa-download" style="color: var(--secondary);"></i> 25k+ users</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="featured-item" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-lg); box-shadow: var(--shadow-sm); display: flex; gap: var(--spacing-md);">
+                            <div class="featured-image" style="width: 50px; height: 50px; background: rgba(236, 72, 153, 0.1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--accent); flex-shrink: 0;">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="featured-content" style="flex-grow: 1;">
+                                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px;">Study Analytics</h3>
+                                <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 8px;">Track your learning progress with detailed analytics and insights.</p>
+                                <div class="featured-meta" style="display: flex; gap: var(--spacing-md); font-size: 0.8rem; color: var(--gray-600);">
+                                    <span><i class="fas fa-star" style="color: var(--warning);"></i> 4.7/5</span>
+                                    <span><i class="fas fa-download" style="color: var(--accent);"></i> 15k+ users</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Resource Recommendations -->
+                <section class="recommendations" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); padding: var(--spacing-xl); box-shadow: var(--shadow-sm);">
+                    <h3 class="section-title" style="font-size: 1.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-compass" style="color: var(--primary);"></i> Personalized Recommendations
+                    </h3>
+                    <div class="recommendations-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-md);">
+                        <div class="recommendation-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
+                            <div class="rec-icon" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 8px;">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 8px;">For STEM Students</h3>
+                            <ul style="list-style: none; padding: 0; font-size: 0.88rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 6px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Wolfram Alpha - Computational knowledge</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Khan Academy - Free educational videos</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> MIT OpenCourseWare - Free courseware</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="recommendation-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
+                            <div class="rec-icon" style="font-size: 1.5rem; color: var(--secondary); margin-bottom: 8px;">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 8px;">For Arts & Humanities</h3>
+                            <ul style="list-style: none; padding: 0; font-size: 0.88rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 6px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Duolingo - Language learning platform</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Google Arts & Culture - Virtual museum tours</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Project Gutenberg - Free e-books</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="recommendation-card" style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: var(--spacing-lg);">
+                            <div class="rec-icon" style="font-size: 1.5rem; color: var(--accent); margin-bottom: 8px;">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 8px;">For Business Students</h3>
+                            <ul style="list-style: none; padding: 0; font-size: 0.88rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 6px;">
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Harvard Business Review - Business insights</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> Coursera - Professional courses</li>
+                                <li><i class="fas fa-check-circle" style="color: var(--success); font-size: 0.8rem; margin-right: 6px;"></i> LinkedIn Learning - Skill development</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </section>
-            </main>
+        </main>
     </div>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>StudyClub</span>
-                    </div>
-                    <p>Empowering students to achieve their academic goals through innovative learning experiences.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 StudyClub. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
 
     <script src="../assets/js/script.js"></script>
     <script src="../assets/js/auth-session.js"></script>
 </body>
-</html> 
+</html>
