@@ -302,34 +302,52 @@ export const Community: React.FC = () => {
                   return (
                     <Card
                       key={g.group_id}
-                      className="flex flex-col justify-between h-48 border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all duration-300"
+                      className="flex flex-col justify-between border border-slate-200 p-6 hover-lift bg-white shadow-sm rounded-2xl min-h-[260px]"
                     >
-                      <div>
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="h-9 w-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100/50">
-                            <i className={`${g.icon || "fas fa-users"} text-md`} />
+                      <div className="flex-1 flex flex-col justify-between">
+                        {/* Top Area: Icon & Category badge */}
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-start">
+                            <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-650 flex items-center justify-center border border-purple-100/50">
+                              <i className={`${g.icon || "fas fa-users"} text-base`} />
+                            </div>
+                            <span className="text-[10px] font-extrabold text-indigo-650 bg-indigo-50 border border-indigo-100/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                              {g.category || "other"}
+                            </span>
                           </div>
-                          <span className="text-[9px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                            {g.category || "other"}
-                          </span>
+
+                          {/* Title & Description */}
+                          <div className="space-y-1.5">
+                            <h4 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-1">
+                              {g.name}
+                            </h4>
+                            <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 min-h-[35px] font-medium">
+                              {g.description}
+                            </p>
+                          </div>
                         </div>
-                        <h4 className="font-extrabold text-gray-900 text-sm leading-tight line-clamp-1">
-                          {g.name}
-                        </h4>
-                        <p className="text-xs text-gray-400 font-medium mt-1.5 line-clamp-2 leading-relaxed">
-                          {g.description}
-                        </p>
+
+                        {/* Details Area */}
+                        <div className="border-t border-slate-100 pt-3.5 mt-3.5 space-y-1.5">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20 shrink-0">Category</span>
+                            <span className="text-xs font-bold text-slate-700 truncate">{g.category || "other"}</span>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex justify-between items-center mt-4 border-t border-slate-100 pt-3">
-                        <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">
-                          {g.member_count ?? 0} members
+                      {/* Bottom Area: Member Count & Action Button */}
+                      <div className="flex justify-between items-center mt-5 border-t border-slate-100 pt-4 shrink-0">
+                        <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                          <i className="fas fa-users text-[10px] text-slate-350" />
+                          <span>{g.member_count ?? 0} members</span>
                         </span>
                         {isJoined ? (
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => setActiveGroupId(g.group_id)}
+                            className="py-1.5 px-4 text-xs font-bold transition-all duration-200 h-9"
                           >
                             Enter Space
                           </Button>
@@ -342,6 +360,7 @@ export const Community: React.FC = () => {
                               joinMutation.isPending &&
                               joinMutation.variables === g.group_id
                             }
+                            className="py-1.5 px-4 text-xs font-bold transition-all duration-200 h-9"
                           >
                             Join Group
                           </Button>

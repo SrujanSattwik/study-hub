@@ -242,21 +242,26 @@ export const Materials: React.FC = () => {
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col justify-between h-64 animate-pulse"
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between min-h-[350px] animate-pulse"
             >
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="flex justify-between items-start">
-                  <div className="h-8 w-16 bg-slate-100 rounded-full shimmer-skeleton" />
-                  <div className="h-3 w-8 bg-slate-150 rounded" />
+                  <div className="h-10 w-10 bg-slate-100 rounded-xl shimmer-skeleton" />
+                  <div className="h-5 w-16 bg-slate-100 rounded-full shimmer-skeleton" />
                 </div>
                 <div className="space-y-2">
-                  <div className="h-4 w-3/4 bg-slate-100 rounded" />
-                  <div className="h-3 w-5/6 bg-slate-150 rounded" />
+                  <div className="h-4 w-3/4 bg-slate-100 rounded shimmer-skeleton" />
+                  <div className="h-3 w-5/6 bg-slate-100 rounded shimmer-skeleton" />
+                  <div className="h-3 w-1/2 bg-slate-100 rounded shimmer-skeleton" />
+                </div>
+                <div className="border-t border-slate-100 pt-4 space-y-2">
+                  <div className="h-3 w-1/3 bg-slate-100 rounded shimmer-skeleton" />
+                  <div className="h-3 w-1/2 bg-slate-100 rounded shimmer-skeleton" />
                 </div>
               </div>
-              <div className="flex justify-between items-center mt-4 border-t border-slate-100 pt-3">
-                <div className="h-3 w-16 bg-slate-100 rounded" />
-                <div className="h-8 w-20 bg-slate-150 rounded-xl" />
+              <div className="flex justify-between items-center mt-5 border-t border-slate-100 pt-4">
+                <div className="h-3 w-16 bg-slate-100 rounded shimmer-skeleton" />
+                <div className="h-9 w-24 bg-slate-150 rounded-xl shimmer-skeleton" />
               </div>
             </div>
           ))}
@@ -290,44 +295,51 @@ export const Materials: React.FC = () => {
                 return (
                   <Card
                     key={m.id}
-                    className="flex flex-col justify-between border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-sm transition-all duration-200 h-64"
+                    className="flex flex-col justify-between border border-slate-200 p-6 hover-lift bg-white shadow-sm rounded-2xl min-h-[350px]"
                   >
-                    <div className="space-y-3">
-                      {/* Badge / Type Header */}
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                          {m.type}
-                        </span>
-                        <span className="text-[10px] text-gray-400 font-bold uppercase">
-                          {m.format || 'Link'}
-                        </span>
+                    <div className="flex-1 flex flex-col justify-between">
+                      {/* Top Area: Icon & Badges */}
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-start">
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} ${meta.color} border border-slate-100`}>
+                            <i className={`${meta.icon} text-base`} />
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 justify-end">
+                            <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                              {m.type}
+                            </span>
+                            <span className="text-[10px] text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full uppercase font-bold">
+                              {m.format || 'Link'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Title & Description */}
+                        <div className="space-y-2">
+                          <h4 className="text-base font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-1" title={m.title}>
+                            {m.title}
+                          </h4>
+                          <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 font-medium min-h-[50px]">
+                            {m.description || 'No description provided.'}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Title & Description */}
-                      <div className="space-y-1">
-                        <h4 className="text-[15px] font-semibold text-gray-900 tracking-tight leading-snug line-clamp-1" title={m.title}>
-                          {m.title}
-                        </h4>
-                        <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 h-8 font-medium">
-                          {m.description || 'No description provided.'}
-                        </p>
-                      </div>
-
-                      {/* Dense metadata list */}
-                      <div className="space-y-1.5 text-xs border-t border-slate-100 pt-2.5">
+                      {/* Details / Middle Section */}
+                      <div className="border-t border-slate-100 pt-4 mt-4 space-y-2">
                         {m.subject && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-400 font-semibold w-12 shrink-0">Subject:</span>
-                            <span className="text-indigo-600 font-extrabold truncate">{m.subject}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20 shrink-0">Subject</span>
+                            <span className="text-xs font-extrabold text-indigo-600 truncate">{m.subject}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-gray-400 font-semibold w-12 shrink-0">Uploaded:</span>
-                          <span className="text-gray-600 font-bold truncate">{m.author || 'Anonymous'}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20 shrink-0">Uploaded</span>
+                          <span className="text-xs font-bold text-slate-700 truncate">{m.author || 'Anonymous'}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-gray-400 font-semibold w-12 shrink-0">Date:</span>
-                          <span className="text-gray-500 font-medium">
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20 shrink-0">Date</span>
+                          <span className="text-xs font-medium text-slate-500">
                             {new Date(m.createdAt).toLocaleDateString(undefined, {
                               year: 'numeric', month: 'short', day: 'numeric'
                             })}
@@ -336,16 +348,17 @@ export const Materials: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Footer downloads & action */}
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 mt-3">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
-                        {m.downloadCount} DLs
-                      </span>
+                    {/* Bottom Area: Downloads & Action */}
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-5 shrink-0">
+                      <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                        <i className="fas fa-download text-[10px] text-slate-350" />
+                        <span>{m.downloadCount} DLs</span>
+                      </div>
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => handleDownload(m.id, m.filePath, m.link)}
-                        className="py-1 px-3 text-xs h-8"
+                        className="py-1.5 px-4 text-xs font-bold transition-all duration-200 h-9"
                       >
                         Download
                       </Button>
