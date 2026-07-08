@@ -797,20 +797,34 @@ export class CommunityService {
     if (!(await this.isGroupMember(userId, groupId)))
       throw new ForbiddenError("Access denied");
 
+    // SQL: NULL = NULL is always false, so we must branch on whether categoryId is set
     const [folders, files] = await Promise.all([
-      prisma.$queryRaw<any[]>(Prisma.sql`
-        SELECT * FROM material_categories
-        WHERE group_id = ${groupId}
-          AND (parent_id = ${categoryId ?? null} OR (parent_id IS NULL AND ${categoryId ?? null} IS NULL))
-      `),
-      prisma.$queryRaw<any[]>(Prisma.sql`
-        SELECT gm.material_id, gm.title, gm.description, gm.file_path, gm.file_name,
-               gm.file_size, gm.file_type, gm.created_at, u.full_name AS author_name
-        FROM group_materials gm
-        LEFT JOIN users u ON gm.uploaded_by = u.user_id
-        WHERE gm.group_id = ${groupId}
-          AND (gm.category_id = ${categoryId ?? null} OR (gm.category_id IS NULL AND ${categoryId ?? null} IS NULL))
-      `),
+      categoryId
+        ? prisma.$queryRaw<any[]>(Prisma.sql`
+            SELECT * FROM material_categories
+            WHERE group_id = ${groupId} AND parent_id = ${categoryId}
+          `)
+        : prisma.$queryRaw<any[]>(Prisma.sql`
+            SELECT * FROM material_categories
+            WHERE group_id = ${groupId} AND parent_id IS NULL
+          `),
+      categoryId
+        ? prisma.$queryRaw<any[]>(Prisma.sql`
+            SELECT gm.material_id, gm.title, gm.description, gm.file_path, gm.file_name,
+                   gm.file_size, gm.file_type, gm.created_at, gm.download_count,
+                   gm.uploaded_by, u.full_name AS author_name
+            FROM group_materials gm
+            LEFT JOIN users u ON gm.uploaded_by = u.user_id
+            WHERE gm.group_id = ${groupId} AND gm.category_id = ${categoryId}
+          `)
+        : prisma.$queryRaw<any[]>(Prisma.sql`
+            SELECT gm.material_id, gm.title, gm.description, gm.file_path, gm.file_name,
+                   gm.file_size, gm.file_type, gm.created_at, gm.download_count,
+                   gm.uploaded_by, u.full_name AS author_name
+            FROM group_materials gm
+            LEFT JOIN users u ON gm.uploaded_by = u.user_id
+            WHERE gm.group_id = ${groupId} AND gm.category_id IS NULL
+          `),
     ]);
 
     return { folders, files };
@@ -1243,6 +1257,90 @@ export class CommunityService {
 
     broadcastGroupEvent(groupId, "meetingEnded", updated);
     return updated;
+  }
+
+  async renameGroupFolder(
+    userId: string,
+    groupId: string,
+    folderId: string,
+    name: string,
+  ) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const folder = await prisma.materialCategory.findUnique({
+      where: { id: folderId }
+    });
+
+    if (!folder) throw new NotFoundError("Folder not found");
+    if (folder.groupId !== groupId) throw new BadRequestError("Folder mismatch");
+
+    const updated = await prisma.materialCategory.update({
+      where: { id: folderId },
+      data: { name }
+    });
+
+    broadcastGroupEvent(groupId, "materialUpdated", { folderId });
+    return updated;
+  }
+
+  async deleteGroupFolder(userId: string, groupId: string, folderId: string) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const folder = await prisma.materialCategory.findUnique({
+      where: { id: folderId }
+    });
+
+    if (!folder) throw new NotFoundError("Folder not found");
+    if (folder.groupId !== groupId) throw new BadRequestError("Folder mismatch");
+
+    await prisma.materialCategory.delete({
+      where: { id: folderId }
+    });
+
+    broadcastGroupEvent(groupId, "materialDeleted", { folderId });
+  }
+
+  async acceptGroupAnswer(userId: string, groupId: string, answerId: string, isAccepted: boolean) {
+    const role = await this.isGroupMember(userId, groupId);
+    if (!role) throw new ForbiddenError("Access denied");
+
+    const answer = await prisma.questionAnswer.findUnique({
+      where: { id: answerId },
+      include: {
+        question: true
+      }
+    });
+
+    if (!answer) throw new NotFoundError("Answer not found");
+
+    if (answer.question.userId !== userId && role !== 'owner' && role !== 'admin') {
+      throw new ForbiddenError("Only the author of the question or group admin can accept answers");
+    }
+
+    const updatedAnswer = await prisma.questionAnswer.update({
+      where: { id: answerId },
+      data: { isAccepted },
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    if (isAccepted) {
+      await prisma.question.update({
+        where: { id: answer.questionId },
+        data: { isSolved: true }
+      });
+    }
+
+    broadcastGroupEvent(groupId, "questionUpdated", { questionId: answer.questionId });
+    return updatedAnswer;
   }
 }
 

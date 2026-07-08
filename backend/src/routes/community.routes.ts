@@ -15,8 +15,9 @@ const UPLOADS_BASE = path.join(__dirname, "../../../uploads/community");
 const MATERIALS_DIR = path.join(UPLOADS_BASE, "materials");
 const CHAT_DIR = path.join(UPLOADS_BASE, "chat");
 const POST_DIR = path.join(UPLOADS_BASE, "posts");
+const QA_DIR = path.join(UPLOADS_BASE, "qa");
 
-[MATERIALS_DIR, CHAT_DIR, POST_DIR].forEach((dir) =>
+[MATERIALS_DIR, CHAT_DIR, POST_DIR, QA_DIR].forEach((dir) =>
   fs.mkdirSync(dir, { recursive: true }),
 );
 
@@ -50,11 +51,17 @@ const ALLOWED_COMMUNITY_MIMES: Record<string, string[]> = {
 
 const storage = multer.diskStorage({
   destination: (req, _file, cb) => {
-    const destType = req.body?.destType ?? "materials";
+    let destType = req.body?.destType ?? "materials";
+    if (req.originalUrl.includes("/questions")) {
+      destType = "qa";
+    } else if (req.originalUrl.includes("/chat")) {
+      destType = "chat";
+    }
     const dirs: Record<string, string> = {
       chat: CHAT_DIR,
       posts: POST_DIR,
       materials: MATERIALS_DIR,
+      qa: QA_DIR,
     };
     cb(null, dirs[destType] ?? MATERIALS_DIR);
   },
@@ -107,6 +114,14 @@ router.post(
   "/groups/:id/materials/folders",
   communityController.createGroupFolder,
 );
+router.patch(
+  "/groups/:id/materials/folders/:folderId",
+  communityController.renameGroupFolder,
+);
+router.delete(
+  "/groups/:id/materials/folders/:folderId",
+  communityController.deleteGroupFolder,
+);
 router.post(
   "/groups/:id/materials",
   upload.single("file"),
@@ -123,16 +138,28 @@ router.delete("/groups/:id/announcements/:announcementId", communityController.d
 
 // Q&A Board
 router.get("/groups/:id/questions", communityController.getGroupQuestions);
-router.post("/groups/:id/questions", communityController.createGroupQuestion);
+router.post(
+  "/groups/:id/questions",
+  upload.single("file"),
+  communityController.createGroupQuestion,
+);
 router.patch("/groups/:id/questions/:questionId", communityController.updateGroupQuestionStatus);
 router.delete("/groups/:id/questions/:questionId", communityController.deleteGroupQuestion);
-router.post("/groups/:id/questions/:questionId/answers", communityController.createGroupAnswer);
+router.post(
+  "/groups/:id/questions/:questionId/answers",
+  upload.single("file"),
+  communityController.createGroupAnswer,
+);
+router.patch("/groups/:id/answers/:answerId/accept", communityController.acceptGroupAnswer);
 router.delete("/groups/:id/answers/:answerId", communityController.deleteGroupAnswer);
 
 // Meetings
 router.get("/groups/:id/meetings", communityController.getGroupMeetings);
 router.post("/groups/:id/meetings", communityController.createGroupMeeting);
 router.patch("/groups/:id/meetings/:meetingId/end", communityController.endGroupMeeting);
+
+// Chat uploads
+router.post("/groups/:id/chat/upload", upload.single("file"), communityController.uploadChatAttachment);
 
 
 // Feed / Posts

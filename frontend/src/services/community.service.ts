@@ -139,8 +139,12 @@ export const communityService = {
     return res.data.questions;
   },
 
-  createGroupQuestion: async (groupId: string, title: string, description: string, subject?: string, tags?: string, attachmentUrl?: string): Promise<any> => {
-    const res = await api.post(`/api/community/groups/${groupId}/questions`, { title, description, subject, tags, attachmentUrl });
+  createGroupQuestion: async (groupId: string, formData: FormData): Promise<any> => {
+    const res = await api.post(`/api/community/groups/${groupId}/questions`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return res.data.question;
   },
 
@@ -153,8 +157,12 @@ export const communityService = {
     await api.delete(`/api/community/groups/${groupId}/questions/${questionId}`);
   },
 
-  createGroupAnswer: async (groupId: string, questionId: string, content: string, attachmentUrl?: string): Promise<any> => {
-    const res = await api.post(`/api/community/groups/${groupId}/questions/${questionId}/answers`, { content, attachmentUrl });
+  createGroupAnswer: async (groupId: string, questionId: string, formData: FormData): Promise<any> => {
+    const res = await api.post(`/api/community/groups/${groupId}/questions/${questionId}/answers`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return res.data.answer;
   },
 
@@ -175,6 +183,29 @@ export const communityService = {
   endGroupMeeting: async (groupId: string, meetingId: string): Promise<any> => {
     const res = await api.patch(`/api/community/groups/${groupId}/meetings/${meetingId}/end`);
     return res.data.meeting;
+  },
+
+  renameGroupFolder: async (groupId: string, folderId: string, name: string): Promise<any> => {
+    const res = await api.patch(`/api/community/groups/${groupId}/materials/folders/${folderId}`, { name });
+    return res.data.folder;
+  },
+
+  deleteGroupFolder: async (groupId: string, folderId: string): Promise<void> => {
+    await api.delete(`/api/community/groups/${groupId}/materials/folders/${folderId}`);
+  },
+
+  acceptGroupAnswer: async (groupId: string, answerId: string, isAccepted: boolean): Promise<any> => {
+    const res = await api.patch(`/api/community/groups/${groupId}/answers/${answerId}/accept`, { isAccepted });
+    return res.data.answer;
+  },
+
+  uploadChatAttachment: async (groupId: string, formData: FormData): Promise<{ filePath: string; fileName: string; fileType: string; fileSize: number }> => {
+    const res = await api.post(`/api/community/groups/${groupId}/chat/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
   },
 };
 export default communityService;

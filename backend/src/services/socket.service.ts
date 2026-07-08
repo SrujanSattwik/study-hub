@@ -21,6 +21,28 @@ async function fetchRecentMessages(groupId: string) {
     ORDER BY gm.created_at ASC LIMIT 100
   `);
 
+  if (rows.length === 0) return [];
+
+  const messageIds = rows.map((r) => r.message_id);
+  const attachments = await prisma.$queryRaw<any[]>(Prisma.sql`
+    SELECT attachment_id, message_id, file_name, file_path, file_type, file_size
+    FROM message_attachments
+    WHERE message_id IN (${Prisma.join(messageIds)})
+  `);
+
+  const attachmentsMap = new Map<string, any[]>();
+  attachments.forEach((att) => {
+    if (!attachmentsMap.has(att.message_id)) {
+      attachmentsMap.set(att.message_id, []);
+    }
+    attachmentsMap.get(att.message_id)!.push({
+      fileName: att.file_name,
+      filePath: att.file_path,
+      fileType: att.file_type,
+      fileSize: att.file_size
+    });
+  });
+
   return rows.map((row) => ({
     messageId: row.message_id,
     groupId: row.group_id,
@@ -28,6 +50,7 @@ async function fetchRecentMessages(groupId: string) {
     authorName: row.author_name,
     content: row.content,
     parentId: row.parent_id,
+    attachments: attachmentsMap.get(row.message_id) || [],
     createdAt: row.created_at,
   }));
 }
@@ -174,8 +197,14 @@ export function initSocket(io: Server) {
         userId: string;
         content: string;
         parentId?: string;
+        attachment?: {
+          fileName: string;
+          filePath: string;
+          fileType: string;
+          fileSize: number;
+        };
       }) => {
-        if (!data?.groupId || !data?.userId || !data?.content) return;
+        if (!data?.groupId || !data?.userId) return;
 
         // Ensure sender matches authenticated user
         if (currentUserId && currentUserId !== data.userId) {
@@ -183,7 +212,7 @@ export function initSocket(io: Server) {
           return;
         }
 
-        const { groupId, userId, content, parentId } = data;
+        const { groupId, userId, content, parentId, attachment } = data;
         const messageId = uuidv4();
 
         try {
@@ -191,7 +220,7 @@ export function initSocket(io: Server) {
 
           const insertPromise = prisma.$executeRaw`
             INSERT INTO group_messages (message_id, group_id, user_id, content, parent_id)
-            VALUES (${messageId}, ${groupId}, ${userId}, ${content}, ${parentId ?? null})
+            VALUES (${messageId}, ${groupId}, ${userId}, ${content || ""}, ${parentId ?? null})
           `;
 
           if (!authorName) {
@@ -208,6 +237,14 @@ export function initSocket(io: Server) {
             await insertPromise;
           }
 
+          if (attachment) {
+            const attachmentId = uuidv4();
+            await prisma.$executeRaw`
+              INSERT INTO message_attachments (attachment_id, message_id, file_name, file_path, file_type, file_size)
+              VALUES (${attachmentId}, ${messageId}, ${attachment.fileName}, ${attachment.filePath}, ${attachment.fileType}, ${attachment.fileSize})
+            `;
+          }
+
           io.to(`group_${groupId}`).emit("newGroupMessage", {
             messageId,
             groupId,
@@ -215,6 +252,7 @@ export function initSocket(io: Server) {
             authorName,
             content,
             parentId: parentId ?? null,
+            attachments: attachment ? [attachment] : [],
             createdAt: new Date().toISOString(),
           });
         } catch (err: any) {
@@ -228,7 +266,7 @@ export function initSocket(io: Server) {
 
     socket.on(
       "typing",
-      (data: { groupId: string; userId: string; isTyping: boolean }) => {
+      (data: { groupId: string; userId: string; userName?: string; isTyping: boolean }) => {
         if (data?.groupId && data?.userId) {
           socket.to(`group_${data.groupId}`).emit("userTyping", data);
         }

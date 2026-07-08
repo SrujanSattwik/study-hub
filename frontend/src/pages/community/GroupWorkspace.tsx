@@ -11,6 +11,7 @@ import Loader from '../../components/ui/Loader';
 import Input from '../../components/ui/Input';
 import Modal from '../../components/ui/Modal';
 import Toast from '../../components/ui/Toast';
+import { API_URL } from '../../services/api';
 
 interface GroupWorkspaceProps {
   groupId: string;
@@ -53,19 +54,61 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
   const [qSubject, setQSubject] = useState('');
   const [qTags, setQTags] = useState('');
   const [qAttachment, setQAttachment] = useState('');
+  const [questionFile, setQuestionFile] = useState<File | null>(null);
 
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [answerContent, setAnswerContent] = useState('');
   const [answerAttachment, setAnswerAttachment] = useState('');
+  const [answerFile, setAnswerFile] = useState<File | null>(null);
 
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [meetingTitle, setMeetingTitle] = useState('');
+
+  // Materials folder explorer state
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [breadcrumbs, setBreadcrumbs] = useState<{ id: string | null; name: string }[]>([{ id: null, name: 'Root' }]);
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [folderFormName, setFolderFormName] = useState('');
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadDesc, setUploadDesc] = useState('');
+  const [uploadTags, setUploadTags] = useState('');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+
+  // Helper helper to format attachment links
+  const getAttachmentLink = (url: string) => {
+    if (!url) return '';
+    return url.startsWith('/') ? `${API_URL}${url}` : url;
+  };
 
   // 1. Fetch group workspace details (Real-time logs, folder, members)
   const { data: workspaceData, isLoading: isWorkspaceLoading } = useQuery({
     queryKey: ['workspace', groupId],
     queryFn: () => communityService.getGroupWorkspace(groupId),
   });
+
+  // 1b. Fetch materials explorer (folders & files) based on currentFolderId
+  const { data: materialsData, isLoading: isMaterialsLoading } = useQuery({
+    queryKey: ['materials', groupId, currentFolderId],
+    queryFn: () => communityService.getGroupMaterials(groupId, currentFolderId),
+  });
+
+  const foldersList = materialsData?.folders || [];
+  const filesList = materialsData?.files || [];
+
+  const handleOpenFolder = (folderId: string, folderName: string) => {
+    setCurrentFolderId(folderId);
+    setBreadcrumbs((prev) => [...prev, { id: folderId, name: folderName }]);
+  };
+
+  const handleNavigateBreadcrumb = (index: number) => {
+    const nextBreadcrumbs = breadcrumbs.slice(0, index + 1);
+    const target = nextBreadcrumbs[nextBreadcrumbs.length - 1];
+    setBreadcrumbs(nextBreadcrumbs);
+    setCurrentFolderId(target.id);
+  };
 
   // 2. Fetch Announcements
   const { data: announcements = [], refetch: refetchAnnouncements } = useQuery({
@@ -104,6 +147,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
     socket.on('announcementUpdated', handleAnnouncement);
     socket.on('announcementDeleted', handleAnnouncement);
     socket.on('materialUploaded', handleMaterial);
+    socket.on('materialUpdated', handleMaterial);
     socket.on('materialDeleted', handleMaterial);
     socket.on('questionCreated', handleQuestion);
     socket.on('questionUpdated', handleQuestion);
@@ -118,6 +162,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
       socket.off('announcementUpdated', handleAnnouncement);
       socket.off('announcementDeleted', handleAnnouncement);
       socket.off('materialUploaded', handleMaterial);
+      socket.off('materialUpdated', handleMaterial);
       socket.off('materialDeleted', handleMaterial);
       socket.off('questionCreated', handleQuestion);
       socket.off('questionUpdated', handleQuestion);
@@ -171,13 +216,61 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
       communityService.deleteGroupMaterial(groupId, materialId),
     onSuccess: () => {
       setToastMessage('Resource deleted!');
+      queryClient.invalidateQueries({ queryKey: ['materials', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['workspace', groupId] });
+    },
+  });
+
+  const createFolderMutation = useMutation({
+    mutationFn: (data: { name: string; parentId: string | null }) =>
+      communityService.createGroupFolder(groupId, data.name, data.parentId),
+    onSuccess: () => {
+      setToastMessage('Folder created!');
+      setIsFolderModalOpen(false);
+      setFolderFormName('');
+      queryClient.invalidateQueries({ queryKey: ['materials', groupId] });
+    },
+  });
+
+  const renameFolderMutation = useMutation({
+    mutationFn: (data: { folderId: string; name: string }) =>
+      communityService.renameGroupFolder(groupId, data.folderId, data.name),
+    onSuccess: () => {
+      setToastMessage('Folder renamed!');
+      setIsFolderModalOpen(false);
+      setFolderFormName('');
+      setEditingFolderId(null);
+      queryClient.invalidateQueries({ queryKey: ['materials', groupId] });
+    },
+  });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: (folderId: string) =>
+      communityService.deleteGroupFolder(groupId, folderId),
+    onSuccess: () => {
+      setToastMessage('Folder deleted!');
+      queryClient.invalidateQueries({ queryKey: ['materials', groupId] });
+    },
+  });
+
+  const uploadMaterialMutation = useMutation({
+    mutationFn: (formData: FormData) =>
+      communityService.uploadGroupMaterial(groupId, formData),
+    onSuccess: () => {
+      setToastMessage('Resource uploaded successfully!');
+      setIsUploadModalOpen(false);
+      setUploadTitle('');
+      setUploadDesc('');
+      setUploadTags('');
+      setUploadFile(null);
+      queryClient.invalidateQueries({ queryKey: ['materials', groupId] });
       queryClient.invalidateQueries({ queryKey: ['workspace', groupId] });
     },
   });
 
   const createQuestionMutation = useMutation({
-    mutationFn: (data: { title: string; description: string; subject?: string; tags?: string; attachmentUrl?: string }) =>
-      communityService.createGroupQuestion(groupId, data.title, data.description, data.subject, data.tags, data.attachmentUrl),
+    mutationFn: (formData: FormData) =>
+      communityService.createGroupQuestion(groupId, formData),
     onSuccess: () => {
       setToastMessage('Question posted!');
       setIsQuestionModalOpen(false);
@@ -186,6 +279,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
       setQSubject('');
       setQTags('');
       setQAttachment('');
+      setQuestionFile(null);
       queryClient.invalidateQueries({ queryKey: ['questions', groupId] });
     },
   });
@@ -209,12 +303,13 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
   });
 
   const createAnswerMutation = useMutation({
-    mutationFn: (data: { questionId: string; content: string; attachmentUrl?: string }) =>
-      communityService.createGroupAnswer(groupId, data.questionId, data.content, data.attachmentUrl),
+    mutationFn: (data: { questionId: string; formData: FormData }) =>
+      communityService.createGroupAnswer(groupId, data.questionId, data.formData),
     onSuccess: () => {
       setToastMessage('Answer submitted!');
       setAnswerContent('');
       setAnswerAttachment('');
+      setAnswerFile(null);
       queryClient.invalidateQueries({ queryKey: ['questions', groupId] });
     },
   });
@@ -224,6 +319,15 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
       communityService.deleteGroupAnswer(groupId, answerId),
     onSuccess: () => {
       setToastMessage('Answer deleted!');
+      queryClient.invalidateQueries({ queryKey: ['questions', groupId] });
+    },
+  });
+
+  const acceptAnswerMutation = useMutation({
+    mutationFn: (data: { answerId: string; isAccepted: boolean }) =>
+      communityService.acceptGroupAnswer(groupId, data.answerId, data.isAccepted),
+    onSuccess: () => {
+      setToastMessage('Answer solution status updated!');
       queryClient.invalidateQueries({ queryKey: ['questions', groupId] });
     },
   });
@@ -278,24 +382,27 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
     e.preventDefault();
     if (!qTitle.trim() || !qDesc.trim()) return;
 
-    createQuestionMutation.mutate({
-      title: qTitle,
-      description: qDesc,
-      subject: qSubject,
-      tags: qTags,
-      attachmentUrl: qAttachment,
-    });
+    const formData = new FormData();
+    formData.append('title', qTitle);
+    formData.append('description', qDesc);
+    if (qSubject) formData.append('subject', qSubject);
+    if (qTags) formData.append('tags', qTags);
+    if (qAttachment) formData.append('attachmentUrl', qAttachment);
+    if (questionFile) formData.append('file', questionFile);
+
+    createQuestionMutation.mutate(formData);
   };
 
   const handleAnswerSubmit = (e: React.FormEvent, questionId: string) => {
     e.preventDefault();
     if (!answerContent.trim()) return;
 
-    createAnswerMutation.mutate({
-      questionId,
-      content: answerContent,
-      attachmentUrl: answerAttachment,
-    });
+    const formData = new FormData();
+    formData.append('content', answerContent);
+    if (answerAttachment) formData.append('attachmentUrl', answerAttachment);
+    if (answerFile) formData.append('file', answerFile);
+
+    createAnswerMutation.mutate({ questionId, formData });
   };
 
   const handleMeetingSubmit = (e: React.FormEvent) => {
@@ -308,7 +415,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
     try {
       await communityService.trackGroupMaterialDownload(groupId, materialId);
       queryClient.invalidateQueries({ queryKey: ['workspace', groupId] });
-      window.open(`http://localhost:3001${filePath}`, '_blank');
+      window.open(`${API_URL}${filePath}`, '_blank');
     } catch {
       setToastMessage('Failed to download material');
     }
@@ -606,49 +713,106 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
             <h3 className="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Shared Materials</h3>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" onClick={() => {
-                const folderName = window.prompt('Enter folder name:');
-                if (folderName) communityService.createGroupFolder(groupId, folderName);
+                setEditingFolderId(null);
+                setFolderFormName('');
+                setIsFolderModalOpen(true);
               }}>
                 Create Folder
               </Button>
               <Button variant="primary" size="sm" onClick={() => {
-                const title = window.prompt('Enter resource title:');
-                if (!title) return;
-                const desc = window.prompt('Enter short description (optional):') || '';
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.onchange = (e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (!file) return;
-                  const formData = new FormData();
-                  formData.append('title', title);
-                  formData.append('description', desc);
-                  formData.append('file', file);
-                  communityService.uploadGroupMaterial(groupId, formData)
-                    .then(() => {
-                      setToastMessage('Resource uploaded successfully!');
-                      queryClient.invalidateQueries({ queryKey: ['workspace', groupId] });
-                    })
-                    .catch(() => setToastMessage('Upload failed'));
-                };
-                input.click();
+                setUploadTitle('');
+                setUploadDesc('');
+                setUploadTags('');
+                setUploadFile(null);
+                setIsUploadModalOpen(true);
               }}>
                 Upload File
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {files.length > 0 ? (
-              files.map((f: any) => {
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-2 text-xs text-slate-500 font-bold mb-4 bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl select-none">
+            {breadcrumbs.map((bc, idx) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && <span className="text-slate-350 font-normal">/</span>}
+                <button
+                  onClick={() => handleNavigateBreadcrumb(idx)}
+                  className={`hover:text-indigo-600 transition-colors uppercase tracking-wider ${
+                    idx === breadcrumbs.length - 1 ? 'text-slate-800 font-extrabold cursor-default' : ''
+                  }`}
+                  disabled={idx === breadcrumbs.length - 1}
+                >
+                  {bc.name}
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+
+          {isMaterialsLoading ? (
+            <div className="py-12 flex justify-center">
+              <Loader size="sm" label="Loading folder contents..." />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {/* Folders */}
+              {foldersList.map((folder: any) => (
+                <Card
+                  key={folder.category_id}
+                  className="flex flex-col justify-between border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-md cursor-pointer transition-all duration-200 bg-white rounded-2xl min-h-[140px]"
+                  onClick={() => handleOpenFolder(folder.category_id, folder.name)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="h-10 w-10 rounded-xl bg-purple-50 text-purple-650 border border-purple-100 flex items-center justify-center shrink-0">
+                      <i className="fas fa-folder text-lg" />
+                    </div>
+                    {isAdminOrOwner && (
+                      <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => {
+                            setEditingFolderId(folder.category_id);
+                            setFolderFormName(folder.name);
+                            setIsFolderModalOpen(true);
+                          }}
+                          className="p-1 hover:bg-slate-100 text-gray-400 hover:text-indigo-650 rounded"
+                        >
+                          <i className="fas fa-edit text-xs" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Delete folder? Files inside will be moved to Root.')) {
+                              deleteFolderMutation.mutate(folder.category_id);
+                            }
+                          }}
+                          className="p-1 hover:bg-rose-50 text-gray-400 hover:text-rose-600 rounded"
+                        >
+                          <i className="fas fa-trash text-xs" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3">
+                    <h4 className="text-sm font-extrabold text-slate-800 truncate" title={folder.name}>
+                      {folder.name}
+                    </h4>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-1">Directory Folder</span>
+                  </div>
+                </Card>
+              ))}
+
+              {/* Files */}
+              {filesList.map((f: any) => {
                 const isUploader = f.uploadedBy === user?.user_id;
                 const canDelete = isUploader || isAdminOrOwner;
                 return (
-                  <Card key={f.material_id} className="flex flex-col justify-between h-48 border border-slate-200 p-5 hover:border-indigo-300">
+                  <Card
+                    key={f.material_id}
+                    className="flex flex-col justify-between border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-white rounded-2xl min-h-[180px]"
+                  >
                     <div className="space-y-3">
                       <div className="flex justify-between items-start">
-                        <div className="h-8 w-8 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                          <i className="fas fa-file-alt text-sm" />
+                        <div className="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                          <i className="fas fa-file-alt text-base" />
                         </div>
                         {canDelete && (
                           <button
@@ -664,33 +828,39 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
                         )}
                       </div>
                       <div>
-                        <h4 className="text-xs font-extrabold text-gray-900 leading-none truncate">{f.title}</h4>
-                        <p className="text-[11px] text-gray-400 mt-1.5 leading-snug line-clamp-2">{f.description || 'No description'}</p>
+                        <h4 className="text-sm font-extrabold text-slate-900 leading-none truncate" title={f.title}>
+                          {f.title}
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-1.5 leading-snug line-clamp-2 min-h-[32px]">
+                          {f.description || 'No description provided.'}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 mt-3">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-3">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
                         {f.downloadCount ?? 0} DLs
                       </span>
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => handleDownloadTrack(f.material_id, f.file_path)}
-                        className="py-1 px-3 text-[11px] h-7"
+                        className="py-1.5 px-4 text-xs font-bold transition-all duration-200 h-9"
                       >
                         Download
                       </Button>
                     </div>
                   </Card>
                 );
-              })
-            ) : (
-              <div className="col-span-full text-center py-12 bg-white border border-slate-200 rounded-2xl">
-                <i className="fas fa-folder-open text-3xl text-gray-300 mb-3" />
-                <p className="text-xs font-semibold text-gray-500">Share the first study material.</p>
-              </div>
-            )}
-          </div>
+              })}
+
+              {foldersList.length === 0 && filesList.length === 0 && (
+                <div className="col-span-full text-center py-12 bg-white border border-slate-200 rounded-2xl">
+                  <i className="fas fa-folder-open text-3xl text-gray-300 mb-3" />
+                  <p className="text-xs font-semibold text-gray-500">This folder is empty.</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -752,11 +922,11 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
                         
                         {q.attachmentUrl && (
                           <a
-                            href={q.attachmentUrl}
+                            href={getAttachmentLink(q.attachmentUrl)}
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full hover:underline uppercase tracking-wider"
+                            className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full hover:underline uppercase tracking-wider mt-2"
                           >
                             <i className="fas fa-paperclip text-[10px]" /> View Attachment
                           </a>
@@ -784,6 +954,8 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
                 const q = questions.find((x: any) => x.id === selectedQuestionId);
                 if (!q) return null;
                 const canToggleSolved = q.userId === user?.user_id || isAdminOrOwner;
+                const isQuestionAuthor = q.userId === user?.user_id;
+                const canAcceptAns = isQuestionAuthor || isAdminOrOwner;
 
                 return (
                   <div className="space-y-4 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
@@ -806,31 +978,57 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
                         q.answers.map((ans: any) => {
                           const canDeleteAns = ans.userId === user?.user_id || isAdminOrOwner;
                           return (
-                            <div key={ans.id} className="pt-3 first:pt-0 space-y-1">
+                            <div
+                              key={ans.id}
+                              className={`pt-3 first:pt-0 space-y-1.5 p-3.5 rounded-xl border ${
+                                ans.isAccepted
+                                  ? 'border-emerald-300 bg-emerald-50/10 shadow-sm'
+                                  : 'border-transparent'
+                              }`}
+                            >
                               <div className="flex justify-between items-start">
-                                <span className="text-[10px] font-black text-indigo-600 leading-none">{ans.user?.fullName}</span>
-                                {canDeleteAns && (
-                                  <button
-                                    onClick={() => {
-                                      if (window.confirm('Delete answer?')) {
-                                        deleteAnswerMutation.mutate(ans.id);
-                                      }
-                                    }}
-                                    className="text-gray-400 hover:text-rose-600 text-[10px]"
-                                  >
-                                    <i className="fas fa-trash" />
-                                  </button>
-                                )}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-black text-indigo-650 leading-none">{ans.user?.fullName}</span>
+                                  {ans.isAccepted && (
+                                    <span className="inline-flex items-center gap-1 text-[8px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full uppercase leading-none select-none">
+                                      <i className="fas fa-check-circle text-[9px]" /> Solution
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {canAcceptAns && (
+                                    <button
+                                      onClick={() => acceptAnswerMutation.mutate({ answerId: ans.id, isAccepted: !ans.isAccepted })}
+                                      className={`text-[9px] font-bold px-2 py-0.5 rounded-lg border transition-all ${
+                                        ans.isAccepted ? 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100' : 'bg-emerald-50 text-emerald-600 border-emerald-150 hover:bg-emerald-100'
+                                      }`}
+                                    >
+                                      {ans.isAccepted ? 'Revoke Accept' : 'Accept Solution'}
+                                    </button>
+                                  )}
+                                  {canDeleteAns && (
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm('Delete answer?')) {
+                                          deleteAnswerMutation.mutate(ans.id);
+                                        }
+                                      }}
+                                      className="text-gray-400 hover:text-rose-600 p-0.5 rounded text-[10px]"
+                                    >
+                                      <i className="fas fa-trash" />
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                              <p className="text-xs text-gray-600 leading-relaxed mt-1">{ans.content}</p>
+                              <p className="text-xs text-gray-750 leading-relaxed font-medium">{ans.content}</p>
                               {ans.attachmentUrl && (
                                 <a
-                                  href={ans.attachmentUrl}
+                                  href={getAttachmentLink(ans.attachmentUrl)}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-1 text-[9px] font-extrabold text-indigo-500 hover:underline mt-1"
+                                  className="inline-flex items-center gap-1 text-[9px] font-extrabold text-indigo-500 hover:underline mt-1 bg-indigo-50/50 border border-indigo-100/50 px-2 py-0.5 rounded-full uppercase tracking-wider"
                                 >
-                                  <i className="fas fa-paperclip text-[8px]" /> attachment
+                                  <i className="fas fa-paperclip text-[8px]" /> Attachment file
                                 </a>
                               )}
                               <span className="text-[9px] text-gray-400 block mt-1">
@@ -853,12 +1051,37 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
                         placeholder="Write your answer..."
                         required
                       />
-                      <Input
-                        id="ans-attachment"
-                        value={answerAttachment}
-                        onChange={(e) => setAnswerAttachment(e.target.value)}
-                        placeholder="Attachment URL (Optional)"
-                      />
+                      <div className="flex gap-2 items-end">
+                        <Input
+                          id="ans-attachment"
+                          value={answerAttachment}
+                          onChange={(e) => setAnswerAttachment(e.target.value)}
+                          placeholder="Attachment URL (Optional)"
+                          className="flex-1"
+                        />
+                        <div className="flex flex-col shrink-0">
+                          <input
+                            type="file"
+                            id="ans-file"
+                            onChange={(e) => setAnswerFile(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          <label
+                            htmlFor="ans-file"
+                            className={`px-3 py-2 text-xs font-bold border rounded-xl cursor-pointer select-none transition-colors h-[42px] flex items-center justify-center gap-1.5 ${
+                              answerFile ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-extrabold' : 'bg-white border-gray-250 text-gray-600 hover:bg-slate-50'
+                            }`}
+                          >
+                            <i className="fas fa-paperclip text-[10px]" />
+                            {answerFile ? 'Attached' : 'Attach File'}
+                          </label>
+                        </div>
+                      </div>
+                      {answerFile && (
+                        <div className="text-[10px] text-indigo-650 font-bold pl-1.5">
+                          Selected File: {answerFile.name} ({(answerFile.size / (1024 * 1024)).toFixed(2)} MB)
+                        </div>
+                      )}
                       <Button variant="primary" size="sm" type="submit" className="w-full" isLoading={createAnswerMutation.isPending}>
                         Submit Answer
                       </Button>
@@ -878,6 +1101,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
       {/* CHAT PANEL */}
       {activeTab === 'chat' && (
         <GroupChat
+          groupId={groupId}
           messages={messages}
           typingUsers={typingUsers}
           sendMessage={sendMessage}
@@ -932,7 +1156,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
                         variant="secondary"
                         onClick={() => {
                           if (window.confirm('End this meeting?')) {
-                            endMeetingMutation.mutate(activeMeeting.meeting_id);
+                            endMeetingMutation.mutate(activeMeeting.id);
                           }
                         }}
                         isLoading={endMeetingMutation.isPending}
@@ -955,7 +1179,7 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
               <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto pr-1">
                 {meetings.length > 0 ? (
                   meetings.map((m: any) => (
-                    <div key={m.meeting_id} className="py-3 flex items-center justify-between gap-3 text-xs">
+                    <div key={m.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                       <div>
                         <p className="font-bold text-gray-900 leading-none">{m.title}</p>
                         <span className="text-[10px] text-gray-400 mt-1 block">
@@ -1091,13 +1315,38 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
               placeholder="e.g. calculus, integration"
             />
           </div>
-          <Input
-            id="q-attachment"
-            label="Attachment URL (Optional)"
-            value={qAttachment}
-            onChange={(e) => setQAttachment(e.target.value)}
-            placeholder="https://drive.google.com/attachment-link"
-          />
+          <div className="flex gap-2 items-end">
+            <Input
+              id="q-attachment"
+              label="Attachment URL (Optional)"
+              value={qAttachment}
+              onChange={(e) => setQAttachment(e.target.value)}
+              placeholder="https://drive.google.com/attachment-link"
+              className="flex-1"
+            />
+            <div className="flex flex-col shrink-0">
+              <input
+                type="file"
+                id="question-file-upload"
+                onChange={(e) => setQuestionFile(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+              <label
+                htmlFor="question-file-upload"
+                className={`px-3 py-2 text-xs font-bold border rounded-xl cursor-pointer select-none transition-colors h-[42px] flex items-center justify-center gap-1.5 ${
+                  questionFile ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-extrabold' : 'bg-white border-gray-250 text-gray-600 hover:bg-slate-50'
+                }`}
+              >
+                <i className="fas fa-paperclip text-[10px]" />
+                {questionFile ? 'Attached' : 'Attach File'}
+              </label>
+            </div>
+          </div>
+          {questionFile && (
+            <div className="text-[10px] text-indigo-650 font-bold pl-1.5">
+              Selected File: {questionFile.name} ({(questionFile.size / (1024 * 1024)).toFixed(2)} MB)
+            </div>
+          )}
         </form>
       </Modal>
 
@@ -1130,6 +1379,147 @@ export const GroupWorkspace: React.FC<GroupWorkspaceProps> = ({ groupId, onBack 
             placeholder="e.g. Math Revision & Homework Help"
             required
           />
+        </form>
+      </Modal>
+
+      {/* FOLDER MODAL */}
+      <Modal
+        isOpen={isFolderModalOpen}
+        onClose={() => setIsFolderModalOpen(false)}
+        title={editingFolderId ? 'Rename Folder' : 'Create Folder'}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsFolderModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (!folderFormName.trim()) return;
+                if (editingFolderId) {
+                  renameFolderMutation.mutate({ folderId: editingFolderId, name: folderFormName });
+                } else {
+                  createFolderMutation.mutate({ name: folderFormName, parentId: currentFolderId });
+                }
+              }}
+              isLoading={createFolderMutation.isPending || renameFolderMutation.isPending}
+            >
+              Save
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <Input
+            id="folder-name"
+            label="Folder Name"
+            value={folderFormName}
+            onChange={(e) => setFolderFormName(e.target.value)}
+            placeholder="e.g. Lecture Notes"
+            required
+          />
+        </div>
+      </Modal>
+
+      {/* UPLOAD FILE MODAL */}
+      <Modal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        title="Upload Material"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsUploadModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (!uploadTitle.trim() || !uploadFile) return;
+                const formData = new FormData();
+                formData.append('title', uploadTitle);
+                formData.append('description', uploadDesc);
+                formData.append('tags', uploadTags);
+                if (currentFolderId) {
+                  formData.append('categoryId', currentFolderId);
+                }
+                formData.append('file', uploadFile);
+                uploadMaterialMutation.mutate(formData);
+              }}
+              isLoading={uploadMaterialMutation.isPending}
+              disabled={!uploadTitle.trim() || !uploadFile}
+            >
+              Upload
+            </Button>
+          </>
+        }
+      >
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <Input
+            id="upload-title"
+            label="Material Title"
+            value={uploadTitle}
+            onChange={(e) => setUploadTitle(e.target.value)}
+            placeholder="e.g. Calculus Cheat Sheet"
+            required
+          />
+          <div>
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
+              Description
+            </label>
+            <textarea
+              value={uploadDesc}
+              onChange={(e) => setUploadDesc(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-250 bg-white rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all duration-200 h-20"
+              placeholder="Provide a brief summary of the file contents..."
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              id="upload-tags"
+              label="Tags"
+              value={uploadTags}
+              onChange={(e) => setUploadTags(e.target.value)}
+              placeholder="e.g. math, exam, revision"
+            />
+            <div>
+              <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
+                Folder Destination
+              </label>
+              <select
+                disabled
+                className="w-full px-4 py-2.5 border border-gray-250 bg-slate-50 rounded-xl text-xs font-extrabold text-gray-500 uppercase tracking-wider h-[42px]"
+              >
+                <option>{breadcrumbs[breadcrumbs.length - 1]?.name || 'Root'}</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-2">
+              Attach File
+            </label>
+            <input
+              type="file"
+              id="material-file-upload"
+              onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+              className="hidden"
+            />
+            <label
+              htmlFor="material-file-upload"
+              className={`w-full p-6 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                uploadFile ? 'border-indigo-300 bg-indigo-50/10 text-indigo-750 font-semibold' : 'border-gray-250 hover:bg-slate-50 text-gray-500'
+              }`}
+            >
+              <i className={`fas ${uploadFile ? 'fa-file-alt text-indigo-650' : 'fa-cloud-upload-alt'} text-2xl mb-2`} />
+              <span className="text-xs font-bold text-center">
+                {uploadFile ? uploadFile.name : 'Select PDF, DOC, Image, or Video file'}
+              </span>
+              {uploadFile && (
+                <span className="text-[10px] text-gray-400 mt-1 font-semibold">
+                  ({(uploadFile.size / (1024 * 1024)).toFixed(2)} MB)
+                </span>
+              )}
+            </label>
+          </div>
         </form>
       </Modal>
 

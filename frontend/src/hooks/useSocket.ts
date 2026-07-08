@@ -8,7 +8,7 @@ export const useSocket = (groupId?: string) => {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<any[]>([]);
-  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
+  const [typingUsers, setTypingUsers] = useState<Record<string, string | boolean>>({});
   const [onlineMembers, setOnlineMembers] = useState<Record<string, { userName: string; status: string }>>({});
   const [raisedHands, setRaisedHands] = useState<Record<string, { userName: string; raised: boolean }>>({});
 
@@ -77,11 +77,11 @@ export const useSocket = (groupId?: string) => {
       }
     });
 
-    socket.on('userTyping', (data: { groupId: string; userId: string; isTyping: boolean }) => {
+    socket.on('userTyping', (data: { groupId: string; userId: string; userName?: string; isTyping: boolean }) => {
       if (data.groupId === groupId) {
         setTypingUsers((prev) => ({
           ...prev,
-          [data.userId]: data.isTyping,
+          [data.userId]: data.isTyping ? (data.userName || 'Someone') : false,
         }));
       }
     });
@@ -103,7 +103,7 @@ export const useSocket = (groupId?: string) => {
   }, [groupId, user, isConnected]);
 
   // 3. Emitter Functions
-  const sendMessage = useCallback((content: string, parentId: string | null = null) => {
+  const sendMessage = useCallback((content: string, parentId: string | null = null, attachment: { fileName: string; filePath: string; fileType: string; fileSize: number } | null = null) => {
     const socket = socketRef.current;
     if (socket && groupId && user) {
       socket.emit('sendGroupMessage', {
@@ -111,6 +111,7 @@ export const useSocket = (groupId?: string) => {
         userId: user.user_id,
         content,
         parentId,
+        attachment: attachment || undefined,
       });
     }
   }, [groupId, user]);
@@ -121,6 +122,7 @@ export const useSocket = (groupId?: string) => {
       socket.emit('typing', {
         groupId,
         userId: user.user_id,
+        userName: user.full_name,
         isTyping,
       });
     }

@@ -1,15 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/ui/Button';
+import communityService from '../../services/community.service';
+import { API_URL } from '../../services/api';
 
 interface GroupChatProps {
+  groupId: string;
   messages: any[];
-  typingUsers: Record<string, boolean>;
-  sendMessage: (content: string, parentId?: string | null) => void;
+  typingUsers: Record<string, any>;
+  sendMessage: (content: string, parentId?: string | null, attachment?: { fileName: string; filePath: string; fileType: string; fileSize: number } | null) => void;
   sendTyping: (isTyping: boolean) => void;
 }
 
 export const GroupChat: React.FC<GroupChatProps> = ({
+  groupId,
   messages,
   typingUsers,
   sendMessage,
@@ -18,6 +22,8 @@ export const GroupChat: React.FC<GroupChatProps> = ({
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [replyTo, setReplyTo] = useState<any | null>(null);
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const typingTimer = useRef<any>(null);
 
@@ -41,20 +47,43 @@ export const GroupChat: React.FC<GroupChatProps> = ({
     }, 2000);
   };
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() && !attachedFile) return;
 
-    sendMessage(content.trim(), replyTo?.messageId || null);
+    let attachmentPayload = null;
+
+    if (attachedFile) {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', attachedFile);
+        const uploadRes = await communityService.uploadChatAttachment(groupId, formData);
+        attachmentPayload = {
+          fileName: uploadRes.fileName,
+          filePath: uploadRes.filePath,
+          fileType: uploadRes.fileType,
+          fileSize: uploadRes.fileSize,
+        };
+      } catch (err) {
+        alert('File upload failed. Please try again.');
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
+    sendMessage(content.trim(), replyTo?.messageId || null, attachmentPayload);
     setContent('');
     setReplyTo(null);
+    setAttachedFile(null);
     sendTyping(false);
   };
 
   // Extract other members typing list
   const activeTyping = Object.entries(typingUsers)
-    .filter(([uId, isTyping]) => uId !== user?.user_id && isTyping)
-    .map(([_, isTyping]) => 'Someone'); // we can show "Someone" or fetch names
+    .filter(([uId, typingState]) => uId !== user?.user_id && typingState)
+    .map(([_, typingState]) => typeof typingState === 'string' ? typingState : 'Someone');
 
   return (
     <div className="flex flex-col h-[500px] border border-gray-200 rounded-2xl bg-white overflow-hidden shadow-sm">
@@ -62,9 +91,22 @@ export const GroupChat: React.FC<GroupChatProps> = ({
       {replyTo && (
         <div className="bg-indigo-50 border-b border-indigo-100 px-4 py-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-indigo-700 truncate">
-            Replying to {replyTo.authorName}: "{replyTo.content}"
+            Replying to {replyTo.authorName}: "{replyTo.content || 'Attachment'}"
           </span>
           <button onClick={() => setReplyTo(null)} className="text-indigo-400 hover:text-indigo-600">
+            <i className="fas fa-times text-xs" />
+          </button>
+        </div>
+      )}
+
+      {/* Attached File Banner */}
+      {attachedFile && (
+        <div className="bg-emerald-50 border-b border-emerald-100 px-4 py-2 flex items-center justify-between">
+          <span className="text-xs font-semibold text-emerald-700 truncate flex items-center gap-1.5">
+            <i className="fas fa-paperclip text-[10px]" />
+            File attached: {attachedFile.name} ({(attachedFile.size / 1024).toFixed(0)} KB)
+          </span>
+          <button onClick={() => setAttachedFile(null)} className="text-emerald-400 hover:text-emerald-600">
             <i className="fas fa-times text-xs" />
           </button>
         </div>
@@ -79,7 +121,7 @@ export const GroupChat: React.FC<GroupChatProps> = ({
               <div
                 className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm shadow-sm relative group ${
                   isMe
-                    ? 'bg-indigo-600 text-white rounded-br-none'
+                    ? 'bg-indigo-650 text-white rounded-br-none'
                     : 'bg-white border border-gray-150 text-gray-800 rounded-bl-none'
                 }`}
               >
@@ -96,7 +138,48 @@ export const GroupChat: React.FC<GroupChatProps> = ({
                   </div>
                 )}
                 
-                <p className="leading-relaxed break-words">{msg.content}</p>
+                {msg.content && <p className="leading-relaxed break-words">{msg.content}</p>}
+
+                {/* Attachments rendering */}
+                {msg.attachments && msg.attachments.length > 0 && (
+                  <div className="mt-2 space-y-1.5 max-w-sm">
+                    {msg.attachments.map((att: any, idx: number) => {
+                      const isImg = ['png', 'jpg', 'jpeg', 'gif'].includes(att.fileType.toLowerCase());
+                      const attUrl = att.filePath.startsWith('/') ? `${API_URL}${att.filePath}` : att.filePath;
+                      return (
+                        <div key={idx} className="mt-1">
+                          {isImg ? (
+                            <img
+                              src={attUrl}
+                              alt={att.fileName}
+                              onClick={() => window.open(attUrl, '_blank')}
+                              className="max-h-48 rounded-xl object-cover border border-white/20 shadow-inner cursor-pointer"
+                            />
+                          ) : (
+                            <a
+                              href={attUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className={`flex items-center gap-2 p-2 rounded-xl text-xs font-bold border transition-colors select-none ${
+                                isMe
+                                  ? 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+                                  : 'bg-slate-50 hover:bg-slate-100 border-gray-200 text-indigo-700'
+                              }`}
+                            >
+                              <i className="fas fa-file-download text-sm" />
+                              <div className="truncate flex-1">
+                                <p className="truncate leading-none">{att.fileName}</p>
+                                <span className="text-[9px] opacity-75">
+                                  ({(att.fileSize / 1024).toFixed(0)} KB)
+                                </span>
+                              </div>
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* Reply quick icon */}
                 <button
@@ -121,21 +204,42 @@ export const GroupChat: React.FC<GroupChatProps> = ({
       {/* Typing Indicators */}
       {activeTyping.length > 0 && (
         <div className="px-4 py-1.5 bg-white text-[10px] italic text-gray-400 font-bold">
-          {activeTyping.join(', ')} is typing...
+          {activeTyping.join(', ')} {activeTyping.length === 1 ? 'is' : 'are'} typing...
         </div>
       )}
 
       {/* Input Form */}
-      <form onSubmit={handleSend} className="border-t border-gray-150 p-4 bg-white flex gap-3">
+      <form onSubmit={handleSend} className="border-t border-gray-150 p-4 bg-white flex gap-2.5 items-center">
+        <input
+          type="file"
+          id="chat-file-input"
+          onChange={(e) => setAttachedFile(e.target.files?.[0] || null)}
+          className="hidden"
+        />
+        <label
+          htmlFor="chat-file-input"
+          className="p-2 border border-gray-250 hover:bg-slate-50 text-gray-500 rounded-xl cursor-pointer select-none transition-colors h-[38px] w-[38px] flex items-center justify-center shrink-0"
+          title="Attach file"
+        >
+          <i className="fas fa-paperclip text-xs" />
+        </label>
+        
         <input
           type="text"
           value={content}
           onChange={handleInputChange}
           placeholder={replyTo ? "Type your reply..." : "Send a message..."}
-          className="flex-1 px-4 py-2 border border-gray-250 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 px-4 py-2 border border-gray-250 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-[38px]"
         />
-        <Button type="submit" variant="primary" size="sm" className="px-5">
-          <i className="fas fa-paper-plane" />
+        
+        <Button
+          type="submit"
+          variant="primary"
+          size="sm"
+          className="px-5 shrink-0 h-[38px]"
+          isLoading={isUploading}
+        >
+          <i className="fas fa-paper-plane text-xs" />
         </Button>
       </form>
     </div>

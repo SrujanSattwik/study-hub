@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import { communityService } from '../services/community.service';
 import {
   createGroupSchema,
@@ -340,6 +341,10 @@ export class CommunityController {
       if (!req.user || !req.user.user_id) throw new BadRequestError('User details missing');
       const { id: groupId } = req.params;
       const body = createQuestionSchema.parse(req.body);
+      let attachmentUrl = body.attachmentUrl;
+      if (req.file) {
+        attachmentUrl = `/uploads/community/qa/${req.file.filename}`;
+      }
       const question = await communityService.createGroupQuestion(
         req.user.user_id,
         groupId,
@@ -347,7 +352,7 @@ export class CommunityController {
         body.description,
         body.subject,
         body.tags,
-        body.attachmentUrl
+        attachmentUrl
       );
       res.json({ success: true, message: 'Question created successfully', question });
     } catch (err) {
@@ -388,12 +393,16 @@ export class CommunityController {
       if (!req.user || !req.user.user_id) throw new BadRequestError('User details missing');
       const { id: groupId, questionId } = req.params;
       const body = createAnswerSchema.parse(req.body);
+      let attachmentUrl = body.attachmentUrl;
+      if (req.file) {
+        attachmentUrl = `/uploads/community/qa/${req.file.filename}`;
+      }
       const answer = await communityService.createGroupAnswer(
         req.user.user_id,
         groupId,
         questionId,
         body.content,
-        body.attachmentUrl
+        attachmentUrl
       );
       res.json({ success: true, message: 'Answer added successfully', answer });
     } catch (err) {
@@ -460,6 +469,73 @@ export class CommunityController {
       const { id: groupId, materialId } = req.params;
       await communityService.trackGroupMaterialDownload(req.user.user_id, groupId, materialId);
       res.json({ success: true, message: 'Download tracked successfully' });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async renameGroupFolder(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user || !req.user.user_id) throw new BadRequestError('User details missing');
+      const { id: groupId, folderId } = req.params;
+      const body = createFolderSchema.parse(req.body);
+      const folder = await communityService.renameGroupFolder(
+        req.user.user_id,
+        groupId,
+        folderId,
+        body.name
+      );
+      res.json({ success: true, message: 'Folder renamed successfully', folder });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteGroupFolder(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user || !req.user.user_id) throw new BadRequestError('User details missing');
+      const { id: groupId, folderId } = req.params;
+      await communityService.deleteGroupFolder(req.user.user_id, groupId, folderId);
+      res.json({ success: true, message: 'Folder deleted successfully' });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async acceptGroupAnswer(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user || !req.user.user_id) throw new BadRequestError('User details missing');
+      const { id: groupId, answerId } = req.params;
+      const { isAccepted } = req.body;
+      const answer = await communityService.acceptGroupAnswer(
+        req.user.user_id,
+        groupId,
+        answerId,
+        isAccepted
+      );
+      res.json({ success: true, message: 'Answer acceptance status updated', answer });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async uploadChatAttachment(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user || !req.user.user_id) throw new BadRequestError('User details missing');
+      if (!req.file) throw new BadRequestError('No file uploaded');
+
+      const filePath = `/uploads/community/chat/${req.file.filename}`;
+      const fileName = req.file.originalname;
+      const fileType = path.extname(fileName).slice(1);
+      const fileSize = req.file.size;
+
+      res.json({
+        success: true,
+        filePath,
+        fileName,
+        fileType,
+        fileSize
+      });
     } catch (err) {
       next(err);
     }
