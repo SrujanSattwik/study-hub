@@ -203,3 +203,28 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
+
+/* Premium Card Border Glow Animations */
+@keyframes card-border-pulse {
+  0%, 100% {
+    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  }
+  50% {
+    border-color: rgba(124, 58, 237, 0.5);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.25), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.card-glow-active {
+  animation: card-border-pulse 4s infinite ease-in-out;
+}
+
+.hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+}
+

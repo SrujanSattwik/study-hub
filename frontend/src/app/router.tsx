@@ -13,6 +13,7 @@ import Register from '../pages/auth/Register';
 
 // Layout shells
 import DashboardLayout from '../layouts/DashboardLayout';
+import PublicLayout from '../layouts/PublicLayout';
 
 // Lazy loaded protected pages
 const Dashboard = React.lazy(() => import('../pages/dashboard/Dashboard'));
@@ -35,8 +36,10 @@ export const AppRouter: React.FC = () => {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Route>
         
         {/* Guest Routes (Unauthenticated only) */}
         <Route path="/login" element={<Login />} />

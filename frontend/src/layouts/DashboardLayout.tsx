@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import InternalFooter from '../components/shared/InternalFooter';
 
 export const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -329,11 +330,15 @@ export const DashboardLayout: React.FC = () => {
         </header>
 
         {/* Content Outlet (Occupies 100% of workspace width, removes max-width limits) */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="w-full h-full">
-            <Outlet />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col">
+          <div className="w-full flex-1 flex flex-col justify-between gap-8">
+            <div className="flex-1 flex flex-col">
+              <Outlet />
+            </div>
+            <InternalFooter />
           </div>
         </main>
+
       </div>
 
       {/* Global Command Palette */}

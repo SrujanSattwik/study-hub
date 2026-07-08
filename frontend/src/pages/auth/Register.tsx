@@ -5,6 +5,7 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Toast from '../../components/ui/Toast';
 import Modal from '../../components/ui/Modal';
+import InternalFooter from '../../components/shared/InternalFooter';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -95,8 +96,9 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white border border-gray-150 rounded-2xl p-8 shadow-sm space-y-6">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-between items-center p-4">
+      <div className="flex-1 flex items-center justify-center w-full">
+        <div className="w-full max-w-md bg-white border border-gray-150 rounded-2xl p-8 shadow-sm space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2 text-2xl font-extrabold text-indigo-600">
@@ -158,7 +160,10 @@ export const Register: React.FC = () => {
             Sign In
           </Link>
         </div>
+        </div>
       </div>
+      <InternalFooter variant="auth" />
+
 
       {/* Verification OTP Modal */}
       <Modal

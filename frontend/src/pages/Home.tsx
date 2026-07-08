@@ -7,46 +7,7 @@ export const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 text-xl font-extrabold text-indigo-600">
-            <i className="fas fa-graduation-cap text-2xl"></i>
-            <span>StudyClub</span>
-          </Link>
-          
-          <ul className="flex items-center gap-6">
-            <li>
-              <Link to="/about" className="text-gray-700 hover:text-indigo-600 font-semibold text-sm transition-colors">
-                About
-              </Link>
-            </li>
-            {isAuthenticated ? (
-              <li>
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-100"
-                >
-                  Dashboard
-                </button>
-              </li>
-            ) : (
-              <li>
-                <Link
-                  to="/login"
-                  className="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-100"
-                >
-                  Login
-                </Link>
-              </li>
-            )}
-          </ul>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="flex-1">
+    <div className="flex-1">
         {/* Hero Section */}
         <section className="py-20 px-6 bg-gradient-to-br from-indigo-50/40 to-purple-50/40">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -148,12 +109,6 @@ export const Home: React.FC = () => {
             </div>
           </div>
         </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} StudyClub. All rights reserved.</p>
-      </footer>
     </div>
   );
 };
