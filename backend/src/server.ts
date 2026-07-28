@@ -9,10 +9,11 @@ import rateLimit from "express-rate-limit";
 import path from "path";
 import { version } from "../package.json";
 
-import { config, getAllowedOrigins } from "./utils/config";
+import { config, getAllowedOrigins, logEnvStatus } from "./utils/config";
 import { logger } from "./utils/logger";
 import { testDbConnection } from "./database/client";
 import { initSocket } from "./services/socket.service";
+import { mailService } from "./services/mail.service";
 import { errorHandler } from "./middleware/error.middleware";
 import { perfLogger } from "./middleware/perf.middleware";
 
@@ -125,10 +126,12 @@ app.use("/api", aiRouter);
 
 app.get("/health", async (_req, res) => {
   const dbStatus = await testDbConnection();
+  const mailHealth = await mailService.checkHealth();
   const httpStatus = dbStatus.success ? 200 : 503;
   res.status(httpStatus).json({
     status: dbStatus.success ? "ok" : "degraded",
     database: dbStatus.success ? "connected" : "disconnected",
+    mailService: mailHealth,
     uptime: Math.floor(process.uptime()),
     version,
     env: config.NODE_ENV,
@@ -144,6 +147,7 @@ app.use(errorHandler);
 
 const startServer = async () => {
   const PORT = config.PORT;
+  logEnvStatus();
   server.listen(PORT, async () => {
     logger.info(
       `✅ StudyHub Backend running on port ${PORT} [${config.NODE_ENV}]`,
@@ -162,6 +166,8 @@ const startServer = async () => {
     } else {
       logger.error(`⚠️ DB connection failed: ${dbStatus.error}`);
     }
+
+    await mailService.verifyTransporter();
   });
 };
 

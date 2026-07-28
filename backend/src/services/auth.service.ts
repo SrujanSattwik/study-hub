@@ -79,8 +79,18 @@ export class AuthService {
       attempts: 0,
     });
 
-    const sent = await mailService.sendOTPEmail(email, otp);
-    if (!sent) throw new Error("Failed to dispatch verification email");
+    try {
+      const sent = await mailService.sendOTPEmail(email, otp);
+      if (!sent) {
+        throw new Error("Failed to dispatch verification email");
+      }
+    } catch (err: any) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`🔑 [DEV MODE OTP]: ${otp}`);
+        return;
+      }
+      throw err;
+    }
   }
 
   async verifyOtpAndCreateUser(
