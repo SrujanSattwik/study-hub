@@ -137,6 +137,53 @@ export interface UpdateNoteDTO {
   isFavorite?: boolean;
 }
 
+// ── Deck DTOs (Phase 8.2) ──
+export interface CreateDeckDTO {
+  userId: string;
+  title: string;
+  description?: string;
+  category?: string;
+  isFavorite?: boolean;
+}
+
+export interface UpdateDeckDTO {
+  title?: string;
+  description?: string;
+  category?: string;
+  isFavorite?: boolean;
+  isArchived?: boolean;
+}
+
+export interface DeckStats {
+  totalCards: number;
+  studiedCount: number;
+  masteredCount: number;
+  accuracyPct: number;
+  lastStudiedAt: string | null;
+}
+
+// ── Quiz DTOs (Phase 8.2) ──
+export type QuizQuestionType = 'mcq' | 'true_false' | 'fill_blank' | 'short_answer' | 'coding' | 'formula';
+
+export interface GenerateQuizDTO {
+  conversationId?: string;
+  noteId?: string;
+  documentId?: string;
+  topic?: string;
+  sourceType?: 'conversation' | 'note' | 'document' | 'custom' | 'flashcards';
+  difficulty?: 'easy' | 'medium' | 'hard';
+  numQuestions?: number;
+  questionTypes?: QuizQuestionType[];
+  timeLimitSec?: number;
+}
+
+export interface SubmitQuizAttemptDTO {
+  quizId: string;
+  userId: string;
+  timeTakenSec: number;
+  answers: Record<string, { userAnswer: string; isCorrect: boolean; explanation?: string }>;
+}
+
 // ─── AI Engine Types (Phase 3) ────────────────────────────────────────────────
 
 export interface AiEngineRequest {

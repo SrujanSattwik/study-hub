@@ -43,6 +43,7 @@ interface ConversationSidebarProps {
 
   onOpenFlashcards: () => void;
   onOpenNotes: () => void;
+  onOpenQuizzes: () => void;
   onOpenUsage: () => void;
 }
 
@@ -86,6 +87,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
   onOpenFlashcards,
   onOpenNotes,
+  onOpenQuizzes,
   onOpenUsage,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -497,27 +499,35 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       </div>
 
       {/* Footer Tools Drawer Triggers */}
-      <div className="p-3 border-t border-gray-700 bg-gray-900/50 flex items-center justify-between gap-1.5">
+      <div className="p-3 border-t border-gray-700 bg-gray-900/50 flex items-center justify-between gap-1">
         <button
           onClick={onOpenNotes}
-          className="flex-1 py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          className="flex-1 py-1.5 px-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
           title="AI Notes Workspace (Ctrl+Shift+N)"
         >
           <span>📝 Notes</span>
         </button>
 
         <button
+          onClick={onOpenQuizzes}
+          className="flex-1 py-1.5 px-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          title="AI Quizzes & Assessment (Ctrl+Shift+Q)"
+        >
+          <span className="text-rose-400">🎯</span>
+          <span>Quiz</span>
+        </button>
+
+        <button
           onClick={onOpenFlashcards}
-          className="flex-1 py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          className="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
           title="AI Flashcards"
         >
           <span className="text-amber-400">🎴</span>
-          <span>Cards</span>
         </button>
 
         <button
           onClick={onOpenUsage}
-          className="py-1.5 px-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          className="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
           title="Usage Metrics"
         >
           <span className="text-emerald-400">📊</span>

@@ -10,11 +10,13 @@ import ChatInput from '../../components/knownook/ChatInput';
 import AttachmentPanel from '../../components/knownook/AttachmentPanel';
 import FlashcardDrawer from '../../components/knownook/FlashcardDrawer';
 import NotesDrawer from '../../components/knownook/NotesDrawer';
+import QuizWorkspaceModal from '../../components/knownook/QuizWorkspaceModal';
 import UsagePanel from '../../components/knownook/UsagePanel';
 import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
 import ToastNotification from '../../components/knownook/ToastNotification';
 import ConfirmDeleteModal from '../../components/knownook/ConfirmDeleteModal';
 import { useKnownookNotes } from '../../hooks/useKnownookNotes';
+import { useKnownookQuizzes } from '../../hooks/useKnownookQuizzes';
 import { AiAttachment, AiConversation } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
@@ -104,6 +106,21 @@ export const KnowNook: React.FC = () => {
     exportToMarkdown: exportNoteMarkdown,
     exportToPdf: exportNotePdf,
   } = useKnownookNotes(activeConversation?.id);
+
+  // AI Quiz Hook & Overlay
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const {
+    quizzes,
+    activeQuiz,
+    activeAttempt,
+    setActiveAttempt,
+    selectQuiz,
+    isLoading: isLoadingQuizzes,
+    isGenerating: isGeneratingQuiz,
+    generateQuiz,
+    submitAttempt,
+    deleteQuiz,
+  } = useKnownookQuizzes(activeConversation?.id);
 
   // Drawer & Modal overlays
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
@@ -253,6 +270,7 @@ export const KnowNook: React.FC = () => {
 
         onOpenFlashcards={() => setIsFlashcardOpen(true)}
         onOpenNotes={() => setIsNotesOpen(true)}
+        onOpenQuizzes={() => setIsQuizOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
       />
 
@@ -311,7 +329,7 @@ export const KnowNook: React.FC = () => {
         />
       </main>
 
-      {/* 3. Slide-over Flashcard Drawer */}
+      {/* 3. Flashcard Drawer Overlay */}
       <FlashcardDrawer
         isOpen={isFlashcardOpen}
         onClose={() => setIsFlashcardOpen(false)}
@@ -319,6 +337,10 @@ export const KnowNook: React.FC = () => {
         onAddFlashcard={addFlashcard}
         onToggleFavorite={toggleFavoriteFlashcard}
         onDeleteFlashcard={deleteFlashcard}
+        onGenerateQuizFromDeck={(topic) => {
+          setIsQuizOpen(true);
+          generateQuiz({ topic: topic || 'Flashcard Deck Review', sourceType: 'flashcards' });
+        }}
       />
 
       {/* 4. Usage Metrics Modal */}
@@ -357,7 +379,31 @@ export const KnowNook: React.FC = () => {
         onExportPdf={exportNotePdf}
       />
 
-      {/* 7. Permanent Delete Confirmation Modal */}
+      {/* 7. AI Quiz & Assessment Hub Modal */}
+      <QuizWorkspaceModal
+        isOpen={isQuizOpen}
+        onClose={() => setIsQuizOpen(false)}
+        quizzes={quizzes}
+        activeQuiz={activeQuiz}
+        activeAttempt={activeAttempt}
+        onSelectQuiz={selectQuiz}
+        onGenerateQuiz={generateQuiz}
+        onSubmitAttempt={submitAttempt}
+        onDeleteQuiz={deleteQuiz}
+        onResetAttempt={() => setActiveAttempt(null)}
+        onCreateFlashcardFromQuestion={(qText, ans) => {
+          addFlashcard({
+            title: 'Quiz Review Concept',
+            question: qText,
+            answer: ans,
+          });
+          triggerToast('Created Flashcard from Quiz question!');
+        }}
+        isLoading={isLoadingQuizzes}
+        isGenerating={isGeneratingQuiz}
+      />
+
+      {/* 8. Permanent Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={!!pendingDeleteConversation}
         conversation={pendingDeleteConversation}
@@ -371,7 +417,7 @@ export const KnowNook: React.FC = () => {
         onCancel={() => setPendingDeleteConversation(null)}
       />
 
-      {/* 8. Floating Toast Undo Notification */}
+      {/* 9. Floating Toast Undo Notification */}
       <ToastNotification toast={toast} onDismiss={dismissToast} />
     </div>
   );

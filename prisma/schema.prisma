@@ -64,6 +64,9 @@ model User {
   aiAttachments        AiAttachment[]
   aiFlashcards         AiFlashcard[]
   aiNotes              AiNote[]
+  aiDecks              AiDeck[]
+  aiQuizzes            AiQuiz[]
+  aiQuizAttempts       AiQuizAttempt[]
   aiUsages             AiUsage[]
 
   @@map("users")
@@ -648,6 +651,7 @@ model AiConversation {
   attachments AiAttachment[]
   flashcards  AiFlashcard[]
   notes       AiNote[]
+  quizzes     AiQuiz[]
 
   @@map("ai_conversations")
   @@index([userId, isDeleted, isPinned])
@@ -710,22 +714,117 @@ model AiFlashcard {
   id             String              @id @default(uuid()) @map("flashcard_id") @db.VarChar(36)
   userId         String              @map("user_id") @db.VarChar(36)
   conversationId String?             @map("conversation_id") @db.VarChar(36)
+  deckId         String?             @map("deck_id") @db.VarChar(36)
   title          String              @db.VarChar(255)
   question       String              @db.Text
   answer         String              @db.Text
   formula        String?             @db.Text
+  cardType       String              @default("qa") @map("card_type") @db.VarChar(50)
   tags           String?             @db.Text
   difficulty     FlashcardDifficulty @default(medium)
   isFavorite     Boolean             @default(false) @map("is_favorite")
+  aiConfidence   Float               @default(0.9) @map("ai_confidence")
+  nextReview     DateTime?           @map("next_review")
+  reviewCount    Int                 @default(0) @map("review_count")
+  mastery        Float               @default(0.0)
+  easeFactor     Float               @default(2.5) @map("ease_factor")
   metadata       Json?
   createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @default(now()) @updatedAt @map("updated_at")
 
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  deck         AiDeck?         @relation(fields: [deckId], references: [id], onDelete: SetNull)
 
   @@map("ai_flashcards")
   @@index([userId, isFavorite])
   @@index([conversationId])
+  @@index([deckId])
+}
+
+model AiDeck {
+  id          String   @id @default(uuid()) @map("deck_id") @db.VarChar(36)
+  userId      String   @map("user_id") @db.VarChar(36)
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  category    String?  @db.VarChar(100)
+  isFavorite  Boolean  @default(false) @map("is_favorite")
+  isArchived  Boolean  @default(false) @map("is_archived")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcards AiFlashcard[]
+
+  @@map("ai_decks")
+  @@index([userId, isFavorite])
+}
+
+model AiQuiz {
+  id             String           @id @default(uuid()) @map("quiz_id") @db.VarChar(36)
+  userId         String           @map("user_id") @db.VarChar(36)
+  conversationId String?          @map("conversation_id") @db.VarChar(36)
+  title          String           @db.VarChar(255)
+  description    String?          @db.Text
+  topic          String?          @db.VarChar(255)
+  sourceType     String           @default("custom") @map("source_type") @db.VarChar(50)
+  difficulty     String           @default("medium") @db.VarChar(20)
+  timeLimitSec   Int              @default(300) @map("time_limit_sec")
+  isTemplate     Boolean          @default(false) @map("is_template")
+  isFavorite     Boolean          @default(false) @map("is_favorite")
+  isArchived     Boolean          @default(false) @map("is_archived")
+  metadata       Json?
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation AiConversation?  @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  questions    AiQuizQuestion[]
+  attempts     AiQuizAttempt[]
+
+  @@map("ai_quizzes")
+  @@index([userId, isFavorite])
+  @@index([conversationId])
+}
+
+model AiQuizQuestion {
+  id           String   @id @default(uuid()) @map("question_id") @db.VarChar(36)
+  quizId       String   @map("quiz_id") @db.VarChar(36)
+  questionText String   @map("question_text") @db.Text
+  questionType String   @default("mcq") @map("question_type") @db.VarChar(50)
+  options      Json?
+  correctAnswer String  @map("correct_answer") @db.Text
+  explanation  String?  @db.Text
+  codeSnippet  String?  @map("code_snippet") @db.Text
+  aiConfidence Float    @default(0.9) @map("ai_confidence")
+  orderIndex   Int      @default(0) @map("order_index")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  quiz AiQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("ai_quiz_questions")
+  @@index([quizId, orderIndex])
+}
+
+model AiQuizAttempt {
+  id             String   @id @default(uuid()) @map("attempt_id") @db.VarChar(36)
+  quizId         String   @map("quiz_id") @db.VarChar(36)
+  userId         String   @map("user_id") @db.VarChar(36)
+  score          Float    @default(0.0)
+  totalQuestions Int      @map("total_questions")
+  correctCount   Int      @map("correct_count")
+  timeTakenSec   Int      @map("time_taken_sec")
+  userAnswers    Json?
+  metadata       Json?
+  completedAt    DateTime @default(now()) @map("completed_at")
+
+  quiz AiQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_quiz_attempts")
+  @@index([quizId, userId])
+  @@index([userId, completedAt])
 }
 
 model AiUsage {

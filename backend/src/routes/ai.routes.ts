@@ -5,6 +5,7 @@ import { aiMessageController } from '../controllers/ai-message.controller';
 import { aiAttachmentController } from '../controllers/ai-attachment.controller';
 import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
 import { aiNoteController } from '../controllers/ai-note.controller';
+import { aiQuizController } from '../controllers/ai-quiz.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
 import { aiEngineController } from '../controllers/ai-engine.controller';
 import { aiStreamController } from '../controllers/ai-stream.controller';
@@ -54,13 +55,19 @@ router.get('/conversations/:conversationId/attachments', aiAttachmentController.
 router.patch('/attachments/:attachmentId/status', aiAttachmentController.updateStatus);
 router.delete('/attachments/:attachmentId', aiAttachmentController.deleteAttachment);
 
-// ── Flashcards ────────────────────────────────────────────────────────────────
+// ── Flashcards & Decks ────────────────────────────────────────────────────────
+router.post('/flashcards/generate', aiQuizController.generateFlashcards);
 router.post('/flashcards', aiFlashcardController.createFlashcard);
 router.get('/flashcards', aiFlashcardController.listFlashcards);
 router.get('/flashcards/:flashcardId', aiFlashcardController.getFlashcard);
 router.patch('/flashcards/:flashcardId', aiFlashcardController.updateFlashcard);
 router.patch('/flashcards/:flashcardId/favorite', aiFlashcardController.toggleFavorite);
 router.delete('/flashcards/:flashcardId', aiFlashcardController.deleteFlashcard);
+
+router.get('/decks', aiQuizController.listDecks);
+router.post('/decks', aiQuizController.createDeck);
+router.get('/decks/:id/stats', aiQuizController.getDeckStats);
+router.delete('/decks/:id', aiQuizController.deleteDeck);
 
 // ── Phase 8.1: AI Notes ───────────────────────────────────────────────────────
 router.post('/notes/generate', aiNoteController.generateNote);
@@ -69,6 +76,13 @@ router.get('/notes/:id', aiNoteController.getNoteById);
 router.patch('/notes/:id', aiNoteController.updateNote);
 router.post('/notes/:id/regenerate', aiNoteController.regenerateNote);
 router.delete('/notes/:id', aiNoteController.deleteNote);
+
+// ── Phase 8.2: Quizzes & Assessment ──────────────────────────────────────────
+router.post('/quizzes/generate', aiQuizController.generateQuiz);
+router.get('/quizzes', aiQuizController.listQuizzes);
+router.get('/quizzes/:id', aiQuizController.getQuizById);
+router.post('/quizzes/:id/submit', aiQuizController.submitAttempt);
+router.delete('/quizzes/:id', aiQuizController.deleteQuiz);
 
 // ── Usage Metrics ─────────────────────────────────────────────────────────────
 router.get('/usage', aiUsageController.getUsageStats);

@@ -5,7 +5,7 @@ import {
   updateFlashcardSchema,
   aiQueryPaginationSchema,
 } from '../validators/ai.validator';
-import { BadRequestError } from '../utils/errors';
+import { BadRequestError, NotFoundError } from '../utils/errors';
 import { FlashcardDifficulty } from '@prisma/client';
 
 export class AiFlashcardController {
@@ -87,6 +87,7 @@ export class AiFlashcardController {
       if (!req.user?.user_id) throw new BadRequestError('User details missing');
       const flashcardId = req.params.flashcardId;
       const existing = await aiFlashcardService.getFlashcard(flashcardId, req.user.user_id);
+      if (!existing) throw new NotFoundError('Flashcard not found');
       const updated = await aiFlashcardService.updateFlashcard(flashcardId, req.user.user_id, {
         isFavorite: !existing.isFavorite,
       });

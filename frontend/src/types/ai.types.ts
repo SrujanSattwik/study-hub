@@ -171,3 +171,86 @@ export interface GenerateNoteDTO {
   customTopic?: string;
   instructions?: string;
 }
+
+export interface AiDeck {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  isFavorite: boolean;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { flashcards: number };
+}
+
+export interface DeckStats {
+  totalCards: number;
+  studiedCount: number;
+  masteredCount: number;
+  accuracyPct: number;
+  lastStudiedAt: string | null;
+}
+
+export interface AiQuizQuestion {
+  id: string;
+  quizId: string;
+  questionText: string;
+  questionType: 'mcq' | 'true_false' | 'fill_blank' | 'short_answer' | 'coding' | 'formula';
+  options?: string[] | null;
+  correctAnswer: string;
+  explanation?: string | null;
+  codeSnippet?: string | null;
+  aiConfidence: number;
+  orderIndex: number;
+}
+
+export interface AiQuizAttempt {
+  id: string;
+  quizId: string;
+  userId: string;
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+  timeTakenSec: number;
+  userAnswers?: Record<string, any> | null;
+  completedAt: string;
+}
+
+export interface AiQuiz {
+  id: string;
+  userId: string;
+  conversationId?: string | null;
+  title: string;
+  description?: string | null;
+  topic?: string | null;
+  sourceType: string;
+  difficulty: string;
+  timeLimitSec: number;
+  isTemplate: boolean;
+  isFavorite: boolean;
+  isArchived: boolean;
+  questions?: AiQuizQuestion[];
+  attempts?: AiQuizAttempt[];
+  _count?: { questions: number; attempts: number };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GenerateQuizDTO {
+  conversationId?: string;
+  noteId?: string;
+  documentId?: string;
+  topic?: string;
+  sourceType?: 'conversation' | 'note' | 'document' | 'custom' | 'flashcards';
+  difficulty?: 'easy' | 'medium' | 'hard';
+  numQuestions?: number;
+  timeLimitSec?: number;
+}
+
+export interface SubmitQuizAttemptDTO {
+  quizId: string;
+  timeTakenSec: number;
+  answers: Record<string, { userAnswer: string; isCorrect: boolean; explanation?: string }>;
+}

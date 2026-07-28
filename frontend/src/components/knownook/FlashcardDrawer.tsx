@@ -8,6 +8,7 @@ interface FlashcardDrawerProps {
   onAddFlashcard: (data: { title: string; question: string; answer: string; formula?: string }) => void;
   onToggleFavorite: (id: string) => void;
   onDeleteFlashcard: (id: string) => void;
+  onGenerateQuizFromDeck?: (topic?: string) => void;
 }
 
 export const FlashcardDrawer: React.FC<FlashcardDrawerProps> = ({
@@ -17,6 +18,7 @@ export const FlashcardDrawer: React.FC<FlashcardDrawerProps> = ({
   onAddFlashcard,
   onToggleFavorite,
   onDeleteFlashcard,
+  onGenerateQuizFromDeck,
 }) => {
   const [search, setSearch] = useState('');
   const [showOnlyFavorite, setShowOnlyFavorite] = useState(false);
@@ -78,6 +80,18 @@ export const FlashcardDrawer: React.FC<FlashcardDrawerProps> = ({
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-amber-500"
             />
+            {onGenerateQuizFromDeck && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onGenerateQuizFromDeck('Flashcard Deck Review');
+                }}
+                className="px-2.5 py-1.5 bg-rose-950 hover:bg-rose-900 text-rose-400 border border-rose-500/40 rounded-lg text-xs font-bold transition flex items-center gap-1"
+                title="Generate Quiz from Flashcard Deck"
+              >
+                <span>🎯 Quiz</span>
+              </button>
+            )}
             <button
               onClick={() => setIsAdding(!isAdding)}
               className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold"
