@@ -105,6 +105,14 @@ export const AppRouter: React.FC = () => {
               }
             />
             <Route
+              path="/knownook/:conversationId"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <KnowNook />
+                </Suspense>
+              }
+            />
+            <Route
               path="/subscription"
               element={
                 <Suspense fallback={<PageFallback />}>
