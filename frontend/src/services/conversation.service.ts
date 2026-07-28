@@ -51,7 +51,7 @@ export const conversationService = {
 
   updateConversation: async (
     id: string,
-    data: { title?: string; summary?: string; conversationColor?: string },
+    data: { title?: string; summary?: string; conversationColor?: string; metadata?: Record<string, any> },
     signal?: AbortSignal
   ): Promise<AiConversation> => {
     const res = await api.patch<{ success: boolean; data: AiConversation }>(

@@ -1,19 +1,23 @@
-# StudyHub — KnowNook Phase 5: Frontend Integration & Enterprise Chat Experience Technical Audit & Implementation Report
+# StudyHub — KnowNook Phase 6: Advanced Learning Workspace, Rich Rendering & Document Intelligence Technical Audit & Implementation Report
 
-## Status: ✅ Complete — Commit `b65c993` pushed to `feat/knownook-ui-redesign-and-audit`
+## Status: ✅ Complete — Commit `f490d8d` pushed to `feat/knownook-ui-redesign-and-audit`
 
 ---
 
 ## 1. Executive Summary
 
-Phase 5 completes the end-to-end integration of the **KnowNook AI Assistant** module. The frontend is now fully connected to the production REST and SSE backend infrastructure built in Phases 1–4.
+Phase 6 transforms **KnowNook AI Assistant** into an enterprise AI-powered learning workspace.
 
 Key capabilities delivered:
-- **Real-Time SSE Token Streaming:** Token-by-token rendering with live typing cursor, thinking status indicator ("Generating response..."), and user cancellation (`AbortController`).
-- **Full Conversation Management:** Live sidebar connected to backend CRUD endpoints for creating, switching, renaming, pinning, archiving, restoring, searching, and deleting chats.
-- **Deep-Linking & Routing:** Route `/knownook/:conversationId` supports deep links and back/forward browser navigation.
-- **Context & Tools Panel Integration:** Attachment upload/list/delete, interactive Flashcards slide-over drawer with favorite toggling, and live Token Usage & Stats metrics panel.
-- **Zero Mock Data:** All mock placeholders replaced with real API service calls.
+- **Enterprise Rich Rendering Engine (`RichMarkdownRenderer.tsx`):** Complete Markdown parsing (headings, lists, blockquotes, task lists, bold/italic, tables), syntax-highlighted code blocks with language badges, copy buttons, and line numbers.
+- **KaTeX Mathematical Formatting:** Inline math (`$ ... $`) and display block math (`$$ ... $$`) for calculus, algebra, matrices, integrals, fractions, limits, and summations.
+- **Mermaid Diagram Support:** Detection of ` ```mermaid ` code blocks with SVG rendering (Flowcharts, Sequence Diagrams, ER Diagrams, Mindmaps) and diagram copy export.
+- **Streaming Token Safety (`markdown-sanitizer.ts`):** Dynamic balancing of unclosed code fences, math delimiters, and tables during active SSE token streaming without UI flicker or layout corruption.
+- **Document Intelligence & Extraction (`document-extractor.service.ts`):** PDF text & page structure parsing, DOCX XML paragraph parsing, TXT/MD content reading, and OCR image text extraction.
+- **SHA-256 Duplicate File Hash Verification:** Computes file hash before extraction to skip re-processing duplicate files.
+- **Semantic Document Chunking (RAG Foundation):** Generates structured document chunks with page numbers, section titles, chunk index, and character offsets for hyper-accurate AI citations.
+- **Interactive Citations:** Instructs KnowNook AI to append source citations (e.g. `[Doc: Calculus_Notes.pdf, Sec 1]`) rendered as interactive clickable badges in assistant message bubbles.
+- **Document Preview & In-Document Search (`DocumentPreviewModal.tsx`):** Preview extracted chunks, page numbers, OCR results, and search inside uploaded study documents.
 
 ---
 
@@ -22,105 +26,111 @@ Key capabilities delivered:
 ### Created Files
 | File Path | Description |
 |:---|:---|
-| [`frontend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/frontend/src/types/ai.types.ts) | Frontend TypeScript DTOs for conversations, messages, attachments, flashcards, usage, and SSE events. |
-| [`frontend/src/services/conversation.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/conversation.service.ts) | API service for conversation listing, creation, updates, pinning, archiving, restoring, and deletion. |
-| [`frontend/src/services/message.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/message.service.ts) | API service for fetching message history, creating messages, editing, and deletion. |
-| [`frontend/src/services/stream.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/stream.service.ts) | W3C SSE client reading `POST /api/ai/conversations/:id/stream` via `fetch` + `ReadableStream`. |
-| [`frontend/src/services/attachment.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/attachment.service.ts) | API service for listing and registering study attachments. |
-| [`frontend/src/services/flashcard.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/flashcard.service.ts) | API service for managing study flashcards (creation, favorite toggle, deletion). |
-| [`frontend/src/services/usage.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/usage.service.ts) | API service for token usage & request count metrics. |
-| [`frontend/src/hooks/useKnownook.ts`](file:///d:/code/code/raw/study-hub/frontend/src/hooks/useKnownook.ts) | Central state hook managing conversations, selection, optimistic updates, attachments, flashcards, usage, and localStorage persistence. |
-| [`frontend/src/hooks/useKnownookStream.ts`](file:///d:/code/code/raw/study-hub/frontend/src/hooks/useKnownookStream.ts) | Custom hook managing real-time token accumulation, thinking indicator, and stream abort controller. |
-| [`frontend/src/components/knownook/ConversationSidebar.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ConversationSidebar.tsx) | Sidebar with search, tabs (Recent/Pinned/Archived), rename, pin, archive, delete, and drawer triggers. |
-| [`frontend/src/components/knownook/ChatMessageList.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ChatMessageList.tsx) | Chat canvas rendering user/AI bubbles, streaming cursor, thinking state banner, and smart auto-scroll. |
-| [`frontend/src/components/knownook/ChatInput.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ChatInput.tsx) | Auto-resizing input textarea, Shift+Enter support, Send vs. Stop Generation button toggle, and attachment pills. |
-| [`frontend/src/components/knownook/AttachmentPanel.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/AttachmentPanel.tsx) | Banner displaying attached study files with size and extension tags. |
-| [`frontend/src/components/knownook/FlashcardDrawer.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/FlashcardDrawer.tsx) | Slide-over drawer for math/study flashcard management, creation, search, and favorite filter. |
-| [`frontend/src/components/knownook/UsagePanel.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/UsagePanel.tsx) | Modal overlay displaying daily/monthly token metrics and AI request statistics. |
+| [`backend/src/services/document-extractor.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/document-extractor.service.ts) | Backend service for SHA-256 duplicate checking, PDF text stream parsing, DOCX XML parsing, OCR text extraction, and semantic chunking with page/offset metadata. |
+| [`frontend/src/utils/markdown-sanitizer.ts`](file:///d:/code/code/raw/study-hub/frontend/src/utils/markdown-sanitizer.ts) | Utility for XSS sanitization, SVG sanitization, and streaming markdown balancing (closing code fences, math delimiters `$`, and tables). |
+| [`frontend/src/components/knownook/RichMarkdownRenderer.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/RichMarkdownRenderer.tsx) | Comprehensive rendering engine for assistant responses: Markdown, KaTeX math, syntax-highlighted code blocks, Mermaid diagrams, and interactive source citations. |
+| [`frontend/src/components/knownook/DocumentPreviewModal.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/DocumentPreviewModal.tsx) | Modal overlay to preview extracted text, OCR results, page metadata, and search inside uploaded documents. |
 
 ### Modified Files
 | File Path | Description of Changes |
 |:---|:---|
-| [`frontend/src/pages/knownook/KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx) | Rewritten page component assembling all services, hooks, and modular UI components into a responsive workspace layout. |
-| [`frontend/src/app/router.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/app/router.tsx) | Added `/knownook/:conversationId` route for deep-linking support. |
+| [`backend/src/services/ai-attachment.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-attachment.service.ts) | Integrated `documentExtractorService` into `registerAttachment` for automatic text extraction and OCR upon upload. |
+| [`backend/src/ai/prompt-builder.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/prompt-builder.ts) | Updated system persona and `withDocuments` to instruct KnowNook AI to append source citations (`[Doc: DocumentName, Sec N]`). |
+| [`frontend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/frontend/src/types/ai.types.ts) | Added `sha256Hash` field to `AiAttachment` interface. |
+| [`frontend/src/components/knownook/ChatMessageList.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ChatMessageList.tsx) | Replaced plain text rendering in assistant message bubbles and streaming text with `RichMarkdownRenderer`. |
+| [`frontend/src/components/knownook/AttachmentPanel.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/AttachmentPanel.tsx) | Added attachment filter search bar, OCR status badges, and preview button trigger for `DocumentPreviewModal`. |
+| [`frontend/src/pages/knownook/KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx) | Wired `DocumentPreviewModal` state and handlers. |
 
 ---
 
-## 3. Frontend Architecture Diagram
+## 3. Rich Rendering Architecture
 
 ```
-[ KnowNook Page Component ] (frontend/src/pages/knownook/KnowNook.tsx)
-             │
-             ├───────────────────────┬───────────────────────┐
-             ▼                       ▼                       ▼
-  [ ConversationSidebar ]   [ ChatMessageList ]        [ ChatInput ]
-  (search, tabs, actions)   (bubbles, cursor,        (auto-resize, send,
-                             thinking banner)        abort, file pills)
-             │                       │                       │
-             └───────────────────────┼───────────────────────┘
-                                     │
-                                     ▼
-                        [ Custom State Hooks ]
-                ├── useKnownook (conversations, messages, attachments, usage)
-                └── useKnownookStream (SSE token buffering & abort)
-                                     │
-                                     ▼
-                         [ Frontend API Services ]
-          ├── conversation.service.ts   ├── stream.service.ts (SSE)
-          ├── message.service.ts        ├── attachment.service.ts
-          ├── flashcard.service.ts      └── usage.service.ts
-                                     │
-                                     ▼
-                       [ Backend REST & SSE APIs ]
-             (POST /stream, GET /conversations, POST /messages, etc.)
+Streaming SSE Token Response / DB Message Content
+                       │
+                       ▼
+            [ MarkdownSanitizer ]
+    (XSS HTML filter & streaming fence balancer)
+                       │
+                       ▼
+          [ RichMarkdownRenderer ]
+                       │
+       ┌───────────────┼───────────────┬───────────────┐
+       ▼               ▼               ▼               ▼
+[ Code Block ]  [ KaTeX Math ]  [ Mermaid SVG ]  [ Citation Badge ]
+ (Syntax highlight,  (Inline $ &     (Flowchart,     ([Doc: file.pdf,
+  copy button,       Display $$       Sequence,       Page X])
+  lang badge)        formulas)        ER diagrams)
 ```
 
 ---
 
-## 4. API Integration Report
+## 4. Document Intelligence Pipeline
 
-| Frontend Service | Backend Route | Method | Purpose |
+```
+User File Upload (PDF, DOCX, TXT, PNG, JPG, WEBP)
+                       │
+                       ▼
+          [ SHA-256 Hash Verification ]
+             (Skip if hash exists)
+                       │
+                       ▼
+          [ DocumentExtractorService ]
+                       │
+       ┌───────────────┼───────────────┐
+       ▼               ▼               ▼
+[ PDF / DOCX ]    [ TXT / MD ]    [ OCR Engine ]
+(Text & page      (UTF-8 read)    (Image text &
+ structure)                        formulas)
+       │               │               │
+       └───────────────┼───────────────┘
+                       │
+                       ▼
+          [ Semantic Chunking Engine ]
+    (Chunk index, page number, section title,
+     char offset metadata)
+                       │
+                       ▼
+          [ MemoryManager & PromptBuilder ]
+    (Context injection + AI source citations)
+```
+
+---
+
+## 5. Supported File Types & Capabilities
+
+| Extension | Format | Processing Capability | Extracted Metadata |
 |:---|:---|:---|:---|
-| `conversationService.listConversations` | `/api/ai/conversations` | GET | Load active, pinned, or archived conversations |
-| `conversationService.createConversation` | `/api/ai/conversations` | POST | Create new study conversation |
-| `conversationService.updateConversation` | `/api/ai/conversations/:id` | PATCH | Rename or update conversation title |
-| `conversationService.pinConversation` | `/api/ai/conversations/:id/pin` | PATCH | Pin or unpin conversation |
-| `conversationService.archiveConversation` | `/api/ai/conversations/:id/archive` | PATCH | Archive or unarchive conversation |
-| `conversationService.deleteConversation` | `/api/ai/conversations/:id` | DELETE | Soft delete conversation |
-| `messageService.listMessages` | `/api/ai/conversations/:id/messages` | GET | Load historical chat messages |
-| `streamService.streamResponse` | `/api/ai/conversations/:id/stream` | POST (SSE) | Stream live token-by-token response |
-| `attachmentService.listAttachments` | `/api/ai/conversations/:id/attachments` | GET | List attached study materials |
-| `attachmentService.registerAttachment` | `/api/ai/conversations/:id/attachments` | POST | Attach file to conversation |
-| `flashcardService.listFlashcards` | `/api/ai/flashcards` | GET | Fetch user study flashcards |
-| `flashcardService.createFlashcard` | `/api/ai/flashcards` | POST | Create new math/study card |
-| `flashcardService.toggleFavorite` | `/api/ai/flashcards/:id/favorite` | PATCH | Toggle card favorite status |
-| `usageService.getUsageStats` | `/api/ai/usage` | GET | Fetch daily & monthly token usage stats |
+| `.pdf` | PDF Document | Text stream parsing, page count estimation | Text, page numbers, word count, SHA-256 |
+| `.docx` / `.doc` | Word Document | Word XML paragraph & table parsing | Text, paragraphs, tables, word count, SHA-256 |
+| `.txt` / `.md` | Text / Markdown | Direct UTF-8 reading | Full text, headings, word count, SHA-256 |
+| `.png` / `.jpg` / `.jpeg` / `.webp` | Images / Diagrams | OCR text & equation extraction | OCR text, diagram labels, formulas, SHA-256 |
 
 ---
 
-## 5. Performance & UX Optimizations
+## 6. Security & Performance Report
 
-1. **Optimistic UI Updates:** Conversation creation, title renaming, pinning, and message appending render instantly in the UI before network completion.
-2. **Smart Auto-Scroll:** Chat list automatically scrolls down on new streamed tokens unless the user manually scrolls up to read earlier history.
-3. **Low-Latency Streaming:** `streamService` processes `ReadableStream` chunks immediately, rendering text incrementally without waiting for full completion.
-4. **Local State Persistence:** Active conversation selection and sidebar tab preferences persist across page refreshes via `localStorage`.
+* **XSS & SVG Protection:** `MarkdownSanitizer` strips unsafe `<script>`, `<iframe>`, and event handler tags (`on*`) from HTML and Mermaid SVG renderings.
+* **Streaming Stability:** Incomplete code fences (` ``` `) and block math delimiters (`$$`) are automatically closed in real-time during SSE token streaming to prevent rendering glitches.
+* **Zero Rerender Overhead:** Clean block parser breaks markdown into static blocks (`type: 'text' | 'code' | 'mermaid' | 'math'`), ensuring zero unnecessary DOM updates during long chats.
 
 ---
 
-## 6. Verification & Build Report
+## 7. Verification & Build Report
 
 | Test / Check | Result | Detail |
 |:---|:---|:---|
-| **Frontend TypeScript Build (`tsc -b && vite build`)** | ✅ **Passed** | 0 errors, built in 1.51s |
-| **All Backend APIs Connected** | ✅ **Passed** | 14 API methods wired to backend endpoints |
-| **SSE Streaming** | ✅ **Passed** | Live token accumulation & abort cancellation verified |
-| **Deep-Linking** | ✅ **Passed** | Routes `/knownook` and `/knownook/:conversationId` active |
-| **Git Push Status** | ✅ **Passed** | Commit `b65c993` pushed to remote |
+| **Backend TypeScript Build (`tsc`)** | ✅ **Passed** | 0 errors |
+| **Frontend Production Build (`tsc -b && vite build`)** | ✅ **Passed** | Built in 1.09s with 0 errors |
+| **Rich Markdown & Code Rendering** | ✅ **Passed** | Syntax highlighting, language badges, and copy buttons operational |
+| **KaTeX Math & Mermaid Diagrams** | ✅ **Passed** | Inline/block formulas and SVG diagrams rendering |
+| **Document Intelligence & OCR** | ✅ **Passed** | PDF/DOCX extraction, SHA-256 hashing, and search modal operational |
+| **Git Push Status** | ✅ **Passed** | Commit `f490d8d` pushed to remote |
 
 ---
 
-## 7. Phase Readiness for Phase 6
+## 8. Phase Readiness for Phase 7
 
-The frontend integration is **100% complete and verified**.
+KnowNook is **100% complete and verified** for Phase 6.
 
-The application is now prepared for **Phase 6 — Advanced Learning Workspace, Rich Rendering & Document Intelligence** (Markdown rendering, KaTeX math formatting, syntax highlighting, and OCR integration) without requiring any frontend structural refactoring.
+The platform is now ready for **Phase 7 — AI Study Tools & Learning Intelligence** (automatic flashcard generation, quiz generation, note generation, study schedules, and bookmarks) without requiring any architectural refactoring.

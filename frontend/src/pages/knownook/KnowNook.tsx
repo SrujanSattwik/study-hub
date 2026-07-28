@@ -19,6 +19,7 @@ export const KnowNook: React.FC = () => {
 
   const {
     conversations,
+    allConversations,
     activeConversation,
     messages,
     attachments,
@@ -30,12 +31,34 @@ export const KnowNook: React.FC = () => {
     setSearchQuery,
     filterTab,
     changeFilterTab,
+    pinnedCount,
+    favoritesCount,
+    archivedCount,
+    recycleBinCount,
+
+    // Multi-Select
+    isMultiSelectMode,
+    setIsMultiSelectMode,
+    selectedChatIds,
+    toggleSelectChat,
+    clearSelection,
+    bulkArchive,
+    bulkDelete,
+    bulkExport,
+    bulkRestore,
+
+    // Actions
     selectConversation,
     createNewChat,
     renameChat,
     togglePinChat,
+    toggleFavoriteChat,
     toggleArchiveChat,
     deleteChat,
+    duplicateChat,
+    exportChat,
+    restoreChat,
+    permanentDeleteChat,
     appendUserMessage,
     refreshMessages,
     addFlashcard,
@@ -57,6 +80,26 @@ export const KnowNook: React.FC = () => {
   const [isUsageOpen, setIsUsageOpen] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState<AiAttachment | null>(null);
 
+  // Keyboard Shortcuts: Ctrl+N (New Chat), Ctrl+K (Focus Search), Esc (Close search/menus)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        createNewChat().then((chat) => navigate(`/knownook/${chat.id}`));
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('knownook-sidebar-search');
+        searchInput?.focus();
+      } else if (e.key === 'Escape') {
+        setSearchQuery('');
+        if (isMultiSelectMode) clearSelection();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [createNewChat, navigate, isMultiSelectMode, clearSelection, setSearchQuery]);
+
   // Sync active conversation with URL
   useEffect(() => {
     if (activeConversation && activeConversation.id !== urlConversationId) {
@@ -68,17 +111,13 @@ export const KnowNook: React.FC = () => {
   const handleSendPrompt = async (text: string) => {
     let targetConv = activeConversation;
 
-    // If no active conversation, create one first
     if (!targetConv) {
       targetConv = await createNewChat(text.slice(0, 40));
     }
 
-    // Append user message optimistically to UI
     appendUserMessage(text);
 
-    // Start SSE token stream
     startStream(targetConv.id, text, () => {
-      // On completed event, refresh messages and usage stats
       refreshMessages();
       refreshUsage();
     });
@@ -124,6 +163,22 @@ export const KnowNook: React.FC = () => {
         onSearchChange={setSearchQuery}
         filterTab={filterTab}
         onFilterTabChange={changeFilterTab}
+        pinnedCount={pinnedCount}
+        favoritesCount={favoritesCount}
+        archivedCount={archivedCount}
+        recycleBinCount={recycleBinCount}
+
+        // Multi-select
+        isMultiSelectMode={isMultiSelectMode}
+        onToggleMultiSelectMode={() => setIsMultiSelectMode(!isMultiSelectMode)}
+        selectedChatIds={selectedChatIds}
+        onToggleSelectChat={toggleSelectChat}
+        onBulkArchive={bulkArchive}
+        onBulkDelete={bulkDelete}
+        onBulkExport={bulkExport}
+        onBulkRestore={bulkRestore}
+
+        // Single Actions
         onSelectChat={(id) => {
           selectConversation(id);
           navigate(`/knownook/${id}`);
@@ -134,8 +189,17 @@ export const KnowNook: React.FC = () => {
         }}
         onRenameChat={renameChat}
         onPinChat={togglePinChat}
+        onFavoriteChat={toggleFavoriteChat}
         onArchiveChat={toggleArchiveChat}
         onDeleteChat={deleteChat}
+        onDuplicateChat={async (id) => {
+          const chat = await duplicateChat(id);
+          if (chat) navigate(`/knownook/${chat.id}`);
+        }}
+        onExportChat={exportChat}
+        onRestoreChat={restoreChat}
+        onPermanentDeleteChat={permanentDeleteChat}
+
         onOpenFlashcards={() => setIsFlashcardOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
       />
@@ -151,6 +215,11 @@ export const KnowNook: React.FC = () => {
             {activeConversation?.isPinned && (
               <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded text-[10px] font-semibold shrink-0">
                 Pinned
+              </span>
+            )}
+            {activeConversation?.metadata?.isFavorite && (
+              <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded text-[10px] font-semibold shrink-0">
+                ★ Starred
               </span>
             )}
           </div>
@@ -174,8 +243,7 @@ export const KnowNook: React.FC = () => {
           isStreaming={isStreaming}
           streamingText={streamingText}
           thinkingStatus={thinkingStatus}
-          onDeleteMessage={async (msgId) => {
-            // Delete message and refresh list
+          onDeleteMessage={async () => {
             refreshMessages();
           }}
         />
