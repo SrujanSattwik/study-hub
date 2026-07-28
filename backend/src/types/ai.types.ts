@@ -95,3 +95,63 @@ export interface UpdateFlashcardDTO {
   difficulty?: FlashcardDifficulty;
   isFavorite?: boolean;
 }
+
+// ─── AI Engine Types (Phase 3) ────────────────────────────────────────────────
+
+export interface AiEngineRequest {
+  userId: string;
+  conversationId: string;
+  userMessage: string;
+  parts?: GeminiPart[];          // optional multimodal parts override
+}
+
+export interface AiEngineResponse {
+  answer: string;
+  conversationId: string;
+  userMessageId: string;
+  assistantMessageId: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  generationTimeMs: number;
+  model: string;
+  finishReason: string;
+}
+
+export interface GeminiPart {
+  text: string;
+}
+
+export interface GeminiContent {
+  role: 'user' | 'model';
+  parts: GeminiPart[];
+}
+
+export interface BuiltPrompt {
+  systemInstruction: string;
+  contents: GeminiContent[];
+  estimatedPromptTokens: number;
+}
+
+export interface ContextDocument {
+  name: string;
+  extractedText: string;
+  relevanceScore: number;
+}
+
+export interface ContextFlashcard {
+  title: string;
+  question: string;
+  answer: string;
+  formula?: string;
+  relevanceScore: number;
+}
+
+export interface MemoryPackage {
+  conversationSummary: string | null;
+  recentMessages: Array<{ role: string; content: string }>;
+  documents: ContextDocument[];
+  flashcards: ContextFlashcard[];
+  totalEstimatedTokens: number;
+}
+

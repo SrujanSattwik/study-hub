@@ -5,6 +5,7 @@ import { aiMessageController } from '../controllers/ai-message.controller';
 import { aiAttachmentController } from '../controllers/ai-attachment.controller';
 import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
+import { aiEngineController } from '../controllers/ai-engine.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -12,8 +13,12 @@ const router = express.Router();
 // Require JWT authentication for all AI endpoints
 router.use(authenticateToken);
 
-// ── Legacy Endpoint ──────────────────────────────────────────────────────────
+// ── Legacy Endpoint (backward compat — stateless, no memory) ────────────────
 router.post('/ask', aiController.ask);
+
+// ── Phase 3: Conversation-Aware AI Engine ────────────────────────────────────
+// POST /api/ai/conversations/:conversationId/ask
+// Uses memory, context, and full multi-turn history
 
 // ── Conversations ─────────────────────────────────────────────────────────────
 router.post('/conversations', aiConversationController.createConversation);
@@ -24,6 +29,10 @@ router.patch('/conversations/:conversationId/pin', aiConversationController.pinC
 router.patch('/conversations/:conversationId/archive', aiConversationController.archiveConversation);
 router.patch('/conversations/:conversationId/restore', aiConversationController.restoreConversation);
 router.delete('/conversations/:conversationId', aiConversationController.deleteConversation);
+
+// ── Phase 3: AI Engine — Conversation-Aware Multi-Turn Ask ───────────────────
+router.post('/conversations/:conversationId/ask', aiEngineController.ask);
+
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 router.post('/conversations/:conversationId/messages', aiMessageController.createMessage);
