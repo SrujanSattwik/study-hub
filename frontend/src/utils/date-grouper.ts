@@ -131,3 +131,26 @@ export function exportBulkConversationsToMarkdown(conversations: AiConversation[
 
   downloadMarkdownFile(`knownook_workspace_export_${Date.now()}.md`, lines.join('\n'));
 }
+
+export type SortMode = 'lastUpdated' | 'dateCreated' | 'alphabetical' | 'mostMessages' | 'recentlyOpened';
+
+/**
+ * Sort list of conversations based on active sort mode.
+ */
+export function sortConversations(conversations: AiConversation[], sortMode: SortMode): AiConversation[] {
+  const sorted = [...conversations];
+
+  switch (sortMode) {
+    case 'alphabetical':
+      return sorted.sort((a, b) => a.title.localeCompare(b.title));
+    case 'dateCreated':
+      return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    case 'mostMessages':
+      return sorted.sort((a, b) => (b.totalMessages || 0) - (a.totalMessages || 0));
+    case 'recentlyOpened':
+    case 'lastUpdated':
+    default:
+      return sorted.sort((a, b) => new Date(b.lastMessageAt || b.createdAt).getTime() - new Date(a.lastMessageAt || a.createdAt).getTime());
+  }
+}
+

@@ -11,7 +11,9 @@ import AttachmentPanel from '../../components/knownook/AttachmentPanel';
 import FlashcardDrawer from '../../components/knownook/FlashcardDrawer';
 import UsagePanel from '../../components/knownook/UsagePanel';
 import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
-import { AiAttachment } from '../../types/ai.types';
+import ToastNotification from '../../components/knownook/ToastNotification';
+import ConfirmDeleteModal from '../../components/knownook/ConfirmDeleteModal';
+import { AiAttachment, AiConversation } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
@@ -31,6 +33,11 @@ export const KnowNook: React.FC = () => {
     setSearchQuery,
     filterTab,
     changeFilterTab,
+    sortMode,
+    changeSortMode,
+    toast,
+    triggerToast,
+    dismissToast,
     pinnedCount,
     favoritesCount,
     archivedCount,
@@ -79,6 +86,7 @@ export const KnowNook: React.FC = () => {
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
   const [isUsageOpen, setIsUsageOpen] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState<AiAttachment | null>(null);
+  const [pendingDeleteConversation, setPendingDeleteConversation] = useState<AiConversation | null>(null);
 
   // Keyboard Shortcuts: Ctrl+N (New Chat), Ctrl+K (Focus Search), Esc (Close search/menus)
   useEffect(() => {
@@ -163,6 +171,8 @@ export const KnowNook: React.FC = () => {
         onSearchChange={setSearchQuery}
         filterTab={filterTab}
         onFilterTabChange={changeFilterTab}
+        sortMode={sortMode}
+        onSortModeChange={changeSortMode}
         pinnedCount={pinnedCount}
         favoritesCount={favoritesCount}
         archivedCount={archivedCount}
@@ -190,15 +200,33 @@ export const KnowNook: React.FC = () => {
         onRenameChat={renameChat}
         onPinChat={togglePinChat}
         onFavoriteChat={toggleFavoriteChat}
-        onArchiveChat={toggleArchiveChat}
-        onDeleteChat={deleteChat}
+        onArchiveChat={(id) => {
+          toggleArchiveChat(id);
+          triggerToast('Chat archived.', () => toggleArchiveChat(id));
+        }}
+        onDeleteChat={(id) => {
+          deleteChat(id);
+          triggerToast('Moved to Recycle Bin.', () => restoreChat(id));
+        }}
         onDuplicateChat={async (id) => {
           const chat = await duplicateChat(id);
-          if (chat) navigate(`/knownook/${chat.id}`);
+          if (chat) {
+            navigate(`/knownook/${chat.id}`);
+            triggerToast('Chat duplicated.');
+          }
         }}
-        onExportChat={exportChat}
-        onRestoreChat={restoreChat}
-        onPermanentDeleteChat={permanentDeleteChat}
+        onExportChat={(id) => {
+          exportChat(id);
+          triggerToast('Chat exported to Markdown.');
+        }}
+        onRestoreChat={(id) => {
+          restoreChat(id);
+          triggerToast('Chat restored to Workspace.');
+        }}
+        onPermanentDeleteChat={(id) => {
+          const found = allConversations.find((c) => c.id === id);
+          if (found) setPendingDeleteConversation(found);
+        }}
 
         onOpenFlashcards={() => setIsFlashcardOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
@@ -282,6 +310,23 @@ export const KnowNook: React.FC = () => {
         onClose={() => setPreviewAttachment(null)}
         attachment={previewAttachment}
       />
+
+      {/* 6. Permanent Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!pendingDeleteConversation}
+        conversation={pendingDeleteConversation}
+        onConfirm={() => {
+          if (pendingDeleteConversation) {
+            permanentDeleteChat(pendingDeleteConversation.id);
+            setPendingDeleteConversation(null);
+            triggerToast('Conversation permanently deleted.');
+          }
+        }}
+        onCancel={() => setPendingDeleteConversation(null)}
+      />
+
+      {/* 7. Floating Toast Undo Notification */}
+      <ToastNotification toast={toast} onDismiss={dismissToast} />
     </div>
   );
 };

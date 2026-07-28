@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AiConversation } from '../../types/ai.types';
-import { groupConversationsByDate, formatRelativeTime } from '../../utils/date-grouper';
+import { groupConversationsByDate, formatRelativeTime, SortMode } from '../../utils/date-grouper';
 import { SidebarTab } from '../../hooks/useKnownook';
 
 interface ConversationSidebarProps {
@@ -11,6 +11,8 @@ interface ConversationSidebarProps {
   onSearchChange: (query: string) => void;
   filterTab: SidebarTab;
   onFilterTabChange: (tab: SidebarTab) => void;
+  sortMode: SortMode;
+  onSortModeChange: (mode: SortMode) => void;
   pinnedCount: number;
   favoritesCount: number;
   archivedCount: number;
@@ -53,6 +55,8 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onSearchChange,
   filterTab,
   onFilterTabChange,
+  sortMode,
+  onSortModeChange,
   pinnedCount,
   favoritesCount,
   archivedCount,
@@ -128,6 +132,11 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     return (
       <div
         key={chat.id}
+        draggable={true}
+        onDragStart={(e) => {
+          e.dataTransfer.setData('text/plain', chat.id);
+          e.dataTransfer.effectAllowed = 'move';
+        }}
         onClick={() => {
           if (isMultiSelectMode) {
             onToggleSelectChat(chat.id);
@@ -399,16 +408,32 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           </button>
         </div>
 
-        {/* Multi-Select & Bulk Toolbar */}
-        <div className="flex items-center justify-between text-xs pt-1">
+        {/* Multi-Select & Sort Toolbar */}
+        <div className="flex items-center justify-between text-xs pt-1 gap-2">
           <button
             onClick={onToggleMultiSelectMode}
-            className={`px-2.5 py-1 rounded-lg border text-[11px] font-semibold transition ${
+            className={`px-2 py-1 rounded-lg border text-[11px] font-semibold transition shrink-0 ${
               isMultiSelectMode ? 'bg-cyan-950 border-cyan-500 text-cyan-300' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white'
             }`}
+            title="Multi-select mode for bulk actions"
           >
-            {isMultiSelectMode ? `Cancel Selection (${selectedChatIds.length})` : 'Select Multiple'}
+            {isMultiSelectMode ? `Cancel (${selectedChatIds.length})` : 'Select Multiple'}
           </button>
+
+          {!isMultiSelectMode && (
+            <select
+              value={sortMode}
+              onChange={(e) => onSortModeChange(e.target.value as SortMode)}
+              className="bg-gray-900 border border-gray-700 text-gray-300 rounded-lg text-[10px] px-2 py-1 focus:outline-none focus:border-cyan-500 font-medium"
+              title="Sort conversations"
+            >
+              <option value="lastUpdated">🕒 Last Updated</option>
+              <option value="dateCreated">📅 Date Created</option>
+              <option value="alphabetical">🔤 Alphabetical (A-Z)</option>
+              <option value="mostMessages">💬 Most Messages</option>
+              <option value="recentlyOpened">👁 Recently Opened</option>
+            </select>
+          )}
 
           {isMultiSelectMode && selectedChatIds.length > 0 && (
             <div className="flex items-center gap-1">

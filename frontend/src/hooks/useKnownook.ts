@@ -4,10 +4,7 @@ import messageService from '../services/message.service';
 import attachmentService from '../services/attachment.service';
 import flashcardService from '../services/flashcard.service';
 import usageService from '../services/usage.service';
-import {
-  exportConversationToMarkdown,
-  exportBulkConversationsToMarkdown,
-} from '../utils/date-grouper';
+
 import {
   AiConversation,
   AiMessage,
@@ -15,9 +12,17 @@ import {
   AiFlashcard,
   AiUsageStats,
 } from '../types/ai.types';
+import {
+  exportConversationToMarkdown,
+  exportBulkConversationsToMarkdown,
+  sortConversations,
+  SortMode,
+} from '../utils/date-grouper';
+import { ToastData } from '../components/knownook/ToastNotification';
 
 const LOCAL_STORAGE_ACTIVE_CHAT = 'knownook_active_conversation_id';
 const LOCAL_STORAGE_SIDEBAR_TAB = 'knownook_sidebar_tab';
+const LOCAL_STORAGE_SORT_MODE = 'knownook_sort_mode';
 
 export type SidebarTab = 'recent' | 'pinned' | 'favorites' | 'archived' | 'recycle_bin';
 
@@ -35,6 +40,13 @@ export function useKnownook(initialConversationId?: string) {
   const [filterTab, setFilterTab] = useState<SidebarTab>(() => {
     return (localStorage.getItem(LOCAL_STORAGE_SIDEBAR_TAB) as SidebarTab) || 'recent';
   });
+
+  const [sortMode, setSortMode] = useState<SortMode>(() => {
+    return (localStorage.getItem(LOCAL_STORAGE_SORT_MODE) as SortMode) || 'lastUpdated';
+  });
+
+  // Toast notification state
+  const [toast, setToast] = useState<ToastData | null>(null);
 
   // Multi-select state
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
@@ -299,14 +311,31 @@ export function useKnownook(initialConversationId?: string) {
     localStorage.setItem(LOCAL_STORAGE_SIDEBAR_TAB, tab);
   };
 
+  const changeSortMode = (mode: SortMode) => {
+    setSortMode(mode);
+    localStorage.setItem(LOCAL_STORAGE_SORT_MODE, mode);
+  };
+
+  const triggerToast = (message: string, onUndo?: () => void) => {
+    setToast({
+      id: `toast-${Date.now()}`,
+      message,
+      onUndo,
+    });
+  };
+
+  const dismissToast = () => {
+    setToast(null);
+  };
+
   // Section Count Badges
   const pinnedCount = conversations.filter((c) => !c.isDeleted && c.isPinned && !c.isArchived).length;
   const favoritesCount = conversations.filter((c) => !c.isDeleted && c.metadata?.isFavorite).length;
   const archivedCount = conversations.filter((c) => !c.isDeleted && c.isArchived).length;
   const recycleBinCount = conversations.filter((c) => c.isDeleted).length;
 
-  // Filtered conversations list for active sidebar view
-  const filteredConversations = conversations.filter((c) => {
+  // Filtered & Sorted conversations list for active sidebar view
+  const rawFiltered = conversations.filter((c) => {
     if (filterTab === 'recycle_bin') return c.isDeleted;
     if (c.isDeleted) return false;
 
@@ -323,6 +352,8 @@ export function useKnownook(initialConversationId?: string) {
     return !c.isArchived; // 'recent' / workspace
   });
 
+  const filteredConversations = sortConversations(rawFiltered, sortMode);
+
   return {
     conversations: filteredConversations,
     allConversations: conversations,
@@ -337,6 +368,11 @@ export function useKnownook(initialConversationId?: string) {
     setSearchQuery,
     filterTab,
     changeFilterTab,
+    sortMode,
+    changeSortMode,
+    toast,
+    triggerToast,
+    dismissToast,
     pinnedCount,
     favoritesCount,
     archivedCount,

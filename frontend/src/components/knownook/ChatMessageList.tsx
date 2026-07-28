@@ -25,6 +25,15 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showJumpToBottom, setShowJumpToBottom] = useState(false);
+
+  // Track scroll position to toggle Jump To Bottom button
+  const handleScroll = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const isScrolledUp = el.scrollHeight - el.scrollTop - el.clientHeight > 200;
+    setShowJumpToBottom(isScrolledUp);
+  };
 
   // Smart auto-scroll
   useEffect(() => {
@@ -42,12 +51,27 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar"
+      onScroll={handleScroll}
+      className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar relative"
       aria-label="Chat Messages"
     >
+      {/* Floating Jump to Latest Message Button */}
+      {showJumpToBottom && (
+        <button
+          onClick={scrollToBottom}
+          className="fixed bottom-24 right-8 z-30 px-3 py-1.5 bg-cyan-600/90 hover:bg-cyan-500 text-white rounded-full text-xs font-semibold shadow-2xl flex items-center gap-1.5 backdrop-blur transition hover:scale-105 border border-cyan-400/40"
+          title="Jump to latest message"
+        >
+          <span>↓ Latest Messages</span>
+        </button>
+      )}
       {/* Loading Skeleton */}
       {isLoading ? (
         <div className="space-y-4 max-w-3xl mx-auto">
