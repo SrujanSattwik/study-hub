@@ -62,6 +62,16 @@ export const RETRY_CONFIG = {
   RETRYABLE_STATUS_CODES: [429, 500, 502, 503, 504],
 };
 
+// ─── SSE Streaming Config ────────────────────────────────────────────────────
+export const SSE_CONFIG = {
+  HEARTBEAT_INTERVAL_MS: parseInt(process.env.SSE_HEARTBEAT_MS || '20000', 10),
+  STREAM_TIMEOUT_MS: parseInt(process.env.SSE_STREAM_TIMEOUT_MS || '120000', 10),
+  IDLE_TIMEOUT_MS: parseInt(process.env.SSE_IDLE_TIMEOUT_MS || '60000', 10),
+  MAX_RETRY_DELAY_MS: 5_000,        // SSE client reconnect hint
+  FLUSH_EVERY_N_CHUNKS: 1,          // flush SSE immediately on each chunk (lowest latency)
+};
+
+
 // ─── General AI_CONFIG (backward compat) ───────────────────────────────────
 export const AI_CONFIG = {
   DEFAULT_MODEL: GEMINI_MODEL_CONFIG.model,

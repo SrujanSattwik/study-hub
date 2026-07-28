@@ -6,6 +6,7 @@ import { aiAttachmentController } from '../controllers/ai-attachment.controller'
 import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
 import { aiEngineController } from '../controllers/ai-engine.controller';
+import { aiStreamController } from '../controllers/ai-stream.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -32,6 +33,12 @@ router.delete('/conversations/:conversationId', aiConversationController.deleteC
 
 // ── Phase 3: AI Engine — Conversation-Aware Multi-Turn Ask ───────────────────
 router.post('/conversations/:conversationId/ask', aiEngineController.ask);
+
+// ── Phase 4: SSE Streaming — Real-Time Token Streaming ───────────────────────
+// POST  /api/ai/conversations/:conversationId/stream
+// Response: text/event-stream (SSE)
+// Events:  conversation_started | metadata | thinking | token | completed | aborted | error | done
+router.post('/conversations/:conversationId/stream', aiStreamController.stream);
 
 
 // ── Messages ──────────────────────────────────────────────────────────────────

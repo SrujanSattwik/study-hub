@@ -1,63 +1,121 @@
-# StudyHub — KnowNook Phase 2 Backend REST API Layer Walkthrough
+# StudyHub — KnowNook Phase 3: AI Conversation Engine Walkthrough
 
 ## Overview
 
-This walkthrough documents the completion of **Phase 2 — KnowNook Backend REST API Layer** in the StudyHub repository. All REST API endpoints, controllers, authorization guards, pagination, search filters, and usage metrics have been built on top of the Phase 1 persistence foundation.
+Phase 3 transforms KnowNook from a stateless Gemini wrapper into a production-grade AI learning assistant with full conversation memory, context intelligence, prompt engineering, safety filtering, and token management.
 
 ---
 
-## Accomplishments
+## Architecture Diagram
 
-### 1. Controllers Built (`/backend/src/controllers/`)
-* [`ai-conversation.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-conversation.controller.ts): CRUD operations, pin/unpin toggles, archive/unarchive toggles, and soft-delete/restore handlers.
-* [`ai-message.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-message.controller.ts): Message insertion, thread listing with pagination, update, and delete handlers.
-* [`ai-attachment.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-attachment.controller.ts): Attachment metadata registration, processing status updates, and unlinking deletion.
-* [`ai-flashcard.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-flashcard.controller.ts): Math Flashcard CRUD, difficulty filtering, search, and favorite toggling.
-* [`ai-usage.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-usage.controller.ts): User token usage statistics (daily, monthly, request counts).
+```
+User HTTP Request
+       │
+       ▼
+AiEngineController
+  (ai-engine.controller.ts)
+       │  Validates UUID + message body
+       ▼
+ConversationEngine.respond()
+  (ai/conversation-engine.ts)
+       │
+       ├─ 1. Verify conversation ownership (DB)
+       │
+       ├─ 2. Load assets in parallel:
+       │      ├─ Messages (from findFullById include)
+       │      ├─ Attachments (by conversationId)
+       │      └─ Flashcards (by userId)
+       │
+       ├─ 3. MemoryManager.package()
+       │      ├─ Sliding window (last 15 msgs)
+       │      ├─ Token budget enforcement (8,000 tokens)
+       │      ├─ Keyword relevance scoring for docs
+       │      ├─ Document budget (6,000 tokens, truncated)
+       │      └─ Flashcard scoring + top-10 selection
+       │
+       ├─ 4. PromptBuilder (Builder Pattern)
+       │      ├─ System instruction (KnowNook persona)
+       │      ├─ Conversation summary (if present)
+       │      ├─ Document context section
+       │      ├─ Flashcard context section
+       │      ├─ History turns (sliding window)
+       │      └─ Current user message
+       │
+       ├─ 5. GeminiClient.generate()
+       │      ├─ Multi-turn contents[]
+       │      ├─ systemInstruction parameter
+       │      ├─ Safety settings (4 categories)
+       │      ├─ Retry engine (exponential backoff, 3 retries)
+       │      └─ Token counts from usageMetadata
+       │
+       ├─ 6. ResponseProcessor.process()
+       │      ├─ Prompt injection sanitization
+       │      ├─ Code/math/table detection
+       │      └─ Reading time estimation
+       │
+       ├─ 7. Persist user message (AiMessage)
+       ├─ 8. Persist assistant message (AiMessage + metadata)
+       ├─ 9. Increment conversation stats
+       ├─ 10. Record usage (AiUsage)
+       └─ 11. Async summarization trigger (if msgs >= 30)
+              └─ SummarizationService → Gemini → DB
+```
 
 ---
 
-### 2. Route Registration ([`ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts))
-Registered 21 protected REST endpoints under `/api/ai/*`:
+## Files Created (`/backend/src/ai/`)
 
-| Resource | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Conversations** | `POST` | `/api/ai/conversations` | Create a new AI chat thread |
-| | `GET` | `/api/ai/conversations` | List user threads (paginated, search, pin, archive) |
-| | `GET` | `/api/ai/conversations/:conversationId` | Get full thread with messages & attachments |
-| | `PATCH` | `/api/ai/conversations/:conversationId` | Update title, color, metadata |
-| | `PATCH` | `/api/ai/conversations/:conversationId/pin` | Toggle pin status |
-| | `PATCH` | `/api/ai/conversations/:conversationId/archive` | Toggle archive status |
-| | `PATCH` | `/api/ai/conversations/:conversationId/restore` | Restore soft-deleted/archived thread |
-| | `DELETE` | `/api/ai/conversations/:conversationId` | Soft-delete thread |
-| **Messages** | `POST` | `/api/ai/conversations/:conversationId/messages` | Add user/assistant message to thread |
-| | `GET` | `/api/ai/conversations/:conversationId/messages` | Get message history (paginated, search) |
-| | `PATCH` | `/api/ai/messages/:messageId` | Update/edit message content |
-| | `DELETE` | `/api/ai/messages/:messageId` | Delete message |
-| **Attachments** | `POST` | `/api/ai/conversations/:conversationId/attachments` | Register uploaded file metadata |
-| | `GET` | `/api/ai/conversations/:conversationId/attachments` | List thread attachments |
-| | `PATCH` | `/api/ai/attachments/:attachmentId/status` | Update processing status |
-| | `DELETE` | `/api/ai/attachments/:attachmentId` | Delete attachment & unlink storage file |
-| **Flashcards** | `POST` | `/api/ai/flashcards` | Create Math Flashcard |
-| | `GET` | `/api/ai/flashcards` | List flashcards (difficulty, favorite, search) |
-| | `GET` | `/api/ai/flashcards/:flashcardId` | Get single flashcard |
-| | `PATCH` | `/api/ai/flashcards/:flashcardId` | Update flashcard details |
-| | `PATCH` | `/api/ai/flashcards/:flashcardId/favorite` | Toggle favorite status |
-| | `DELETE` | `/api/ai/flashcards/:flashcardId` | Delete flashcard |
-| **Usage Stats** | `GET` | `/api/ai/usage` | Get user token usage & activity metrics |
+| File | Responsibility |
+| :--- | :--- |
+| [`token-counter.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/token-counter.ts) | Char-to-token estimation, budget enforcement, text truncation |
+| [`memory-manager.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/memory-manager.ts) | Sliding window selection, keyword relevance scoring, document/flashcard budgeting |
+| [`prompt-builder.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/prompt-builder.ts) | Builder-pattern structured prompt assembly (persona, summary, docs, cards, history, question) |
+| [`gemini-client.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/gemini-client.ts) | Provider-agnostic HTTP client with safety settings, retry engine, and token parsing |
+| [`response-processor.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/response-processor.ts) | Injection sanitization, code/math/table detection, reading time annotation |
+| [`summarization.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/summarization.service.ts) | Summarization prompt builder, async summary persistence |
+| [`conversation-engine.ts`](file:///d:/code/code/raw/study-hub/backend/src/ai/conversation-engine.ts) | Central orchestrator — entire 11-step pipeline |
+
+## Files Modified
+
+| File | Change |
+| :--- | :--- |
+| [`ai.config.ts`](file:///d:/code/code/raw/study-hub/backend/src/config/ai.config.ts) | Added `GEMINI_MODEL_CONFIG`, `TOKEN_BUDGET`, `MEMORY_CONFIG`, `RETRY_CONFIG`, `GEMINI_SAFETY_SETTINGS` |
+| [`ai.types.ts`](file:///d:/code/code/raw/study-hub/backend/src/types/ai.types.ts) | Added `AiEngineRequest`, `AiEngineResponse`, `BuiltPrompt`, `GeminiContent`, `MemoryPackage`, `ContextDocument`, `ContextFlashcard` |
+| [`ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts) | Registered `POST /api/ai/conversations/:conversationId/ask` |
+| [`ai-engine.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-engine.controller.ts) | HTTP handler for the engine endpoint |
 
 ---
 
-## Verification & Testing Results
+## New Endpoint
 
-| Check | Scope / Command | Result | Notes |
-| :--- | :--- | :--- | :--- |
-| **Backend TypeScript Build** | `tsc` (via `npm run build`) | ✅ **Passed** | 0 TypeScript errors |
-| **Frontend Vite Build** | `vite build` (via `npm run build`) | ✅ **Passed** | 0 compilation errors |
-| **Route Authorization** | JWT Bearer Middleware | ✅ **Passed** | All endpoints enforce JWT & user isolation |
-| **Response Format** | Standardized JSON structure | ✅ **Passed** | `{ success, data, message, pagination }` |
+| Method | Route | Auth | Body | Response |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/api/ai/conversations/:conversationId/ask` | `Bearer JWT` | `{ message: string }` | `{ success, data: { answer, userMessageId, assistantMessageId, meta: { tokens, model, time } } }` |
+
+---
+
+## Memory Strategy
+
+| Strategy | Implementation |
+| :--- | :--- |
+| **Sliding Window** | Last 15 messages always included |
+| **Token Budget** | History capped at 8,000 tokens; documents at 6,000; flashcards at 2,000 |
+| **Relevance Scoring** | Keyword overlap score; threshold 0.3 |
+| **Summarization Trigger** | Auto-triggered async at 30+ messages |
+| **Summary Reuse** | Stored summary injected into all future requests |
+
+---
+
+## Verification
+
+| Check | Result |
+| :--- | :--- |
+| **Backend TypeScript Build** | ✅ `tsc` — 0 errors |
+| **Git Push** | ✅ Commit `e724935` pushed |
+| **Legacy `/ask` endpoint** | ✅ Preserved unchanged |
 
 ---
 
 ## Phase Readiness
-The backend REST API layer is 100% complete and ready for **Phase 3 (AI Conversation Engine & Streaming Memory)** without requiring further database or REST API refactoring.
+
+The AI Engine is fully ready for **Phase 4 — Real-Time SSE Streaming**. The `GeminiClient` is provider-isolated; adding streaming requires only a `generateStream()` method. `ConversationEngine` can call it without architectural changes.

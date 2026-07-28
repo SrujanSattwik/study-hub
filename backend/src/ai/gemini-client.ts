@@ -118,6 +118,79 @@ export class GeminiClient {
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+
+  // ─── Phase 4: Streaming ──────────────────────────────────────────────────────
+
+  /**
+   * generateStream — calls Gemini's streamGenerateContent endpoint and yields
+   * text chunks one by one as an async generator.
+   *
+   * Uses Node.js HTTP with raw chunked-transfer decoding to avoid buffering
+   * the full response in memory.
+   *
+   * The caller owns the AbortController and is responsible for cleanup.
+   * This method does NOT modify any existing generate() logic.
+   */
+  async *generateStream(
+    prompt: BuiltPrompt,
+    abortController?: AbortController
+  ): AsyncGenerator<string, void, unknown> {
+    const streamUrl = `${GEMINI_MODEL_CONFIG.baseUrl}/${this.model}:streamGenerateContent?alt=sse`;
+    const payload = this.buildPayload(prompt);
+
+    let response: any;
+    try {
+      response = await axios.post(streamUrl, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': config.GEMINI_API_KEY,
+        },
+        timeout: GEMINI_MODEL_CONFIG.timeoutMs,
+        responseType: 'stream',
+        signal: abortController?.signal,
+      });
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || err.message;
+      throw new Error(`Gemini stream error: ${msg}`);
+    }
+
+    // Parse the SSE-encoded stream from Gemini line-by-line
+    const stream = response.data;
+    let buffer = '';
+
+    for await (const rawChunk of stream) {
+      // Respect abort signal
+      if (abortController?.signal.aborted) {
+        stream.destroy();
+        return;
+      }
+
+      buffer += rawChunk.toString('utf8');
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data:')) continue;
+
+        const json = trimmed.slice(5).trim();
+        if (!json || json === '[DONE]') continue;
+
+        try {
+          const parsed = JSON.parse(json);
+          const parts = parsed?.candidates?.[0]?.content?.parts || [];
+          for (const part of parts) {
+            if (part.text) {
+              yield part.text as string;
+            }
+          }
+        } catch {
+          // Partial JSON chunk — skip and continue accumulating
+        }
+      }
+    }
+  }
 }
 
 export const geminiClient = new GeminiClient();
+

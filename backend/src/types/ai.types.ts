@@ -155,3 +155,57 @@ export interface MemoryPackage {
   totalEstimatedTokens: number;
 }
 
+// ─── Phase 4: SSE Streaming Types ─────────────────────────────────────────────
+
+export type SseEventType =
+  | 'conversation_started'
+  | 'thinking'
+  | 'token'
+  | 'partial_message'
+  | 'progress'
+  | 'heartbeat'
+  | 'completed'
+  | 'aborted'
+  | 'error'
+  | 'metadata'
+  | 'done';
+
+export interface SseEvent<T = unknown> {
+  event: SseEventType;
+  data: T;
+  id?: string;
+}
+
+export interface SseTokenPayload {
+  text: string;
+  index: number;
+}
+
+export interface SseCompletedPayload {
+  userMessageId: string;
+  assistantMessageId: string;
+  answer: string;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  generationTimeMs: number;
+  model: string;
+  finishReason: string;
+}
+
+export interface SseErrorPayload {
+  code: string;
+  message: string;
+}
+
+export interface SseMetadataPayload {
+  conversationId: string;
+  model: string;
+  estimatedPromptTokens: number;
+}
+
+export interface StreamEngineRequest extends AiEngineRequest {
+  abortSignal?: AbortSignal;
+}
+
+
