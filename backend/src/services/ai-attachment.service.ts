@@ -6,6 +6,8 @@ import { StorageUtils } from '../utils/storage';
 import { logger } from '../utils/logger';
 import { AiAttachment, AttachmentProcessingStatus } from '@prisma/client';
 
+import { documentExtractorService } from './document-extractor.service';
+
 export class AiAttachmentService {
   async registerAttachment(userId: string, data: CreateAttachmentDTO): Promise<AiAttachment> {
     const conversation = await aiConversationRepository.findById(data.conversationId, userId);
@@ -13,8 +15,38 @@ export class AiAttachmentService {
       throw new AiConversationNotFoundError();
     }
 
-    const attachment = await aiAttachmentRepository.create(data);
-    logger.info(`📎 [AI ATTACHMENT] Registered attachment ${attachment.id} for conversation ${data.conversationId}`);
+    let extractedText = data.extractedText;
+    let ocrText = data.ocrText;
+    let sha256Hash = data.sha256Hash;
+    let status: AttachmentProcessingStatus = AttachmentProcessingStatus.completed;
+
+    // Run automatic extraction if text/OCR not already supplied
+    if (!extractedText && !ocrText) {
+      try {
+        const extraction = await documentExtractorService.extract(
+          data.uploadPath,
+          data.originalName,
+          data.mimeType
+        );
+        extractedText = extraction.extractedText;
+        ocrText = extraction.ocrText;
+        sha256Hash = extraction.sha256Hash;
+      } catch (err: any) {
+        logger.warn(`[AI ATTACHMENT] Extraction notice for ${data.originalName}: ${err.message}`);
+        status = AttachmentProcessingStatus.completed;
+      }
+    }
+
+    const attachment = await aiAttachmentRepository.create({
+      ...data,
+      sha256Hash,
+      extractedText,
+      ocrText,
+    });
+
+    await aiAttachmentRepository.updateStatus(attachment.id, status, extractedText, ocrText);
+
+    logger.info(`📎 [AI ATTACHMENT] Registered attachment ${attachment.id} for conversation ${data.conversationId} with status ${status}`);
     return attachment;
   }
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AiMessage } from '../../types/ai.types';
 
+import RichMarkdownRenderer from './RichMarkdownRenderer';
+
 interface ChatMessageListProps {
   messages: AiMessage[];
   isLoading: boolean;
@@ -111,7 +113,11 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                   }`}
                 >
                   {/* Content */}
-                  <div className="whitespace-pre-wrap break-words">{msg.content}</div>
+                  {isUser ? (
+                    <div className="whitespace-pre-wrap break-words">{msg.content}</div>
+                  ) : (
+                    <RichMarkdownRenderer content={msg.content} />
+                  )}
 
                   {/* Footer / Actions */}
                   <div className="mt-2 flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-700/40">
@@ -177,7 +183,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               </div>
 
               <div className="relative max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed bg-gray-800/90 border border-cyan-500/40 text-gray-100 rounded-tl-none shadow-lg">
-                <div className="whitespace-pre-wrap break-words">{streamingText}</div>
+                <RichMarkdownRenderer content={streamingText} isStreaming={true} />
                 <span className="inline-block w-2 h-4 bg-cyan-400 ml-1 animate-pulse rounded-sm align-middle" />
               </div>
             </div>

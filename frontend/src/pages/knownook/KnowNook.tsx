@@ -10,6 +10,8 @@ import ChatInput from '../../components/knownook/ChatInput';
 import AttachmentPanel from '../../components/knownook/AttachmentPanel';
 import FlashcardDrawer from '../../components/knownook/FlashcardDrawer';
 import UsagePanel from '../../components/knownook/UsagePanel';
+import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
+import { AiAttachment } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
@@ -50,9 +52,10 @@ export const KnowNook: React.FC = () => {
     stopStream,
   } = useKnownookStream();
 
-  // Drawer overlays
+  // Drawer & Modal overlays
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
   const [isUsageOpen, setIsUsageOpen] = useState(false);
+  const [previewAttachment, setPreviewAttachment] = useState<AiAttachment | null>(null);
 
   // Sync active conversation with URL
   useEffect(() => {
@@ -158,7 +161,11 @@ export const KnowNook: React.FC = () => {
         </header>
 
         {/* Attachment Banner */}
-        <AttachmentPanel attachments={attachments} onRemove={handleRemoveAttachment} />
+        <AttachmentPanel
+          attachments={attachments}
+          onRemove={handleRemoveAttachment}
+          onPreview={(att) => setPreviewAttachment(att)}
+        />
 
         {/* Chat Messages Canvas */}
         <ChatMessageList
@@ -199,6 +206,13 @@ export const KnowNook: React.FC = () => {
         isOpen={isUsageOpen}
         onClose={() => setIsUsageOpen(false)}
         stats={usageStats}
+      />
+
+      {/* 5. Document Preview Modal */}
+      <DocumentPreviewModal
+        isOpen={!!previewAttachment}
+        onClose={() => setPreviewAttachment(null)}
+        attachment={previewAttachment}
       />
     </div>
   );

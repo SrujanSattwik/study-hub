@@ -37,6 +37,7 @@ Response formatting:
 - Use Markdown for structure (headers, lists, code blocks, math notation)
 - Use triple backticks for code with language specification
 - Use $ delimiters for inline math and $$ for block equations
+- When referencing uploaded study materials, append source citations in format: [Doc: DocumentName, Sec N]
 - Keep responses focused and scannable — not walls of text
 - Always end complex explanations with a concise summary
 

@@ -57,6 +57,7 @@ export interface AiAttachment {
   mimeType: string;
   fileSize: number;
   uploadPath: string;
+  sha256Hash?: string | null;
   status: AttachmentProcessingStatus;
   extractedText?: string | null;
   ocrText?: string | null;
