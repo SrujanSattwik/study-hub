@@ -63,6 +63,7 @@ model User {
   aiConversations      AiConversation[]
   aiAttachments        AiAttachment[]
   aiFlashcards         AiFlashcard[]
+  aiNotes              AiNote[]
   aiUsages             AiUsage[]
 
   @@map("users")
@@ -646,6 +647,7 @@ model AiConversation {
   messages    AiMessage[]
   attachments AiAttachment[]
   flashcards  AiFlashcard[]
+  notes       AiNote[]
 
   @@map("ai_conversations")
   @@index([userId, isDeleted, isPinned])
@@ -740,4 +742,27 @@ model AiUsage {
   @@map("ai_usages")
   @@index([userId, date])
 }
+
+model AiNote {
+  id             String         @id @default(uuid()) @map("note_id") @db.VarChar(36)
+  userId         String         @map("user_id") @db.VarChar(36)
+  conversationId String?        @map("conversation_id") @db.VarChar(36)
+  title          String         @db.VarChar(255)
+  noteType       String         @default("smart") @map("note_type") @db.VarChar(50)
+  content        String         @db.Text
+  summary        String?        @db.Text
+  tags           String?        @db.Text
+  isFavorite     Boolean        @default(false) @map("is_favorite")
+  metadata       Json?
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @default(now()) @updatedAt @map("updated_at")
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@map("ai_notes")
+  @@index([userId, isFavorite])
+  @@index([conversationId])
+}
+
 

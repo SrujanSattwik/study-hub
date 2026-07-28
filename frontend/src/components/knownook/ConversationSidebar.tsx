@@ -42,6 +42,7 @@ interface ConversationSidebarProps {
   onPermanentDeleteChat: (id: string) => void;
 
   onOpenFlashcards: () => void;
+  onOpenNotes: () => void;
   onOpenUsage: () => void;
 }
 
@@ -84,6 +85,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onPermanentDeleteChat,
 
   onOpenFlashcards,
+  onOpenNotes,
   onOpenUsage,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -495,25 +497,30 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       </div>
 
       {/* Footer Tools Drawer Triggers */}
-      <div className="p-3 border-t border-gray-700 bg-gray-900/50 flex items-center justify-between gap-2">
+      <div className="p-3 border-t border-gray-700 bg-gray-900/50 flex items-center justify-between gap-1.5">
+        <button
+          onClick={onOpenNotes}
+          className="flex-1 py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          title="AI Notes Workspace (Ctrl+Shift+N)"
+        >
+          <span>📝 Notes</span>
+        </button>
+
         <button
           onClick={onOpenFlashcards}
-          className="flex-1 py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1.5 transition"
+          className="flex-1 py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          title="AI Flashcards"
         >
-          <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <span>Flashcards</span>
+          <span className="text-amber-400">🎴</span>
+          <span>Cards</span>
         </button>
 
         <button
           onClick={onOpenUsage}
-          className="flex-1 py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1.5 transition"
+          className="py-1.5 px-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          title="Usage Metrics"
         >
-          <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          <span>Usage</span>
+          <span className="text-emerald-400">📊</span>
         </button>
       </div>
     </aside>

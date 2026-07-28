@@ -9,10 +9,12 @@ import ChatMessageList from '../../components/knownook/ChatMessageList';
 import ChatInput from '../../components/knownook/ChatInput';
 import AttachmentPanel from '../../components/knownook/AttachmentPanel';
 import FlashcardDrawer from '../../components/knownook/FlashcardDrawer';
+import NotesDrawer from '../../components/knownook/NotesDrawer';
 import UsagePanel from '../../components/knownook/UsagePanel';
 import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
 import ToastNotification from '../../components/knownook/ToastNotification';
 import ConfirmDeleteModal from '../../components/knownook/ConfirmDeleteModal';
+import { useKnownookNotes } from '../../hooks/useKnownookNotes';
 import { AiAttachment, AiConversation } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
@@ -81,6 +83,27 @@ export const KnowNook: React.FC = () => {
     startStream,
     stopStream,
   } = useKnownookStream();
+
+  // AI Notes Hook & Overlay
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
+  const {
+    notes,
+    activeNote,
+    setActiveNote,
+    isLoading: isLoadingNotes,
+    isGenerating: isGeneratingNote,
+    searchQuery: noteSearchQuery,
+    setSearchQuery: setNoteSearchQuery,
+    filterType: noteFilterType,
+    setFilterType: setNoteFilterType,
+    generateNote,
+    regenerateNote,
+    updateNote,
+    toggleFavorite: toggleFavoriteNote,
+    deleteNote,
+    exportToMarkdown: exportNoteMarkdown,
+    exportToPdf: exportNotePdf,
+  } = useKnownookNotes(activeConversation?.id);
 
   // Drawer & Modal overlays
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
@@ -229,6 +252,7 @@ export const KnowNook: React.FC = () => {
         }}
 
         onOpenFlashcards={() => setIsFlashcardOpen(true)}
+        onOpenNotes={() => setIsNotesOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
       />
 
@@ -311,7 +335,29 @@ export const KnowNook: React.FC = () => {
         attachment={previewAttachment}
       />
 
-      {/* 6. Permanent Delete Confirmation Modal */}
+      {/* 6. AI Notes Workspace Drawer */}
+      <NotesDrawer
+        isOpen={isNotesOpen}
+        onClose={() => setIsNotesOpen(false)}
+        notes={notes}
+        activeNote={activeNote}
+        onSelectNote={setActiveNote}
+        isLoading={isLoadingNotes}
+        isGenerating={isGeneratingNote}
+        searchQuery={noteSearchQuery}
+        onSearchChange={setNoteSearchQuery}
+        filterType={noteFilterType}
+        onFilterChange={setNoteFilterType}
+        onGenerateNote={generateNote}
+        onRegenerateNote={regenerateNote}
+        onUpdateNote={updateNote}
+        onToggleFavorite={toggleFavoriteNote}
+        onDeleteNote={deleteNote}
+        onExportMarkdown={exportNoteMarkdown}
+        onExportPdf={exportNotePdf}
+      />
+
+      {/* 7. Permanent Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={!!pendingDeleteConversation}
         conversation={pendingDeleteConversation}
@@ -325,7 +371,7 @@ export const KnowNook: React.FC = () => {
         onCancel={() => setPendingDeleteConversation(null)}
       />
 
-      {/* 7. Floating Toast Undo Notification */}
+      {/* 8. Floating Toast Undo Notification */}
       <ToastNotification toast={toast} onDismiss={dismissToast} />
     </div>
   );

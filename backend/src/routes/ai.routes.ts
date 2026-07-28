@@ -4,6 +4,7 @@ import { aiConversationController } from '../controllers/ai-conversation.control
 import { aiMessageController } from '../controllers/ai-message.controller';
 import { aiAttachmentController } from '../controllers/ai-attachment.controller';
 import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
+import { aiNoteController } from '../controllers/ai-note.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
 import { aiEngineController } from '../controllers/ai-engine.controller';
 import { aiStreamController } from '../controllers/ai-stream.controller';
@@ -60,6 +61,14 @@ router.get('/flashcards/:flashcardId', aiFlashcardController.getFlashcard);
 router.patch('/flashcards/:flashcardId', aiFlashcardController.updateFlashcard);
 router.patch('/flashcards/:flashcardId/favorite', aiFlashcardController.toggleFavorite);
 router.delete('/flashcards/:flashcardId', aiFlashcardController.deleteFlashcard);
+
+// ── Phase 8.1: AI Notes ───────────────────────────────────────────────────────
+router.post('/notes/generate', aiNoteController.generateNote);
+router.get('/notes', aiNoteController.listNotes);
+router.get('/notes/:id', aiNoteController.getNoteById);
+router.patch('/notes/:id', aiNoteController.updateNote);
+router.post('/notes/:id/regenerate', aiNoteController.regenerateNote);
+router.delete('/notes/:id', aiNoteController.deleteNote);
 
 // ── Usage Metrics ─────────────────────────────────────────────────────────────
 router.get('/usage', aiUsageController.getUsageStats);

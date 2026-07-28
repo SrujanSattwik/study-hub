@@ -96,6 +96,47 @@ export interface UpdateFlashcardDTO {
   isFavorite?: boolean;
 }
 
+// ── Note DTOs (Phase 8.1) ──
+export type NoteType =
+  | 'executive_summary'
+  | 'detailed'
+  | 'bullet'
+  | 'revision'
+  | 'exam'
+  | 'eli5'
+  | 'key_takeaways'
+  | 'definitions'
+  | 'formulas'
+  | 'mindmap'
+  | 'smart';
+
+export interface GenerateNoteDTO {
+  conversationId?: string;
+  noteType: NoteType;
+  customTopic?: string;
+  instructions?: string;
+}
+
+export interface CreateNoteDTO {
+  userId: string;
+  conversationId?: string;
+  title: string;
+  noteType: string;
+  content: string;
+  summary?: string;
+  tags?: string;
+  isFavorite?: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface UpdateNoteDTO {
+  title?: string;
+  content?: string;
+  summary?: string;
+  tags?: string;
+  isFavorite?: boolean;
+}
+
 // ─── AI Engine Types (Phase 3) ────────────────────────────────────────────────
 
 export interface AiEngineRequest {

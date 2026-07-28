@@ -136,3 +136,38 @@ export interface SseErrorPayload {
   code: string;
   message: string;
 }
+
+export type NoteType =
+  | 'executive_summary'
+  | 'detailed'
+  | 'bullet'
+  | 'revision'
+  | 'exam'
+  | 'eli5'
+  | 'key_takeaways'
+  | 'definitions'
+  | 'formulas'
+  | 'mindmap'
+  | 'smart';
+
+export interface AiNote {
+  id: string;
+  userId: string;
+  conversationId?: string | null;
+  title: string;
+  noteType: string;
+  content: string;
+  summary?: string | null;
+  tags?: string | null;
+  isFavorite: boolean;
+  metadata?: Record<string, any> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GenerateNoteDTO {
+  conversationId?: string;
+  noteType: NoteType;
+  customTopic?: string;
+  instructions?: string;
+}
