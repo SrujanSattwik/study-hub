@@ -1,9 +1,51 @@
 import express from 'express';
 import { aiController } from '../controllers/ai.controller';
+import { aiConversationController } from '../controllers/ai-conversation.controller';
+import { aiMessageController } from '../controllers/ai-message.controller';
+import { aiAttachmentController } from '../controllers/ai-attachment.controller';
+import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
+import { aiUsageController } from '../controllers/ai-usage.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.post('/ask', authenticateToken, aiController.ask);
+// Require JWT authentication for all AI endpoints
+router.use(authenticateToken);
+
+// ── Legacy Endpoint ──────────────────────────────────────────────────────────
+router.post('/ask', aiController.ask);
+
+// ── Conversations ─────────────────────────────────────────────────────────────
+router.post('/conversations', aiConversationController.createConversation);
+router.get('/conversations', aiConversationController.listConversations);
+router.get('/conversations/:conversationId', aiConversationController.getConversation);
+router.patch('/conversations/:conversationId', aiConversationController.updateConversation);
+router.patch('/conversations/:conversationId/pin', aiConversationController.pinConversation);
+router.patch('/conversations/:conversationId/archive', aiConversationController.archiveConversation);
+router.patch('/conversations/:conversationId/restore', aiConversationController.restoreConversation);
+router.delete('/conversations/:conversationId', aiConversationController.deleteConversation);
+
+// ── Messages ──────────────────────────────────────────────────────────────────
+router.post('/conversations/:conversationId/messages', aiMessageController.createMessage);
+router.get('/conversations/:conversationId/messages', aiMessageController.listMessages);
+router.patch('/messages/:messageId', aiMessageController.updateMessage);
+router.delete('/messages/:messageId', aiMessageController.deleteMessage);
+
+// ── Attachments ───────────────────────────────────────────────────────────────
+router.post('/conversations/:conversationId/attachments', aiAttachmentController.registerAttachment);
+router.get('/conversations/:conversationId/attachments', aiAttachmentController.listAttachments);
+router.patch('/attachments/:attachmentId/status', aiAttachmentController.updateStatus);
+router.delete('/attachments/:attachmentId', aiAttachmentController.deleteAttachment);
+
+// ── Flashcards ────────────────────────────────────────────────────────────────
+router.post('/flashcards', aiFlashcardController.createFlashcard);
+router.get('/flashcards', aiFlashcardController.listFlashcards);
+router.get('/flashcards/:flashcardId', aiFlashcardController.getFlashcard);
+router.patch('/flashcards/:flashcardId', aiFlashcardController.updateFlashcard);
+router.patch('/flashcards/:flashcardId/favorite', aiFlashcardController.toggleFavorite);
+router.delete('/flashcards/:flashcardId', aiFlashcardController.deleteFlashcard);
+
+// ── Usage Metrics ─────────────────────────────────────────────────────────────
+router.get('/usage', aiUsageController.getUsageStats);
 
 export default router;

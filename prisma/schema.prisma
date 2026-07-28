@@ -60,6 +60,10 @@ model User {
   presence             PresenceStatus?
   typingStatuses       TypingStatus[]
   refreshTokens        RefreshToken[]
+  aiConversations      AiConversation[]
+  aiAttachments        AiAttachment[]
+  aiFlashcards         AiFlashcard[]
+  aiUsages             AiUsage[]
 
   @@map("users")
   @@index([role])
@@ -597,3 +601,143 @@ model TypingStatus {
   @@map("typing_status")
   @@index([groupId])
 }
+
+// ─── KnowNook AI Persistence Enums & Models ──────────────────────────────────
+
+enum MessageRole {
+  user
+  assistant
+  system
+}
+
+enum AttachmentProcessingStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum FlashcardDifficulty {
+  easy
+  medium
+  hard
+}
+
+model AiConversation {
+  id                String    @id @default(uuid()) @map("conversation_id") @db.VarChar(36)
+  userId            String    @map("user_id") @db.VarChar(36)
+  title             String    @default("New Chat") @db.VarChar(255)
+  summary           String?   @db.Text
+  modelUsed         String    @default("gemini-2.0-flash") @map("model_used") @db.VarChar(100)
+  temperature       Float     @default(0.7)
+  totalMessages     Int       @default(0) @map("total_messages")
+  totalTokens       Int       @default(0) @map("total_tokens")
+  conversationColor String?   @map("conversation_color") @db.VarChar(50)
+  isPinned          Boolean   @default(false) @map("is_pinned")
+  isArchived        Boolean   @default(false) @map("is_archived")
+  isDeleted         Boolean   @default(false) @map("is_deleted")
+  deletedAt         DateTime? @map("deleted_at")
+  lastMessageAt     DateTime  @default(now()) @map("last_message_at")
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    AiMessage[]
+  attachments AiAttachment[]
+  flashcards  AiFlashcard[]
+
+  @@map("ai_conversations")
+  @@index([userId, isDeleted, isPinned])
+  @@index([userId, lastMessageAt])
+  @@index([updatedAt])
+}
+
+model AiMessage {
+  id              String      @id @default(uuid()) @map("message_id") @db.VarChar(36)
+  conversationId  String      @map("conversation_id") @db.VarChar(36)
+  parentMessageId String?     @map("parent_message_id") @db.VarChar(36)
+  role            MessageRole
+  content         String      @db.Text
+  markdown        String?     @db.Text
+  htmlCache       String?     @map("html_cache") @db.Text
+  tokenCount      Int?        @map("token_count")
+  finishReason    String?     @map("finish_reason") @db.VarChar(50)
+  generationTime  Int?        @map("generation_time")
+  model           String?     @db.VarChar(100)
+  isRegenerated   Boolean     @default(false) @map("is_regenerated")
+  isEdited        Boolean     @default(false) @map("is_edited")
+  metadata        Json?
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  parent       AiMessage?     @relation("MessageReplies", fields: [parentMessageId], references: [id], onDelete: SetNull)
+  replies      AiMessage[]    @relation("MessageReplies")
+
+  @@map("ai_messages")
+  @@index([conversationId, createdAt])
+  @@index([role])
+}
+
+model AiAttachment {
+  id               String                     @id @default(uuid()) @map("attachment_id") @db.VarChar(36)
+  conversationId   String                     @map("conversation_id") @db.VarChar(36)
+  userId           String                     @map("user_id") @db.VarChar(36)
+  originalName     String                     @map("original_name") @db.VarChar(255)
+  storedName       String                     @map("stored_name") @db.VarChar(255)
+  extension        String                     @db.VarChar(20)
+  mimeType         String                     @map("mime_type") @db.VarChar(100)
+  fileSize         Int                        @map("file_size")
+  uploadPath       String                     @map("upload_path") @db.VarChar(500)
+  sha256Hash       String?                    @map("sha256_hash") @db.VarChar(64)
+  extractedText    String?                    @map("extracted_text") @db.Text
+  ocrText          String?                    @map("ocr_text") @db.Text
+  processingStatus AttachmentProcessingStatus @default(pending) @map("processing_status")
+  metadata         Json?
+  createdAt        DateTime                   @default(now()) @map("created_at")
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_attachments")
+  @@index([conversationId])
+  @@index([userId])
+}
+
+model AiFlashcard {
+  id             String              @id @default(uuid()) @map("flashcard_id") @db.VarChar(36)
+  userId         String              @map("user_id") @db.VarChar(36)
+  conversationId String?             @map("conversation_id") @db.VarChar(36)
+  title          String              @db.VarChar(255)
+  question       String              @db.Text
+  answer         String              @db.Text
+  formula        String?             @db.Text
+  tags           String?             @db.Text
+  difficulty     FlashcardDifficulty @default(medium)
+  isFavorite     Boolean             @default(false) @map("is_favorite")
+  metadata       Json?
+  createdAt      DateTime            @default(now()) @map("created_at")
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@map("ai_flashcards")
+  @@index([userId, isFavorite])
+  @@index([conversationId])
+}
+
+model AiUsage {
+  id               String   @id @default(uuid()) @map("usage_id") @db.VarChar(36)
+  userId           String   @map("user_id") @db.VarChar(36)
+  promptTokens     Int      @default(0) @map("prompt_tokens")
+  completionTokens Int      @default(0) @map("completion_tokens")
+  totalTokens      Int      @default(0) @map("total_tokens")
+  requestCount     Int      @default(1) @map("request_count")
+  date             DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_usages")
+  @@index([userId, date])
+}
+

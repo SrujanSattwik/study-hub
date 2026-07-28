@@ -1,60 +1,63 @@
-# StudyHub — KnowNook Phase 1 Implementation & UI Redesign Walkthrough
+# StudyHub — KnowNook Phase 2 Backend REST API Layer Walkthrough
 
 ## Overview
 
-This walkthrough documents the technical accomplishments, UI enhancements, and persistence foundation established for the **KnowNook AI Assistant** module in the StudyHub repository.
+This walkthrough documents the completion of **Phase 2 — KnowNook Backend REST API Layer** in the StudyHub repository. All REST API endpoints, controllers, authorization guards, pagination, search filters, and usage metrics have been built on top of the Phase 1 persistence foundation.
 
 ---
 
 ## Accomplishments
 
-### 1. Visual & UI Redesign
-* **Dashboard Layout Shell ([`DashboardLayout.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/layouts/DashboardLayout.tsx)):**
-  * Added top workspace banner (`STUDYHUB WORKSPACE | GLOBAL DASHBOARD`) with color tokens (`#6366F1` Slate Iris and `#06B6D4` Cyan Pulse).
-  * Styled sidebar navigation with 24px grid spacing, 12px rounded corners, and smooth active state pills.
-  * Preserved all 8 existing sidebar menu options, routing, authentication, and command palette logic.
-* **KnowNook AI Assistant Page ([`KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx)):**
-  * Implemented a two-column SaaS layout (780px Chat Pane + 350px Context Sidebar).
-  * Formatted dark code snippet blocks (`bg-[#0F172A]`) with copy button capability.
-  * Added LaTeX math equation rendering view ($x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$).
-  * Added sticky input bar with attachment upload button, emoji selector, and send trigger.
-  * Created Attached Materials cards (`Calculus_Notes.pdf`, `History_Essay.docx`) and Math Flashcard preview.
+### 1. Controllers Built (`/backend/src/controllers/`)
+* [`ai-conversation.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-conversation.controller.ts): CRUD operations, pin/unpin toggles, archive/unarchive toggles, and soft-delete/restore handlers.
+* [`ai-message.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-message.controller.ts): Message insertion, thread listing with pagination, update, and delete handlers.
+* [`ai-attachment.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-attachment.controller.ts): Attachment metadata registration, processing status updates, and unlinking deletion.
+* [`ai-flashcard.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-flashcard.controller.ts): Math Flashcard CRUD, difficulty filtering, search, and favorite toggling.
+* [`ai-usage.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-usage.controller.ts): User token usage statistics (daily, monthly, request counts).
 
 ---
 
-### 2. Phase 1 — Database Foundation & Persistence Layer
-* **Prisma Schema Extensions ([`schema.prisma`](file:///d:/code/code/raw/study-hub/prisma/schema.prisma)):**
-  * Extended `User` model with AI relations.
-  * Added `MessageRole`, `AttachmentProcessingStatus`, and `FlashcardDifficulty` enums.
-  * Implemented 5 database models: `AiConversation`, `AiMessage`, `AiAttachment`, `AiFlashcard`, `AiUsage`.
-* **Prisma Client Code Generation:**
-  * Successfully ran `npm run prisma:generate` producing generated Prisma Client v5.22.0.
-* **Configuration & Storage Utilities:**
-  * Created [`ai.config.ts`](file:///d:/code/code/raw/study-hub/backend/src/config/ai.config.ts) for AI module constants.
-  * Created [`storage.ts`](file:///d:/code/code/raw/study-hub/backend/src/utils/storage.ts) for file path resolution, directory initialization, SHA256 hashing, and unlinking.
-* **Types & Zod Validation:**
-  * Created [`ai.types.ts`](file:///d:/code/code/raw/study-hub/backend/src/types/ai.types.ts) and [`ai.validator.ts`](file:///d:/code/code/raw/study-hub/backend/src/validators/ai.validator.ts).
-* **Repository Layer (`/backend/src/repositories/`):**
-  * `AiConversationRepository`, `AiMessageRepository`, `AiAttachmentRepository`, `AiFlashcardRepository`.
-* **Domain Service Layer (`/backend/src/services/`):**
-  * `AiConversationService`, `AiMessageService`, `AiAttachmentService`, `AiFlashcardService`.
-* **Operational Errors ([`errors.ts`](file:///d:/code/code/raw/study-hub/backend/src/utils/errors.ts)):**
-  * Added `AiConversationNotFoundError`, `AiMessageNotFoundError`, `AiAttachmentNotFoundError`, `AiFlashcardNotFoundError`, `RepositoryError`, `DatabaseError`.
+### 2. Route Registration ([`ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts))
+Registered 21 protected REST endpoints under `/api/ai/*`:
+
+| Resource | Method | Endpoint | Description |
+| :--- | :--- | :--- | :--- |
+| **Conversations** | `POST` | `/api/ai/conversations` | Create a new AI chat thread |
+| | `GET` | `/api/ai/conversations` | List user threads (paginated, search, pin, archive) |
+| | `GET` | `/api/ai/conversations/:conversationId` | Get full thread with messages & attachments |
+| | `PATCH` | `/api/ai/conversations/:conversationId` | Update title, color, metadata |
+| | `PATCH` | `/api/ai/conversations/:conversationId/pin` | Toggle pin status |
+| | `PATCH` | `/api/ai/conversations/:conversationId/archive` | Toggle archive status |
+| | `PATCH` | `/api/ai/conversations/:conversationId/restore` | Restore soft-deleted/archived thread |
+| | `DELETE` | `/api/ai/conversations/:conversationId` | Soft-delete thread |
+| **Messages** | `POST` | `/api/ai/conversations/:conversationId/messages` | Add user/assistant message to thread |
+| | `GET` | `/api/ai/conversations/:conversationId/messages` | Get message history (paginated, search) |
+| | `PATCH` | `/api/ai/messages/:messageId` | Update/edit message content |
+| | `DELETE` | `/api/ai/messages/:messageId` | Delete message |
+| **Attachments** | `POST` | `/api/ai/conversations/:conversationId/attachments` | Register uploaded file metadata |
+| | `GET` | `/api/ai/conversations/:conversationId/attachments` | List thread attachments |
+| | `PATCH` | `/api/ai/attachments/:attachmentId/status` | Update processing status |
+| | `DELETE` | `/api/ai/attachments/:attachmentId` | Delete attachment & unlink storage file |
+| **Flashcards** | `POST` | `/api/ai/flashcards` | Create Math Flashcard |
+| | `GET` | `/api/ai/flashcards` | List flashcards (difficulty, favorite, search) |
+| | `GET` | `/api/ai/flashcards/:flashcardId` | Get single flashcard |
+| | `PATCH` | `/api/ai/flashcards/:flashcardId` | Update flashcard details |
+| | `PATCH` | `/api/ai/flashcards/:flashcardId/favorite` | Toggle favorite status |
+| | `DELETE` | `/api/ai/flashcards/:flashcardId` | Delete flashcard |
+| **Usage Stats** | `GET` | `/api/ai/usage` | Get user token usage & activity metrics |
 
 ---
 
 ## Verification & Testing Results
 
-| Test / Check | Command / Scope | Status | Notes |
+| Check | Scope / Command | Result | Notes |
 | :--- | :--- | :--- | :--- |
-| **Prisma Generation** | `npm run prisma:generate` | ✅ **Passed** | Client generated cleanly |
 | **Backend TypeScript Build** | `tsc` (via `npm run build`) | ✅ **Passed** | 0 TypeScript errors |
-| **Frontend Vite Build** | `vite build` (via `npm run build`) | ✅ **Passed** | Compiled dist bundle in 1.10s |
-| **Git Branch Push** | `git push -u origin feat/knownook-ui-redesign-and-audit` | ✅ **Passed** | Branch `feat/knownook-ui-redesign-and-audit` pushed |
+| **Frontend Vite Build** | `vite build` (via `npm run build`) | ✅ **Passed** | 0 compilation errors |
+| **Route Authorization** | JWT Bearer Middleware | ✅ **Passed** | All endpoints enforce JWT & user isolation |
+| **Response Format** | Standardized JSON structure | ✅ **Passed** | `{ success, data, message, pagination }` |
 
 ---
 
-## Next Steps
-
-1. **Phase 2 — Backend API Development:** Implement REST endpoints for conversation CRUD, message history, attachment uploads, and flashcard management.
-2. **Phase 3 — Server-Sent Events (SSE) Token Streaming:** Add SSE streaming handler for real-time Gemini AI tokens.
+## Phase Readiness
+The backend REST API layer is 100% complete and ready for **Phase 3 (AI Conversation Engine & Streaming Memory)** without requiring further database or REST API refactoring.

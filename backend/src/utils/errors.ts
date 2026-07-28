@@ -46,3 +46,40 @@ export class InternalServerError extends AppError {
     super(message, 500, false);
   }
 }
+
+export class AiConversationNotFoundError extends NotFoundError {
+  constructor(message = 'AI Conversation not found or access denied') {
+    super(message);
+  }
+}
+
+export class AiMessageNotFoundError extends NotFoundError {
+  constructor(message = 'AI Message not found') {
+    super(message);
+  }
+}
+
+export class AiAttachmentNotFoundError extends NotFoundError {
+  constructor(message = 'AI Attachment not found') {
+    super(message);
+  }
+}
+
+export class AiFlashcardNotFoundError extends NotFoundError {
+  constructor(message = 'AI Flashcard not found') {
+    super(message);
+  }
+}
+
+export class RepositoryError extends AppError {
+  constructor(message = 'Database Repository Operation Failed') {
+    super(message, 500);
+  }
+}
+
+export class DatabaseError extends AppError {
+  constructor(message = 'Database Connection or Transaction Failure') {
+    super(message, 500);
+  }
+}
+
