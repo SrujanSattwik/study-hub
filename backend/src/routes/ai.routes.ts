@@ -8,6 +8,7 @@ import { aiNoteController } from '../controllers/ai-note.controller';
 import { aiQuizController } from '../controllers/ai-quiz.controller';
 import { aiStudyPlannerController } from '../controllers/ai-study-planner.controller';
 import { aiLibraryController } from '../controllers/ai-library.controller';
+import { aiIntelligenceController } from '../controllers/ai-intelligence.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
 import { aiEngineController } from '../controllers/ai-engine.controller';
 import { aiStreamController } from '../controllers/ai-stream.controller';
@@ -111,6 +112,15 @@ router.get('/library/tags', aiLibraryController.listTags);
 router.get('/library/stats', aiLibraryController.getStorageInsights);
 router.get('/library/lineage/:id', aiLibraryController.getAssetLineage);
 router.get('/library/export', aiLibraryController.exportKnowledgeBundle);
+
+// ── Phase 9: Learning Intelligence & Personalization Engine ───────────────────
+router.get('/intelligence/profile', aiIntelligenceController.getProfile);
+router.get('/intelligence/mastery', aiIntelligenceController.getMasteries);
+router.get('/intelligence/weak-topics', aiIntelligenceController.getWeakTopics);
+router.get('/intelligence/recommendations', aiIntelligenceController.getRecommendations);
+router.post('/intelligence/recommendations/:id/feedback', aiIntelligenceController.updateRecommendationStatus);
+router.get('/intelligence/weekly-report', aiIntelligenceController.getWeeklyReport);
+router.get('/intelligence/achievements', aiIntelligenceController.getAchievements);
 
 // ── Usage Metrics ─────────────────────────────────────────────────────────────
 router.get('/usage', aiUsageController.getUsageStats);

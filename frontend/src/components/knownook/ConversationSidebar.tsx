@@ -46,6 +46,7 @@ interface ConversationSidebarProps {
   onOpenQuizzes: () => void;
   onOpenPlanner: () => void;
   onOpenLibrary: () => void;
+  onOpenIntelligence: () => void;
   onOpenUsage: () => void;
 }
 
@@ -92,6 +93,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onOpenQuizzes,
   onOpenPlanner,
   onOpenLibrary,
+  onOpenIntelligence,
   onOpenUsage,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -505,12 +507,20 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       {/* Footer Tools Drawer Triggers */}
       <div className="p-3 border-t border-gray-700 bg-gray-900/50 flex items-center justify-between gap-1">
         <button
-          onClick={onOpenLibrary}
+          onClick={onOpenIntelligence}
           className="flex-1 py-1.5 px-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          title="Learning Intelligence & Personalization (Ctrl+Shift+I)"
+        >
+          <span className="text-purple-400">🧠</span>
+          <span>Insights</span>
+        </button>
+
+        <button
+          onClick={onOpenLibrary}
+          className="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
           title="Knowledge Library & Search (Ctrl+Shift+L)"
         >
           <span className="text-cyan-400">📚</span>
-          <span>Library</span>
         </button>
 
         <button
@@ -535,14 +545,6 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           title="AI Quizzes & Assessment (Ctrl+Shift+Q)"
         >
           <span className="text-rose-400">🎯</span>
-        </button>
-
-        <button
-          onClick={onOpenFlashcards}
-          className="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
-          title="AI Flashcards"
-        >
-          <span className="text-amber-400">🎴</span>
         </button>
       </div>
     </aside>

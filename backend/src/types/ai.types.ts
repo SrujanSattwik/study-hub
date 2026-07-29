@@ -307,6 +307,69 @@ export interface KnowledgeBundleManifest {
   manifestId: string;
 }
 
+// ── Learning Intelligence DTOs (Phase 9) ──
+export type MasteryLevel = 'beginner' | 'learning' | 'competent' | 'advanced' | 'mastered';
+
+export interface LearnerProfileMetrics {
+  healthScore: number; // 0-100 Aggregate Learning Health
+  knowledgeScore: number;
+  consistencyScore: number;
+  focusScore: number;
+  productivityScore: number;
+  learningVelocity: number;
+  xpTotal: number;
+  currentLevel: number;
+  forecastedCompletionDate: string;
+  forecastConfidencePct: number;
+}
+
+export interface TopicMasteryItem {
+  topicName: string;
+  masteryScore: number;
+  masteryLevel: MasteryLevel;
+  isWeak: boolean;
+  notesReadCount: number;
+  flashcardsCount: number;
+  quizzesTaken: number;
+  quizAccuracyPct: number;
+  suggestedDifficulty: string;
+  prerequisites?: string[];
+  timelineHistory?: Record<string, number>; // Week 1 -> 35%, Week 2 -> 52%
+}
+
+export interface DetailedRecommendationItem {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  reason: string;
+  priority: 'high' | 'medium' | 'low';
+  estimatedMin: number;
+  expectedImpact: string;
+  actionPayload?: Record<string, any>;
+  status: 'active' | 'helpful' | 'dismissed' | 'snoozed';
+}
+
+export interface WeeklyIntelligenceReport {
+  weekLabel: string;
+  hoursStudied: number;
+  quizzesTaken: number;
+  flashcardsReviewed: number;
+  knowledgeScoreDelta: number;
+  strongestTopic: string;
+  needsAttentionTopic: string;
+}
+
+export interface AchievementItem {
+  id: string;
+  badgeCode: string;
+  title: string;
+  description: string;
+  xpEarned: number;
+  unlockedAt: string;
+  isUnlocked: boolean;
+}
+
 // ─── AI Engine Types (Phase 3) ────────────────────────────────────────────────
 
 export interface AiEngineRequest {

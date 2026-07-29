@@ -13,6 +13,7 @@ import NotesDrawer from '../../components/knownook/NotesDrawer';
 import QuizWorkspaceModal from '../../components/knownook/QuizWorkspaceModal';
 import StudyPlannerModal from '../../components/knownook/StudyPlannerModal';
 import KnowledgeLibraryModal from '../../components/knownook/KnowledgeLibraryModal';
+import LearningIntelligenceModal from '../../components/knownook/LearningIntelligenceModal';
 import UsagePanel from '../../components/knownook/UsagePanel';
 import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
 import ToastNotification from '../../components/knownook/ToastNotification';
@@ -21,6 +22,7 @@ import { useKnownookNotes } from '../../hooks/useKnownookNotes';
 import { useKnownookQuizzes } from '../../hooks/useKnownookQuizzes';
 import { useKnownookPlanner } from '../../hooks/useKnownookPlanner';
 import { useKnownookLibrary } from '../../hooks/useKnownookLibrary';
+import { useKnownookIntelligence } from '../../hooks/useKnownookIntelligence';
 import { AiAttachment, AiConversation } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
@@ -160,6 +162,19 @@ export const KnowNook: React.FC = () => {
     deleteBookmark,
     exportBundle,
   } = useKnownookLibrary();
+
+  // Learning Intelligence Hook & Overlay
+  const [isIntelligenceOpen, setIsIntelligenceOpen] = useState(false);
+  const {
+    profile: intelProfile,
+    masteries: intelMasteries,
+    weakTopics: intelWeakTopics,
+    recommendations: intelRecs,
+    weeklyReport: intelWeeklyReport,
+    achievements: intelAchievements,
+    isLoading: isLoadingIntel,
+    sendRecommendationFeedback,
+  } = useKnownookIntelligence();
 
   // Drawer & Modal overlays
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
@@ -312,6 +327,7 @@ export const KnowNook: React.FC = () => {
         onOpenQuizzes={() => setIsQuizOpen(true)}
         onOpenPlanner={() => setIsPlannerOpen(true)}
         onOpenLibrary={() => setIsLibraryOpen(true)}
+        onOpenIntelligence={() => setIsIntelligenceOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
       />
 
@@ -480,7 +496,21 @@ export const KnowNook: React.FC = () => {
         isLoading={isLoadingLibrary}
       />
 
-      {/* 10. Permanent Delete Confirmation Modal */}
+      {/* 10. Learning Intelligence & Personalization Engine Modal */}
+      <LearningIntelligenceModal
+        isOpen={isIntelligenceOpen}
+        onClose={() => setIsIntelligenceOpen(false)}
+        profile={intelProfile}
+        masteries={intelMasteries}
+        weakTopics={intelWeakTopics}
+        recommendations={intelRecs}
+        weeklyReport={intelWeeklyReport}
+        achievements={intelAchievements}
+        onFeedback={sendRecommendationFeedback}
+        isLoading={isLoadingIntel}
+      />
+
+      {/* 11. Permanent Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={!!pendingDeleteConversation}
         conversation={pendingDeleteConversation}
@@ -494,7 +524,7 @@ export const KnowNook: React.FC = () => {
         onCancel={() => setPendingDeleteConversation(null)}
       />
 
-      {/* 11. Floating Toast Undo Notification */}
+      {/* 12. Floating Toast Undo Notification */}
       <ToastNotification toast={toast} onDismiss={dismissToast} />
     </div>
   );
