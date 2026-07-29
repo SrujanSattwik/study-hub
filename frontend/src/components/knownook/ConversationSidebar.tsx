@@ -45,6 +45,7 @@ interface ConversationSidebarProps {
   onOpenNotes: () => void;
   onOpenQuizzes: () => void;
   onOpenPlanner: () => void;
+  onOpenLibrary: () => void;
   onOpenUsage: () => void;
 }
 
@@ -90,6 +91,7 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   onOpenNotes,
   onOpenQuizzes,
   onOpenPlanner,
+  onOpenLibrary,
   onOpenUsage,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -503,12 +505,20 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       {/* Footer Tools Drawer Triggers */}
       <div className="p-3 border-t border-gray-700 bg-gray-900/50 flex items-center justify-between gap-1">
         <button
-          onClick={onOpenPlanner}
+          onClick={onOpenLibrary}
           className="flex-1 py-1.5 px-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
+          title="Knowledge Library & Search (Ctrl+Shift+L)"
+        >
+          <span className="text-cyan-400">📚</span>
+          <span>Library</span>
+        </button>
+
+        <button
+          onClick={onOpenPlanner}
+          className="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
           title="AI Learning Planner & Progress (Ctrl+Shift+P)"
         >
           <span className="text-emerald-400">📅</span>
-          <span>Planner</span>
         </button>
 
         <button
@@ -533,14 +543,6 @@ export const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
           title="AI Flashcards"
         >
           <span className="text-amber-400">🎴</span>
-        </button>
-
-        <button
-          onClick={onOpenUsage}
-          className="py-1.5 px-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-xs font-medium text-gray-300 hover:text-white flex items-center justify-center gap-1 transition"
-          title="Usage Metrics"
-        >
-          <span className="text-cyan-400">📊</span>
         </button>
       </div>
     </aside>

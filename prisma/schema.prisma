@@ -71,6 +71,9 @@ model User {
   aiStudyGoals         AiStudyGoal[]
   aiStudySessions      AiStudySession[]
   aiAchievements       AiAchievement[]
+  aiCollections        AiCollection[]
+  aiBookmarks          AiBookmark[]
+  aiTags               AiTag[]
   aiUsages             AiUsage[]
 
   @@map("users")
@@ -968,6 +971,92 @@ model AiAchievement {
 
   @@map("ai_achievements")
   @@index([userId, badgeCode])
+}
+
+model AiCollection {
+  id          String   @id @default(uuid()) @map("collection_id") @db.VarChar(36)
+  userId      String   @map("user_id") @db.VarChar(36)
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  color       String   @default("#0284c7") @db.VarChar(20)
+  icon        String   @default("📂") @db.VarChar(10)
+  isPinned    Boolean  @default(false) @map("is_pinned")
+  isFavorite  Boolean  @default(false) @map("is_favorite")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items AiCollectionItem[]
+
+  @@map("ai_collections")
+  @@index([userId, isFavorite])
+}
+
+model AiCollectionItem {
+  id           String   @id @default(uuid()) @map("item_id") @db.VarChar(36)
+  collectionId String   @map("collection_id") @db.VarChar(36)
+  entityType   String   @map("entity_type") @db.VarChar(50) // note, flashcard, deck, quiz, plan, document, message
+  entityId     String   @map("entity_id") @db.VarChar(36)
+  addedAt      DateTime @default(now()) @map("added_at")
+
+  collection AiCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@map("ai_collection_items")
+  @@unique([collectionId, entityType, entityId])
+  @@index([collectionId])
+  @@index([entityType, entityId])
+}
+
+model AiBookmark {
+  id          String   @id @default(uuid()) @map("bookmark_id") @db.VarChar(36)
+  userId      String   @map("user_id") @db.VarChar(36)
+  entityType  String   @map("entity_type") @db.VarChar(50)
+  entityId    String   @map("entity_id") @db.VarChar(36)
+  title       String   @db.VarChar(255)
+  snippet     String?  @db.Text
+  userNotes   String?  @map("user_notes") @db.Text
+  isPinned    Boolean  @default(false) @map("is_pinned")
+  isFavorite  Boolean  @default(false) @map("is_favorite")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_bookmarks")
+  @@unique([userId, entityType, entityId])
+  @@index([userId, isFavorite])
+}
+
+model AiTag {
+  id         String   @id @default(uuid()) @map("tag_id") @db.VarChar(36)
+  userId     String   @map("user_id") @db.VarChar(36)
+  name       String   @db.VarChar(100)
+  color      String   @default("#06b6d4") @db.VarChar(20)
+  usageCount Int      @default(0) @map("usage_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relations AiTagRelation[]
+
+  @@map("ai_tags")
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model AiTagRelation {
+  id         String   @id @default(uuid()) @map("relation_id") @db.VarChar(36)
+  tagId      String   @map("tag_id") @db.VarChar(36)
+  entityType String   @map("entity_type") @db.VarChar(50)
+  entityId   String   @map("entity_id") @db.VarChar(36)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  tag AiTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@map("ai_tag_relations")
+  @@unique([tagId, entityType, entityId])
+  @@index([tagId])
+  @@index([entityType, entityId])
 }
 
 

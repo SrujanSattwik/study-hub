@@ -7,6 +7,7 @@ import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
 import { aiNoteController } from '../controllers/ai-note.controller';
 import { aiQuizController } from '../controllers/ai-quiz.controller';
 import { aiStudyPlannerController } from '../controllers/ai-study-planner.controller';
+import { aiLibraryController } from '../controllers/ai-library.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
 import { aiEngineController } from '../controllers/ai-engine.controller';
 import { aiStreamController } from '../controllers/ai-stream.controller';
@@ -96,6 +97,20 @@ router.get('/planner/goals', aiStudyPlannerController.listGoals);
 router.post('/planner/sessions', aiStudyPlannerController.logSession);
 router.get('/planner/progress', aiStudyPlannerController.getProgressSummary);
 router.get('/planner/recommendations', aiStudyPlannerController.getSmartRecommendations);
+
+// ── Phase 8.5: Knowledge Library, Bookmarks & Collections ─────────────────────
+router.get('/library/search', aiLibraryController.universalSearch);
+router.post('/library/bookmarks', aiLibraryController.createBookmark);
+router.get('/library/bookmarks', aiLibraryController.listBookmarks);
+router.delete('/library/bookmarks/:id', aiLibraryController.deleteBookmark);
+router.post('/library/collections', aiLibraryController.createCollection);
+router.get('/library/collections', aiLibraryController.listCollections);
+router.post('/library/collections/:id/items', aiLibraryController.addItemToCollection);
+router.delete('/library/collections/:id', aiLibraryController.deleteCollection);
+router.get('/library/tags', aiLibraryController.listTags);
+router.get('/library/stats', aiLibraryController.getStorageInsights);
+router.get('/library/lineage/:id', aiLibraryController.getAssetLineage);
+router.get('/library/export', aiLibraryController.exportKnowledgeBundle);
 
 // ── Usage Metrics ─────────────────────────────────────────────────────────────
 router.get('/usage', aiUsageController.getUsageStats);

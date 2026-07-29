@@ -12,6 +12,7 @@ import FlashcardDrawer from '../../components/knownook/FlashcardDrawer';
 import NotesDrawer from '../../components/knownook/NotesDrawer';
 import QuizWorkspaceModal from '../../components/knownook/QuizWorkspaceModal';
 import StudyPlannerModal from '../../components/knownook/StudyPlannerModal';
+import KnowledgeLibraryModal from '../../components/knownook/KnowledgeLibraryModal';
 import UsagePanel from '../../components/knownook/UsagePanel';
 import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
 import ToastNotification from '../../components/knownook/ToastNotification';
@@ -19,6 +20,7 @@ import ConfirmDeleteModal from '../../components/knownook/ConfirmDeleteModal';
 import { useKnownookNotes } from '../../hooks/useKnownookNotes';
 import { useKnownookQuizzes } from '../../hooks/useKnownookQuizzes';
 import { useKnownookPlanner } from '../../hooks/useKnownookPlanner';
+import { useKnownookLibrary } from '../../hooks/useKnownookLibrary';
 import { AiAttachment, AiConversation } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
@@ -140,6 +142,24 @@ export const KnowNook: React.FC = () => {
     createGoal,
     logSession,
   } = useKnownookPlanner(activeConversation?.id);
+
+  // Knowledge Library Hook & Overlay
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const {
+    collections,
+    bookmarks,
+    tags,
+    insights,
+    searchResults,
+    searchQuery: librarySearchQuery,
+    isLoading: isLoadingLibrary,
+    search: searchLibrary,
+    createCollection,
+    deleteCollection,
+    createBookmark,
+    deleteBookmark,
+    exportBundle,
+  } = useKnownookLibrary();
 
   // Drawer & Modal overlays
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
@@ -291,6 +311,7 @@ export const KnowNook: React.FC = () => {
         onOpenNotes={() => setIsNotesOpen(true)}
         onOpenQuizzes={() => setIsQuizOpen(true)}
         onOpenPlanner={() => setIsPlannerOpen(true)}
+        onOpenLibrary={() => setIsLibraryOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
       />
 
@@ -441,7 +462,25 @@ export const KnowNook: React.FC = () => {
         isGenerating={isGeneratingPlan}
       />
 
-      {/* 9. Permanent Delete Confirmation Modal */}
+      {/* 9. Enterprise Knowledge Library Modal */}
+      <KnowledgeLibraryModal
+        isOpen={isLibraryOpen}
+        onClose={() => setIsLibraryOpen(false)}
+        collections={collections}
+        bookmarks={bookmarks}
+        tags={tags}
+        insights={insights}
+        searchResults={searchResults}
+        searchQuery={librarySearchQuery}
+        onSearch={searchLibrary}
+        onCreateCollection={createCollection}
+        onDeleteCollection={deleteCollection}
+        onDeleteBookmark={deleteBookmark}
+        onExportBundle={exportBundle}
+        isLoading={isLoadingLibrary}
+      />
+
+      {/* 10. Permanent Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={!!pendingDeleteConversation}
         conversation={pendingDeleteConversation}
@@ -455,7 +494,7 @@ export const KnowNook: React.FC = () => {
         onCancel={() => setPendingDeleteConversation(null)}
       />
 
-      {/* 10. Floating Toast Undo Notification */}
+      {/* 11. Floating Toast Undo Notification */}
       <ToastNotification toast={toast} onDismiss={dismissToast} />
     </div>
   );

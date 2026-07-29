@@ -348,3 +348,71 @@ export interface GenerateStudyPlanDTO {
   daysDuration?: number;
   dailyHoursLimit?: number;
 }
+
+export type LibraryEntityType = 'conversation' | 'note' | 'flashcard' | 'deck' | 'quiz' | 'plan' | 'document' | 'message';
+
+export interface AiCollection {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string | null;
+  color: string;
+  icon: string;
+  isPinned: boolean;
+  isFavorite: boolean;
+  _count?: { items: number };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AiBookmark {
+  id: string;
+  userId: string;
+  entityType: LibraryEntityType;
+  entityId: string;
+  title: string;
+  snippet?: string | null;
+  userNotes?: string | null;
+  isPinned: boolean;
+  isFavorite: boolean;
+  createdAt: string;
+}
+
+export interface AiTag {
+  id: string;
+  userId: string;
+  name: string;
+  color: string;
+  usageCount: number;
+  createdAt: string;
+}
+
+export interface UniversalSearchResultItem {
+  id: string;
+  entityType: LibraryEntityType;
+  title: string;
+  snippet?: string;
+  createdAt: string;
+  tags?: string[];
+  isFavorite?: boolean;
+  isPinned?: boolean;
+}
+
+export interface StorageInsights {
+  documentsCount: number;
+  notesCount: number;
+  flashcardsCount: number;
+  decksCount: number;
+  quizzesCount: number;
+  studyPlansCount: number;
+  bookmarksCount: number;
+  collectionsCount: number;
+}
+
+export interface AssetLineageGraph {
+  entityId: string;
+  entityType: LibraryEntityType;
+  title: string;
+  generatedFrom?: Array<{ id: string; entityType: LibraryEntityType; title: string }>;
+  derivedAssets?: Array<{ id: string; entityType: LibraryEntityType; title: string }>;
+}

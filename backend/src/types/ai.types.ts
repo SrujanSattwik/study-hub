@@ -240,6 +240,73 @@ export interface SmartRecommendationItem {
   priority: 'high' | 'medium' | 'low';
 }
 
+// ── Knowledge Library DTOs (Phase 8.5) ──
+export type LibraryEntityType = 'conversation' | 'note' | 'flashcard' | 'deck' | 'quiz' | 'plan' | 'document' | 'message';
+
+export interface CreateBookmarkDTO {
+  userId: string;
+  entityType: LibraryEntityType;
+  entityId: string;
+  title: string;
+  snippet?: string;
+  userNotes?: string;
+  isPinned?: boolean;
+  isFavorite?: boolean;
+}
+
+export interface CreateCollectionDTO {
+  userId: string;
+  title: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+}
+
+export interface AddCollectionItemDTO {
+  collectionId: string;
+  entityType: LibraryEntityType;
+  entityId: string;
+}
+
+export interface UniversalSearchResultItem {
+  id: string;
+  entityType: LibraryEntityType;
+  title: string;
+  snippet?: string;
+  createdAt: string;
+  tags?: string[];
+  isFavorite?: boolean;
+  isPinned?: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface StorageInsights {
+  documentsCount: number;
+  notesCount: number;
+  flashcardsCount: number;
+  decksCount: number;
+  quizzesCount: number;
+  studyPlansCount: number;
+  bookmarksCount: number;
+  collectionsCount: number;
+}
+
+export interface AssetLineageGraph {
+  entityId: string;
+  entityType: LibraryEntityType;
+  title: string;
+  generatedFrom?: Array<{ id: string; entityType: LibraryEntityType; title: string }>;
+  derivedAssets?: Array<{ id: string; entityType: LibraryEntityType; title: string }>;
+}
+
+export interface KnowledgeBundleManifest {
+  exportDate: string;
+  version: string;
+  exportedBy: string;
+  assetCounts: Record<string, number>;
+  manifestId: string;
+}
+
 // ─── AI Engine Types (Phase 3) ────────────────────────────────────────────────
 
 export interface AiEngineRequest {
