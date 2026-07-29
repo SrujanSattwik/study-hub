@@ -254,3 +254,97 @@ export interface SubmitQuizAttemptDTO {
   timeTakenSec: number;
   answers: Record<string, { userAnswer: string; isCorrect: boolean; explanation?: string }>;
 }
+
+export type StudyPlanType = 'daily' | 'weekly' | 'monthly' | 'exam_prep' | 'custom';
+export type StudyPlanStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
+export type StudyTaskType = 'read_note' | 'review_flashcards' | 'take_quiz' | 'revise_topic' | 'practice_coding' | 'custom';
+export type StudyTaskStatus = 'pending' | 'completed' | 'skipped' | 'rescheduled';
+
+export interface AiStudyTask {
+  id: string;
+  planId: string;
+  title: string;
+  description?: string | null;
+  taskType: StudyTaskType;
+  status: StudyTaskStatus;
+  dueDate: string;
+  durationMin: number;
+  orderIndex: number;
+  completedAt?: string | null;
+  createdAt: string;
+}
+
+export interface AiStudyPlan {
+  id: string;
+  userId: string;
+  conversationId?: string | null;
+  title: string;
+  description?: string | null;
+  planType: StudyPlanType;
+  status: StudyPlanStatus;
+  startDate: string;
+  endDate: string;
+  targetGoal?: string | null;
+  tasks?: AiStudyTask[];
+  _count?: { tasks: number };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AiStudyGoal {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string | null;
+  targetCategory?: string | null;
+  targetValue: number;
+  currentValue: number;
+  unit: string;
+  status: string;
+  targetDate: string;
+  estimatedFinish?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AiStudySession {
+  id: string;
+  userId: string;
+  durationSec: number;
+  sessionType: string;
+  tasksCompletedCount: number;
+  notesUsed: number;
+  flashcardsReviewed: number;
+  quizzesTaken: number;
+  startedAt: string;
+  endedAt: string;
+}
+
+export interface LearningProgressSummary {
+  totalStudyMinutes: number;
+  totalStudyHours: number;
+  activeStreakDays: number;
+  completedTasksCount: number;
+  completedGoalsCount: number;
+  quizAccuracyPct: number;
+  flashcardMasteryPct: number;
+  notesCreatedCount: number;
+  heatmap: Record<string, number>;
+}
+
+export interface SmartRecommendationItem {
+  category: 'revision' | 'weak_topics' | 'upcoming_goals' | 'deadlines' | 'suggested_notes' | 'suggested_quizzes' | 'suggested_flashcards';
+  title: string;
+  description: string;
+  actionPayload?: Record<string, any>;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface GenerateStudyPlanDTO {
+  conversationId?: string;
+  topic?: string;
+  planType?: StudyPlanType;
+  targetGoal?: string;
+  daysDuration?: number;
+  dailyHoursLimit?: number;
+}

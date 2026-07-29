@@ -11,12 +11,14 @@ import AttachmentPanel from '../../components/knownook/AttachmentPanel';
 import FlashcardDrawer from '../../components/knownook/FlashcardDrawer';
 import NotesDrawer from '../../components/knownook/NotesDrawer';
 import QuizWorkspaceModal from '../../components/knownook/QuizWorkspaceModal';
+import StudyPlannerModal from '../../components/knownook/StudyPlannerModal';
 import UsagePanel from '../../components/knownook/UsagePanel';
 import DocumentPreviewModal from '../../components/knownook/DocumentPreviewModal';
 import ToastNotification from '../../components/knownook/ToastNotification';
 import ConfirmDeleteModal from '../../components/knownook/ConfirmDeleteModal';
 import { useKnownookNotes } from '../../hooks/useKnownookNotes';
 import { useKnownookQuizzes } from '../../hooks/useKnownookQuizzes';
+import { useKnownookPlanner } from '../../hooks/useKnownookPlanner';
 import { AiAttachment, AiConversation } from '../../types/ai.types';
 
 export const KnowNook: React.FC = () => {
@@ -121,6 +123,23 @@ export const KnowNook: React.FC = () => {
     submitAttempt,
     deleteQuiz,
   } = useKnownookQuizzes(activeConversation?.id);
+
+  // AI Learning Planner Hook & Overlay
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const {
+    plans,
+    activePlan,
+    goals,
+    progress,
+    recommendations,
+    selectPlan,
+    isLoading: isLoadingPlanner,
+    isGenerating: isGeneratingPlan,
+    generatePlan,
+    updateTaskStatus,
+    createGoal,
+    logSession,
+  } = useKnownookPlanner(activeConversation?.id);
 
   // Drawer & Modal overlays
   const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
@@ -271,6 +290,7 @@ export const KnowNook: React.FC = () => {
         onOpenFlashcards={() => setIsFlashcardOpen(true)}
         onOpenNotes={() => setIsNotesOpen(true)}
         onOpenQuizzes={() => setIsQuizOpen(true)}
+        onOpenPlanner={() => setIsPlannerOpen(true)}
         onOpenUsage={() => setIsUsageOpen(true)}
       />
 
@@ -403,7 +423,25 @@ export const KnowNook: React.FC = () => {
         isGenerating={isGeneratingQuiz}
       />
 
-      {/* 8. Permanent Delete Confirmation Modal */}
+      {/* 8. AI Learning Planner & Progress Center Modal */}
+      <StudyPlannerModal
+        isOpen={isPlannerOpen}
+        onClose={() => setIsPlannerOpen(false)}
+        plans={plans}
+        activePlan={activePlan}
+        goals={goals}
+        progress={progress}
+        recommendations={recommendations}
+        onSelectPlan={selectPlan}
+        onGeneratePlan={generatePlan}
+        onUpdateTaskStatus={updateTaskStatus}
+        onCreateGoal={createGoal}
+        onLogSession={logSession}
+        isLoading={isLoadingPlanner}
+        isGenerating={isGeneratingPlan}
+      />
+
+      {/* 9. Permanent Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={!!pendingDeleteConversation}
         conversation={pendingDeleteConversation}
@@ -417,7 +455,7 @@ export const KnowNook: React.FC = () => {
         onCancel={() => setPendingDeleteConversation(null)}
       />
 
-      {/* 9. Floating Toast Undo Notification */}
+      {/* 10. Floating Toast Undo Notification */}
       <ToastNotification toast={toast} onDismiss={dismissToast} />
     </div>
   );

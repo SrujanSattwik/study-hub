@@ -184,6 +184,62 @@ export interface SubmitQuizAttemptDTO {
   answers: Record<string, { userAnswer: string; isCorrect: boolean; explanation?: string }>;
 }
 
+// ── Learning Planner DTOs (Phase 8.4) ──
+export type StudyPlanType = 'daily' | 'weekly' | 'monthly' | 'exam_prep' | 'custom';
+export type StudyPlanStatus = 'draft' | 'active' | 'paused' | 'completed' | 'archived';
+export type StudyTaskType = 'read_note' | 'review_flashcards' | 'take_quiz' | 'revise_topic' | 'practice_coding' | 'custom';
+export type StudyTaskStatus = 'pending' | 'completed' | 'skipped' | 'rescheduled';
+
+export interface GenerateStudyPlanDTO {
+  conversationId?: string;
+  topic?: string;
+  planType?: StudyPlanType;
+  targetGoal?: string;
+  daysDuration?: number;
+  dailyHoursLimit?: number;
+}
+
+export interface CreateStudyGoalDTO {
+  userId: string;
+  title: string;
+  description?: string;
+  targetCategory?: string;
+  targetValue?: number;
+  unit?: string;
+  targetDate: string;
+}
+
+export interface LogStudySessionDTO {
+  userId: string;
+  durationSec: number;
+  sessionType?: string;
+  tasksCompletedCount?: number;
+  notesUsed?: number;
+  flashcardsReviewed?: number;
+  quizzesTaken?: number;
+  startedAt?: string;
+}
+
+export interface LearningProgressSummary {
+  totalStudyMinutes: number;
+  totalStudyHours: number;
+  activeStreakDays: number;
+  completedTasksCount: number;
+  completedGoalsCount: number;
+  quizAccuracyPct: number;
+  flashcardMasteryPct: number;
+  notesCreatedCount: number;
+  heatmap: Record<string, number>; // YYYY-MM-DD -> minutes
+}
+
+export interface SmartRecommendationItem {
+  category: 'revision' | 'weak_topics' | 'upcoming_goals' | 'deadlines' | 'suggested_notes' | 'suggested_quizzes' | 'suggested_flashcards';
+  title: string;
+  description: string;
+  actionPayload?: Record<string, any>;
+  priority: 'high' | 'medium' | 'low';
+}
+
 // ─── AI Engine Types (Phase 3) ────────────────────────────────────────────────
 
 export interface AiEngineRequest {

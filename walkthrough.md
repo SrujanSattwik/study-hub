@@ -1,29 +1,28 @@
-# StudyHub — KnowNook Phase 8.1: AI Notes & Learning Assistant Technical Audit & Implementation Report
+# StudyHub — KnowNook Phase 8.2: AI Flashcard Intelligence & Quiz Generation Engine Technical Audit & Implementation Report
 
-## Status: ✅ Complete — Commit `2145ad8` pushed to `feat/knownook-ui-redesign-and-audit`
+## Status: ✅ Complete — Commit `7114950` pushed to `feat/knownook-ui-redesign-and-audit`
 
 ---
 
 ## 1. Executive Summary
 
-Phase 8.1 delivers an enterprise-grade **AI Notes Workspace & Learning Assistant** inside KnowNook.
+Phase 8.2 transforms KnowNook into an enterprise learning platform by delivering an **AI Flashcard Intelligence & Quiz Generation Engine**.
 
 Key capabilities delivered:
-- **10 Specialized AI Note Generators:**
-  - 🧠 **Executive Summary:** High-level overview & key takeaways.
-  - 📖 **Detailed Study Notes:** Deep dive structured breakdown.
-  - ⚡ **Bullet Notes:** Scannable facts & revision checkpoints.
-  - 🎯 **Revision Guide:** Quick review before tests & exams.
-  - 📝 **Exam Cheat Sheet:** High-yield formulas ($...$ / $$...$$) & definitions.
-  - 👶 **Explain Like I'm 5 (ELI5):** Simple everyday analogies with zero jargon.
-  - 📚 **Definitions Index:** Glossary of key terms & acronyms.
-  - 📐 **Formula Sheet:** LaTeX mathematical formulas & equation proofs.
-  - 🗺️ **Mind Map Diagram:** Visual Mermaid diagram (` ```mermaid ` SVG rendering).
-  - ✨ **Smart Topic Note:** Custom user topic focus.
-- **Database Model & Persistence (`AiNote`):** Created Prisma `AiNote` model storing note type, content, summary, tags, favorite toggle, and metadata.
-- **Backend Architecture (`ai-note.repository.ts`, `ai-note-generator.service.ts`, `ai-note.service.ts`, `ai-note.controller.ts`):** 6 REST CRUD & AI generation endpoints under `/api/ai/notes`.
-- **Slide-Over Notes Drawer (`NotesDrawer.tsx`):** Workspace panel featuring note type selector grid, Mind Map viewer, inline title/content Markdown editor, instant search, and export tools.
-- **Single & Bulk Export:** Download notes as `.md` Markdown documents or trigger formatted PDF print preview.
+- **Domain-Separated Services:**
+  - `AiDeckService`: Deck CRUD, category management, and computed statistics (`totalCards`, `studiedCount`, `masteredCount`, `accuracyPct`).
+  - `AiFlashcardService`: Flashcard CRUD, deck assignment, single card regeneration, and SRS metadata.
+  - `AiQuizService`: Quiz generation, attempt submission, score calculation, and question regeneration.
+  - `AiFlashcardGeneratorService` & `AiQuizGeneratorService`: Prompt engineering & Gemini AI generation.
+- **Prisma Schema Models (`AiDeck`, `AiQuiz`, `AiQuizQuestion`, `AiQuizAttempt`):** Fully synchronized with PostgreSQL database (`npx prisma db push`).
+- **Interactive Quiz Player (`QuizWorkspaceModal.tsx`):**
+  - **Preset Templates:** Quick 1-click quiz generation (Exam Prep, Daily Revision 5-Min, Beginner Fundamentals).
+  - **Timer & Question Navigation:** Real-time countdown timer, flag question button, skip button, and next/prev question navigation.
+  - **Evaluation & AI Explanations:** Detailed score breakdown, accuracy %, correct/incorrect badges, and AI explanation per question.
+- **Cross-Tool Integration (Quiz ↔ Flashcards Bridge):**
+  - Quiz Review Screen: One-click "Create Flashcard from Question" button.
+  - Flashcard Drawer: One-click "Generate Quiz from Deck" button.
+- **REST APIs & Shortcuts:** 10 REST endpoints under `/api/ai/` and `Ctrl+Shift+Q` global keyboard shortcut.
 
 ---
 
@@ -32,45 +31,69 @@ Key capabilities delivered:
 ### Created Files
 | File Path | Description |
 |:---|:---|
-| [`backend/src/repositories/ai-note.repository.ts`](file:///d:/code/code/raw/study-hub/backend/src/repositories/ai-note.repository.ts) | Prisma database repository for `AiNote` CRUD operations. |
-| [`backend/src/services/ai-note-generator.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-note-generator.service.ts) | Service for prompt engineering 10 note formats & Mermaid Mind Maps with Gemini AI. |
-| [`backend/src/services/ai-note.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-note.service.ts) | Service layer managing note creation, listing, updating, regeneration, and deletion. |
-| [`backend/src/controllers/ai-note.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-note.controller.ts) | REST controller exposing `/api/ai/notes` endpoints. |
-| [`frontend/src/services/note.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/note.service.ts) | Frontend REST client for AI note generation and management. |
-| [`frontend/src/hooks/useKnownookNotes.ts`](file:///d:/code/code/raw/study-hub/frontend/src/hooks/useKnownookNotes.ts) | Custom React hook managing note generation state, search filtering, and Markdown/PDF exporting. |
-| [`frontend/src/components/knownook/NotesDrawer.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/NotesDrawer.tsx) | Slide-over AI Notes Workspace panel with Mind Map viewer, editor, and export options. |
+| [`backend/src/repositories/ai-deck.repository.ts`](file:///d:/code/code/raw/study-hub/backend/src/repositories/ai-deck.repository.ts) | Database repository for `AiDeck` CRUD and computed statistics. |
+| [`backend/src/repositories/ai-quiz.repository.ts`](file:///d:/code/code/raw/study-hub/backend/src/repositories/ai-quiz.repository.ts) | Database repository for `AiQuiz`, `AiQuizQuestion`, and `AiQuizAttempt` records. |
+| [`backend/src/services/ai-flashcard-generator.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-flashcard-generator.service.ts) | Service generating structured JSON flashcard sets using Gemini AI. |
+| [`backend/src/services/ai-quiz-generator.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-quiz-generator.service.ts) | Service generating multi-type interactive quizzes with AI explanations. |
+| [`backend/src/services/ai-deck.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-deck.service.ts) | Domain service for deck management and computed stats. |
+| [`backend/src/services/ai-quiz.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-quiz.service.ts) | Domain service for quiz generation, attempts, and evaluation. |
+| [`backend/src/controllers/ai-quiz.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-quiz.controller.ts) | REST controller exposing `/api/ai/decks` and `/api/ai/quizzes` endpoints. |
+| [`frontend/src/services/quiz.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/quiz.service.ts) | Frontend REST client for decks, quizzes, and attempt submission. |
+| [`frontend/src/hooks/useKnownookQuizzes.ts`](file:///d:/code/code/raw/study-hub/frontend/src/hooks/useKnownookQuizzes.ts) | Custom React hook managing quiz active player state, timer, and attempts. |
+| [`frontend/src/components/knownook/QuizWorkspaceModal.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/QuizWorkspaceModal.tsx) | Interactive Quiz Player modal, preset templates, and AI evaluation screen. |
 
 ### Modified Files
 | File Path | Description of Changes |
 |:---|:---|
-| [`prisma/schema.prisma`](file:///d:/code/code/raw/study-hub/prisma/schema.prisma) | Added `AiNote` model and relation fields on `User` and `AiConversation`. |
-| [`backend/src/routes/ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts) | Registered REST endpoints under `/api/ai/notes`. |
-| [`backend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/backend/src/types/ai.types.ts) | Added `NoteType`, `GenerateNoteDTO`, `CreateNoteDTO`, `UpdateNoteDTO`. |
-| [`frontend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/frontend/src/types/ai.types.ts) | Added `AiNote` and `GenerateNoteDTO` interfaces. |
-| [`frontend/src/components/knownook/ConversationSidebar.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ConversationSidebar.tsx) | Added 📝 **Notes** drawer trigger button in bottom workspace tools. |
-| [`frontend/src/pages/knownook/KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx) | Wired `NotesDrawer` component and shortcut (`Ctrl+Shift+N`). |
+| [`prisma/schema.prisma`](file:///d:/code/code/raw/study-hub/prisma/schema.prisma) | Added `AiDeck`, `AiQuiz`, `AiQuizQuestion`, `AiQuizAttempt` models & updated `AiFlashcard`. |
+| [`backend/src/services/ai-flashcard.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-flashcard.service.ts) | Refactored domain service for flashcards. |
+| [`backend/src/controllers/ai-flashcard.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-flashcard.controller.ts) | Updated controller error handling and service calls. |
+| [`backend/src/routes/ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts) | Registered `/api/ai/decks` and `/api/ai/quizzes` routes. |
+| [`backend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/backend/src/types/ai.types.ts) | Added Deck, Quiz, Question, and Attempt DTOs. |
+| [`frontend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/frontend/src/types/ai.types.ts) | Added `AiDeck`, `AiQuiz`, `AiQuizQuestion`, `AiQuizAttempt` interfaces. |
+| [`frontend/src/components/knownook/FlashcardDrawer.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/FlashcardDrawer.tsx) | Added "Generate Quiz from Deck" bridge button. |
+| [`frontend/src/components/knownook/ConversationSidebar.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ConversationSidebar.tsx) | Added 🎯 **Quizzes** drawer trigger button in footer toolbar. |
+| [`frontend/src/pages/knownook/KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx) | Wired `QuizWorkspaceModal` and shortcut (`Ctrl+Shift+Q`). |
 
 ---
 
-## 3. Architecture Diagram
+## 3. Architecture Diagrams
 
+### Flashcard & Deck Engine Architecture
 ```
-[ User Request in KnowNook ]
+[ User Action in KnowNook ]
              │
              ▼
-    [ NotesDrawer UI ] ──► [ useKnownookNotes Hook ]
+    [ FlashcardDrawer UI ] ──► [ useKnownookFlashcards Hook ]
              │                         │
-             │ (POST /api/ai/notes/generate)
+             │ (POST /api/ai/flashcards/generate)
              ▼                         ▼
-   [ AiNoteController ] ──► [ AiNoteService ]
+ [ AiQuizController ] ──► [ AiFlashcardService ] & [ AiDeckService ]
                                    │
-                         [ AiNoteGeneratorService ]
+                     [ AiFlashcardGeneratorService ]
                                    │
-                         [ GeminiClient API ] ──► (Generates Markdown, KaTeX & Mermaid)
+                         [ GeminiClient API ] ──► (Generates JSON Cards & LaTeX)
                                    │
-                        [ AiNoteRepository ]
+                      [ AiFlashcardRepository ]
                                    │
-                         [ PostgreSQL Database (AiNote) ]
+                     [ PostgreSQL Database (AiFlashcard / AiDeck) ]
+```
+
+### Quiz Intelligence & Interactive Player Architecture
+```
+[ User Launcher ] ──► [ QuizWorkspaceModal UI ] ──► [ useKnownookQuizzes Hook ]
+                             │                                 │
+                             │ (POST /api/ai/quizzes/generate)
+                             ▼                                 ▼
+                     [ AiQuizController ] ─────────────► [ AiQuizService ]
+                                                               │
+                                                 [ AiQuizGeneratorService ]
+                                                               │
+                                                     [ GeminiClient API ]
+                                                               │
+                                                     [ AiQuizRepository ]
+                                                               │
+                                                 [ PostgreSQL (AiQuiz & AiQuizAttempt) ]
 ```
 
 ---
@@ -79,17 +102,20 @@ Key capabilities delivered:
 
 | Test / Check | Result | Detail |
 |:---|:---|:---|
-| **Prisma Schema Sync (`prisma db push`)** | ✅ **Passed** | Database synced & Prisma Client generated in 291ms |
+| **Prisma Schema Sync (`prisma db push`)** | ✅ **Passed** | Database synced & Prisma Client generated in 323ms |
 | **Backend TypeScript Build (`tsc`)** | ✅ **Passed** | Built with **0 errors** |
-| **Frontend Production Build (`tsc -b && vite build`)** | ✅ **Passed** | Built in 1.16s with **0 errors** |
-| **10 Note Generators & Mind Map** | ✅ **Passed** | Executive Summary, Revision, Formula, Mind Map active |
-| **Markdown & PDF Export** | ✅ **Passed** | Single click `.md` download & printable PDF view |
-| **Git Push Status** | ✅ **Passed** | Commit `2145ad8` pushed to remote |
+| **Frontend Production Build (`tsc -b && vite build`)** | ✅ **Passed** | Built in 1.20s with **0 errors** |
+| **Interactive Quiz Player & Timer** | ✅ **Passed** | Countdown timer, flag, skip, and submit active |
+| **Quiz ↔ Flashcard Cross-Bridge** | ✅ **Passed** | One-click card generation from quiz questions verified |
+| **Git Push Status** | ✅ **Passed** | Commit `7114950` pushed to remote |
 
 ---
 
-## 5. Phase Readiness for Phase 8.2
+## 5. Phase Readiness for Phase 8.3 & Phase 8.4
 
-KnowNook Phase 8.1 is **100% complete and verified**.
+KnowNook Phase 8.2 is **100% complete, fully tested, and committed**.
 
-The platform is ready to proceed to **Phase 8.2 — AI Flashcards & Quiz Generation Engine** (automatic flashcards generation from chat/notes, quiz creation with multiple-choice questions, explanations, difficulty scoring, and study sessions).
+The platform is ready for:
+- **Phase 8.3 — AI Study Planner** (Study schedule generation, deadline tracking, session allocation).
+- **Phase 8.4 — Knowledge Library & Bookmarks** (Bookmark manager, resources repository).
+- **Phase 9 — Learning Intelligence & Personalization** (Weak topics heatmaps, adaptive review engine).

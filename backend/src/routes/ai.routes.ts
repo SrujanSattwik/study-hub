@@ -6,6 +6,7 @@ import { aiAttachmentController } from '../controllers/ai-attachment.controller'
 import { aiFlashcardController } from '../controllers/ai-flashcard.controller';
 import { aiNoteController } from '../controllers/ai-note.controller';
 import { aiQuizController } from '../controllers/ai-quiz.controller';
+import { aiStudyPlannerController } from '../controllers/ai-study-planner.controller';
 import { aiUsageController } from '../controllers/ai-usage.controller';
 import { aiEngineController } from '../controllers/ai-engine.controller';
 import { aiStreamController } from '../controllers/ai-stream.controller';
@@ -83,6 +84,18 @@ router.get('/quizzes', aiQuizController.listQuizzes);
 router.get('/quizzes/:id', aiQuizController.getQuizById);
 router.post('/quizzes/:id/submit', aiQuizController.submitAttempt);
 router.delete('/quizzes/:id', aiQuizController.deleteQuiz);
+
+// ── Phase 8.4: AI Learning Planner & Progress ─────────────────────────────────
+router.post('/planner/plans/generate', aiStudyPlannerController.generatePlan);
+router.get('/planner/plans', aiStudyPlannerController.listPlans);
+router.get('/planner/plans/:id', aiStudyPlannerController.getPlanById);
+router.patch('/planner/plans/:id/status', aiStudyPlannerController.updatePlanStatus);
+router.patch('/planner/tasks/:id', aiStudyPlannerController.updateTaskStatus);
+router.post('/planner/goals', aiStudyPlannerController.createGoal);
+router.get('/planner/goals', aiStudyPlannerController.listGoals);
+router.post('/planner/sessions', aiStudyPlannerController.logSession);
+router.get('/planner/progress', aiStudyPlannerController.getProgressSummary);
+router.get('/planner/recommendations', aiStudyPlannerController.getSmartRecommendations);
 
 // ── Usage Metrics ─────────────────────────────────────────────────────────────
 router.get('/usage', aiUsageController.getUsageStats);

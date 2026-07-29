@@ -67,6 +67,10 @@ model User {
   aiDecks              AiDeck[]
   aiQuizzes            AiQuiz[]
   aiQuizAttempts       AiQuizAttempt[]
+  aiStudyPlans         AiStudyPlan[]
+  aiStudyGoals         AiStudyGoal[]
+  aiStudySessions      AiStudySession[]
+  aiAchievements       AiAchievement[]
   aiUsages             AiUsage[]
 
   @@map("users")
@@ -652,6 +656,7 @@ model AiConversation {
   flashcards  AiFlashcard[]
   notes       AiNote[]
   quizzes     AiQuiz[]
+  studyPlans  AiStudyPlan[]
 
   @@map("ai_conversations")
   @@index([userId, isDeleted, isPinned])
@@ -862,6 +867,107 @@ model AiNote {
   @@map("ai_notes")
   @@index([userId, isFavorite])
   @@index([conversationId])
+}
+
+model AiStudyPlan {
+  id             String        @id @default(uuid()) @map("plan_id") @db.VarChar(36)
+  userId         String        @map("user_id") @db.VarChar(36)
+  conversationId String?       @map("conversation_id") @db.VarChar(36)
+  title          String        @db.VarChar(255)
+  description    String?       @db.Text
+  planType       String        @default("weekly") @map("plan_type") @db.VarChar(50) // daily, weekly, monthly, exam_prep, custom
+  status         String        @default("active") @db.VarChar(30) // draft, active, paused, completed, archived
+  startDate      DateTime      @map("start_date")
+  endDate        DateTime      @map("end_date")
+  targetGoal     String?       @map("target_goal") @db.VarChar(255)
+  metadata       Json?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  tasks        AiStudyTask[]
+
+  @@map("ai_study_plans")
+  @@index([userId, status])
+  @@index([conversationId])
+}
+
+model AiStudyTask {
+  id          String    @id @default(uuid()) @map("task_id") @db.VarChar(36)
+  planId      String    @map("plan_id") @db.VarChar(36)
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  taskType    String    @default("read_note") @map("task_type") @db.VarChar(50) // read_note, review_flashcards, take_quiz, revise_topic, practice_coding, custom
+  status      String    @default("pending") @db.VarChar(30) // pending, completed, skipped, rescheduled
+  dueDate     DateTime  @map("due_date")
+  durationMin Int       @default(30) @map("duration_min")
+  orderIndex  Int       @default(0) @map("order_index")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  plan AiStudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@map("ai_study_tasks")
+  @@index([planId, status])
+  @@index([dueDate])
+}
+
+model AiStudyGoal {
+  id               String    @id @default(uuid()) @map("goal_id") @db.VarChar(36)
+  userId           String    @map("user_id") @db.VarChar(36)
+  title            String    @db.VarChar(255)
+  description      String?   @db.Text
+  targetCategory   String?   @map("target_category") @db.VarChar(100)
+  targetValue      Int       @default(100) @map("target_value")
+  currentValue     Int       @default(0) @map("current_value")
+  unit             String    @default("tasks") @db.VarChar(50)
+  status           String    @default("in_progress") @db.VarChar(30) // in_progress, completed, abandoned
+  targetDate       DateTime  @map("target_date")
+  estimatedFinish  DateTime? @map("estimated_finish")
+  metadata         Json?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_study_goals")
+  @@index([userId, status])
+}
+
+model AiStudySession {
+  id                  String   @id @default(uuid()) @map("session_id") @db.VarChar(36)
+  userId              String   @map("user_id") @db.VarChar(36)
+  durationSec         Int      @map("duration_sec")
+  sessionType         String   @default("focus") @map("session_type") @db.VarChar(50) // focus, revision, quiz, flashcard
+  tasksCompletedCount Int      @default(0) @map("tasks_completed_count")
+  notesUsed           Int      @default(0) @map("notes_used")
+  flashcardsReviewed  Int      @default(0) @map("flashcards_reviewed")
+  quizzesTaken        Int      @default(0) @map("quizzes_taken")
+  startedAt           DateTime @map("started_at")
+  endedAt             DateTime @default(now()) @map("ended_at")
+  metadata            Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_study_sessions")
+  @@index([userId, endedAt])
+}
+
+model AiAchievement {
+  id          String    @id @default(uuid()) @map("achievement_id") @db.VarChar(36)
+  userId      String    @map("user_id") @db.VarChar(36)
+  title       String    @db.VarChar(255)
+  badgeCode   String    @map("badge_code") @db.VarChar(100)
+  description String?   @db.Text
+  xpEarned    Int       @default(100) @map("xp_earned")
+  unlockedAt  DateTime  @default(now()) @map("unlocked_at")
+  metadata    Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_achievements")
+  @@index([userId, badgeCode])
 }
 
 
