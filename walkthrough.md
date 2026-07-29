@@ -1,26 +1,27 @@
-# StudyHub — KnowNook Phase 8.5: Knowledge Library, Bookmarks & Learning Collections Technical Audit & Implementation Report
+# StudyHub — KnowNook Phase 9: Learning Intelligence & Personalization Engine Technical Audit & Implementation Report
 
-## Status: ✅ Complete — Commit `b45ecb5` pushed to `feat/knownook-ui-redesign-and-audit`
+## Status: ✅ Complete — Commit `3ae2db5` pushed to `feat/knownook-ui-redesign-and-audit`
 
 ---
 
 ## 1. Executive Summary
 
-Phase 8.5 completes the entire **Phase 8 Learning Suite** inside KnowNook by delivering an enterprise-grade **Knowledge Library, Bookmarks & Learning Collections** workspace. Every learning artifact generated across conversations, notes, flashcard decks, quizzes, study plans, and uploaded documents can now be centralized, searched, bookmarked, categorized into collections, traced via asset lineage, and exported as portable Knowledge Bundles.
+Phase 9 transforms KnowNook from an AI-powered study tool into an adaptive, personalized **Learning Intelligence System**. By analyzing user interactions across notes, flashcard decks, quizzes, study plans, focus timer sessions, and documents, the system computes dynamic learner profile metrics, topic mastery breakdowns, weak topic warnings, smart revision queues, predictive goal completion forecasts, and gamified XP rewards.
 
 Key capabilities delivered:
-- **Prisma Schema Models (`AiCollection`, `AiCollectionItem`, `AiBookmark`, `AiTag`, `AiTagRelation`):** Database models fully synchronized with PostgreSQL database (`npx prisma db push`).
+- **Prisma Schema Models (`AiLearnerProfile`, `AiTopicMastery`, `AiRecommendationCache`):** Database models fully synchronized with PostgreSQL database (`npx prisma db push`).
 - **Domain Services & Repositories:**
-  - `AiLibraryRepository`: Universal search engine across notes, flashcards, quizzes, plans, documents, and bookmarks with storage insights.
-  - `AiLibraryService`: Domain logic for collection templates, bookmarks, asset lineage trees, and Knowledge Bundle exports with `manifest.json`.
-  - `AiLibraryController`: 12 REST endpoints registered under `/api/ai/library/`.
-- **Interactive Knowledge Library Workspace (`KnowledgeLibraryModal.tsx`):**
-  - **Storage Insights & Overview:** Breakdown of notes, flashcard decks, quizzes, documents, plans, and bookmarks.
-  - **Universal Search View:** Single search bar querying all content types with type pill filters (`ALL`, `NOTE`, `FLASHCARD`, `QUIZ`, `PLAN`) and instant result card previews.
-  - **Collections View (Folders):** Preset templates (*Semester Subject*, *Technical Interview Prep*, *Research Project*, *Competitive Exam*), custom folder creator, and nested item counts.
-  - **Bookmarks Panel:** Saved message snippets, notes, and quiz questions with user notes and quick removal.
-  - **Asset Lineage Graph View:** Connected asset lineage tree (`AI Conversation` ➔ `Generated Notes` ➔ `Flashcard Deck` ➔ `Quiz` ➔ `Study Plan`).
-  - **Export Center:** One-click Knowledge Bundle exporter with `.MD` notes and portable `manifest.json`.
+  - `AiIntelligenceRepository`: Persists learner metrics, topic masteries, recommendation caches, and XP progress.
+  - `AiLearnerProfileService`: Calculates overall **Learning Health Score (0-100)**, Knowledge Score, Consistency Score, Focus Score, and Learning Velocity.
+  - `AiTopicMasteryService`: Calculates topic mastery levels (*Beginner*, *Learning*, *Competent*, *Advanced*, *Mastered*), 4-week timeline trend history, and prerequisite topic maps.
+  - `AiIntelligenceService`: Coordinates personalized recommendations with explicit reasons & expected mastery impact (`+12% OS mastery`), weekly report generation, and XP achievement unlocking.
+  - `AiIntelligenceController`: 7 REST endpoints registered under `/api/ai/intelligence/`.
+- **Interactive Intelligence Modal (`LearningIntelligenceModal.tsx`):**
+  - **Profile & Health Score View:** Aggregate Learning Health Score (0-100) gauge, Knowledge Score, Focus Score, Consistency Score, Learning Velocity, and Forecasted Target Completion with 91% confidence.
+  - **Mastery Map View:** Topic cards with mastery progress bars, weak topic warning badges, prerequisite topics, and suggested difficulty progression.
+  - **Smart Recommendations & Revision Queue:** Prioritized AI action items displaying explicit rationale, expected mastery impact, estimated study time, and feedback buttons (*Helpful*, *Dismiss*).
+  - **Weekly Report View:** Total hours studied, quizzes taken, flashcards reviewed, strongest topic, and areas needing attention.
+  - **Achievement & XP Center View:** Total XP, Level progress bar, unlocked badges (*7-Day Streak*, *Flashcard Master*, *Quiz Ace*, *Master Planner*).
 
 ---
 
@@ -29,42 +30,43 @@ Key capabilities delivered:
 ### Created Files
 | File Path | Description |
 |:---|:---|
-| [`backend/src/repositories/ai-library.repository.ts`](file:///d:/code/code/raw/study-hub/backend/src/repositories/ai-library.repository.ts) | Database repository for universal search, collections, bookmarks, tags, and storage insights. |
-| [`backend/src/services/ai-library.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-library.service.ts) | Domain service for collections, bookmarks, asset lineage, and Knowledge Bundle exports. |
-| [`backend/src/controllers/ai-library.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-library.controller.ts) | REST controller for `/api/ai/library/` endpoints. |
-| [`frontend/src/services/library.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/library.service.ts) | Frontend REST client for universal search, collections, bookmarks, tags, and export bundles. |
-| [`frontend/src/hooks/useKnownookLibrary.ts`](file:///d:/code/code/raw/study-hub/frontend/src/hooks/useKnownookLibrary.ts) | Custom React hook managing active search, collections, bookmarks, and exports. |
-| [`frontend/src/components/knownook/KnowledgeLibraryModal.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/KnowledgeLibraryModal.tsx) | Comprehensive Knowledge Library Workspace Modal with Universal Search, Collections, Bookmarks, and Lineage Tree. |
+| [`backend/src/repositories/ai-intelligence.repository.ts`](file:///d:/code/code/raw/study-hub/backend/src/repositories/ai-intelligence.repository.ts) | Database repository for learner profiles, topic masteries, recommendation caches, and XP. |
+| [`backend/src/services/ai-learner-profile.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-learner-profile.service.ts) | Domain service computing Learning Health Score, Knowledge Score, Focus Score, and Velocity. |
+| [`backend/src/services/ai-topic-mastery.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-topic-mastery.service.ts) | Domain service for topic masteries, 4-week timeline history, and weak topic detection. |
+| [`backend/src/services/ai-intelligence.service.ts`](file:///d:/code/code/raw/study-hub/backend/src/services/ai-intelligence.service.ts) | Master domain service for recommendations, weekly reports, and achievement unlocking. |
+| [`backend/src/controllers/ai-intelligence.controller.ts`](file:///d:/code/code/raw/study-hub/backend/src/controllers/ai-intelligence.controller.ts) | REST controller for `/api/ai/intelligence/` endpoints. |
+| [`frontend/src/services/intelligence.service.ts`](file:///d:/code/code/raw/study-hub/frontend/src/services/intelligence.service.ts) | Frontend REST client for profile metrics, mastery maps, recommendations, and achievements. |
+| [`frontend/src/hooks/useKnownookIntelligence.ts`](file:///d:/code/code/raw/study-hub/frontend/src/hooks/useKnownookIntelligence.ts) | Custom React hook managing intelligence dashboard state and recommendation feedback. |
+| [`frontend/src/components/knownook/LearningIntelligenceModal.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/LearningIntelligenceModal.tsx) | Comprehensive Learning Intelligence Workspace Modal with Health Score Gauge and Mastery Map. |
 
 ### Modified Files
 | File Path | Description of Changes |
 |:---|:---|
-| [`prisma/schema.prisma`](file:///d:/code/code/raw/study-hub/prisma/schema.prisma) | Added `AiCollection`, `AiCollectionItem`, `AiBookmark`, `AiTag`, `AiTagRelation` models. |
-| [`backend/src/routes/ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts) | Registered 12 `/api/ai/library/` REST endpoints. |
-| [`backend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/backend/src/types/ai.types.ts) | Added Collection, Bookmark, Tag, Universal Search, and Manifest DTOs. |
-| [`frontend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/frontend/src/types/ai.types.ts) | Added `AiCollection`, `AiBookmark`, `AiTag`, `StorageInsights`, `AssetLineageGraph` interfaces. |
-| [`frontend/src/components/knownook/ConversationSidebar.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ConversationSidebar.tsx) | Added 📚 **Library** drawer trigger button in bottom tools toolbar. |
-| [`frontend/src/pages/knownook/KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx) | Wired `KnowledgeLibraryModal` component and keyboard shortcut (`Ctrl+Shift+L`). |
+| [`prisma/schema.prisma`](file:///d:/code/code/raw/study-hub/prisma/schema.prisma) | Added `AiLearnerProfile`, `AiTopicMastery`, `AiRecommendationCache` models. |
+| [`backend/src/routes/ai.routes.ts`](file:///d:/code/code/raw/study-hub/backend/src/routes/ai.routes.ts) | Registered 7 `/api/ai/intelligence/` REST endpoints. |
+| [`backend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/backend/src/types/ai.types.ts) | Added Profile, Topic Mastery, Recommendation, Weekly Report, and Achievement DTOs. |
+| [`frontend/src/types/ai.types.ts`](file:///d:/code/code/raw/study-hub/frontend/src/types/ai.types.ts) | Added `LearnerProfileMetrics`, `TopicMasteryItem`, `DetailedRecommendationItem` interfaces. |
+| [`frontend/src/components/knownook/ConversationSidebar.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/components/knownook/ConversationSidebar.tsx) | Added 🧠 **Intelligence** drawer trigger button in bottom tools toolbar. |
+| [`frontend/src/pages/knownook/KnowNook.tsx`](file:///d:/code/code/raw/study-hub/frontend/src/pages/knownook/KnowNook.tsx) | Wired `LearningIntelligenceModal` component and keyboard shortcut (`Ctrl+Shift+I`). |
 
 ---
 
 ## 3. Architecture Diagram
 
 ```
-[ User Action in KnowNook ]
-             │
-             ▼
-   [ KnowledgeLibraryModal UI ] ──► [ useKnownookLibrary Hook ]
-             │                             │
-             │ (GET /api/ai/library/search)│ (GET /api/ai/library/export)
-             ▼                             ▼
-   [ AiLibraryController ] ────────► [ AiLibraryService ]
-                                           │
-                             [ AiLibraryRepository ]
-                                           │
-             ┌─────────────────────────────┼─────────────────────────────┐
-             ▼                             ▼                             ▼
-  [ PostgreSQL (AiCollection) ]   [ PostgreSQL (AiBookmark) ]   [ PostgreSQL (AiTag) ]
+[ User Interaction & Learning Data ]
+                 │
+                 ▼
+  [ Learning Intelligence Engine ]
+                 │
+  ┌──────────────┼──────────────┬──────────────┬──────────────┐
+  ▼              ▼              ▼              ▼              ▼
+[Learner      [Topic        [Personalized   [Weekly        [Gamification
+ Profile]      Mastery]      Recs & Impact]  Report]        & XP Badges]
+  │              │              │              │              │
+  └──────────────┴──────────────┼──────────────┴──────────────┘
+                                ▼
+               [ LearningIntelligenceModal UI ]
 ```
 
 ---
@@ -73,21 +75,16 @@ Key capabilities delivered:
 
 | Test / Check | Result | Detail |
 |:---|:---|:---|
-| **Prisma Schema Sync (`prisma db push`)** | ✅ **Passed** | Database synced & Prisma Client generated in 376ms |
+| **Prisma Schema Sync (`prisma db push`)** | ✅ **Passed** | Database synced & Prisma Client generated in 340ms |
 | **Backend TypeScript Build (`tsc`)** | ✅ **Passed** | Built with **0 errors** |
-| **Frontend Production Build (`tsc -b && vite build`)** | ✅ **Passed** | Built in 1.46s with **0 errors** |
-| **Universal Cross-Asset Search** | ✅ **Passed** | Queries across Notes, Flashcards, Quizzes, Plans & Documents |
-| **Knowledge Bundle Exporter** | ✅ **Passed** | Exports `.JSON` bundle with `manifest.json` |
-| **Git Push Status** | ✅ **Passed** | Commit `b45ecb5` pushed to remote |
+| **Frontend Production Build (`tsc -b && vite build`)** | ✅ **Passed** | Built in 1.12s with **0 errors** |
+| **Learning Health Score (0-100)** | ✅ **Passed** | Computed aggregate metric active in UI |
+| **Recommendations with Expected Impact** | ✅ **Passed** | Displays explicit rationale, time, and expected mastery gain |
+| **Git Push Status** | ✅ **Passed** | Commit `3ae2db5` pushed to remote |
 
 ---
 
-## 5. Phase 8 Final Completion Summary & Roadmap Readiness
+## 5. Phase Readiness for Phase 10 (Production Hardening)
 
-With Phase 8.5 finished, the entire **Phase 8 Learning Suite** is **100% Complete**:
-- **Phase 8.1:** AI Notes Workspace (10 Note Types, Mind Map, Markdown/PDF exports)
-- **Phase 8.2:** Flashcards & Quiz Engine (Preset templates, interactive player, answer explanations)
-- **Phase 8.4:** AI Learning Planner & Progress Center (Focus timer 25/45/60/90m, 52-week heatmap)
-- **Phase 8.5:** Knowledge Library, Bookmarks & Collections (Universal search, collection folders, asset lineage tree, bundle exporter)
-
-KnowNook is now fully prepared for **Phase 9 — Learning Intelligence & Personalization**.
+KnowNook Phase 9 is **100% complete, verified, and pushed**. The system is ready to proceed to:
+- **Phase 10 — Production Hardening, Performance Optimization, Security & Release Readiness**

@@ -1,89 +1,41 @@
-version: "3.9"
+version: '3.8'
 
-# ─── Networks ──────────────────────────────────────────────────────────────────
-networks:
-  studyclub-net:
-    driver: bridge
-
-# ─── Volumes ───────────────────────────────────────────────────────────────────
-volumes:
-  postgres_data:
-  uploads_data:
-
-# ─── Services ──────────────────────────────────────────────────────────────────
 services:
-
-  # ── PostgreSQL Database ──────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
-    container_name: studyclub_postgres
-    restart: unless-stopped
+    container_name: studyhub-postgres
+    restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-study_club}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - studyclub-net
+      POSTGRES_USER: study_hub_user
+      POSTGRES_PASSWORD: study_hub_password
+      POSTGRES_DB: study_hub
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-study_club}"]
+      test: ["CMD-SHELL", "pg_isready -U study_hub_user -d study_hub"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 15s
 
-  # ── Backend API ──────────────────────────────────────────────────────────────
-  backend:
+  app:
     build:
-      context: .                        # Repo root — gives access to /prisma
-      dockerfile: backend/Dockerfile
-    container_name: studyclub_backend
-    restart: unless-stopped
+      context: .
+      dockerfile: Dockerfile
+    container_name: studyhub-app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: "postgresql://study_hub_user:study_hub_password@postgres:5432/study_hub?schema=public"
+      JWT_SECRET: "production-super-secret-jwt-key-studyhub-v1"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      NODE_ENV: production
-      PORT: 3001
-      # Use container name as hostname inside Docker network
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-study_club}
-      JWT_SECRET: ${JWT_SECRET}
-      ACCESS_TOKEN_EXPIRY: ${ACCESS_TOKEN_EXPIRY:-15m}
-      REFRESH_TOKEN_EXPIRY_DAYS: ${REFRESH_TOKEN_EXPIRY_DAYS:-30}
-      MAIL_USER: ${MAIL_USER:-}
-      MAIL_PASS: ${MAIL_PASS:-}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
-    volumes:
-      - uploads_data:/app/uploads
-    networks:
-      - studyclub-net
-    ports:
-      - "3001:3001"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
 
-  # ── Frontend (Nginx) ─────────────────────────────────────────────────────────
-  frontend:
-    build:
-      context: .                        # Repo root
-      dockerfile: frontend/Dockerfile
-      args:
-        # Bake the backend API URL into the Vite bundle at build time
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
-    container_name: studyclub_frontend
-    restart: unless-stopped
-    depends_on:
-      backend:
-        condition: service_healthy
-    networks:
-      - studyclub-net
-    ports:
-      - "80:80"
+volumes:
+  pgdata:

@@ -115,14 +115,21 @@ app.use(perfLogger);
 
 app.use("/uploads", express.static(path.join(__dirname, "../../uploads")));
 
-// ─── API Routes ──────────────────────────────────────────────────────────────
+import healthRouter from "./routes/health.routes";
+import { observabilityMiddleware } from "./middleware/observability.middleware";
+import { sanitizationMiddleware } from "./middleware/sanitization.middleware";
+
+// ─── Middleware Chain ────────────────────────────────────────────────────────
+app.use(observabilityMiddleware);
+app.use(sanitizationMiddleware);
 
 app.use("/auth", authRouter);
 app.use("/api/materials", materialsRouter);
 app.use("/api/community", communityRouter);
+app.use("/api/health", healthRouter);
 app.use("/api", aiRouter);
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
+// ─── Legacy Health Endpoint ───────────────────────────────────────────────────
 
 app.get("/health", async (_req, res) => {
   const dbStatus = await testDbConnection();
@@ -143,20 +150,17 @@ app.get("/health", async (_req, res) => {
 
 app.use(errorHandler);
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
+// ─── Boot & Graceful Shutdown ───────────────────────────────────────────────
 
 const startServer = async () => {
   const PORT = config.PORT;
   logEnvStatus();
   server.listen(PORT, async () => {
     logger.info(
-      `✅ StudyHub Backend running on port ${PORT} [${config.NODE_ENV}]`,
+      `✅ StudyHub Backend running on port ${PORT} [${config.NODE_ENV}] [v1.0.0]`,
     );
-    logger.info(`✅ Auth API:      http://localhost:${PORT}/auth/*`);
-    logger.info(`✅ Materials API: http://localhost:${PORT}/api/materials`);
-    logger.info(`✅ Community API: http://localhost:${PORT}/api/community`);
-    logger.info(`✅ AI API:        http://localhost:${PORT}/api/ask`);
-    logger.info(`✅ Health:        http://localhost:${PORT}/health`);
+    logger.info(`✅ Health:        http://localhost:${PORT}/api/health`);
+    logger.info(`✅ Readiness:     http://localhost:${PORT}/api/health/readiness`);
 
     const dbStatus = await testDbConnection();
     if (dbStatus.success) {
@@ -170,6 +174,21 @@ const startServer = async () => {
     await mailService.verifyTransporter();
   });
 };
+
+const gracefulShutdown = (signal: string) => {
+  logger.info(`Received ${signal}. Shutting down server gracefully...`);
+  server.close(() => {
+    logger.info("HTTP server closed. Exiting process.");
+    process.exit(0);
+  });
+  setTimeout(() => {
+    logger.error("Forceful shutdown after timeout.");
+    process.exit(1);
+  }, 10000);
+};
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
 if (config.NODE_ENV !== "test") {
   startServer().catch((err) => {
